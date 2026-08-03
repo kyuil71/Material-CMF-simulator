@@ -14,9 +14,8 @@
   --text:#111318; --muted:#6d727c;
   --shadow:0 18px 50px rgba(18,22,30,.12);
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
-  /* 시뮬레이터 테마 (Gemini가 물성마다 생성) */
-  --sim-bg1:#dfe6ee; --sim-bg2:#f6f7fa; --sim-bg3:#cfdcea;
-  --sim-accent:#3d6bdd; --sim-ink:#12151b; --sim-ink-soft:rgba(18,21,27,.6);
+  --sim-bg1:#dde7ef; --sim-bg2:#f2f7fa; --sim-bg3:#c9dbe9;
+  --sim-accent:#2f7fb8; --sim-ink:#12151b; --sim-ink-soft:rgba(18,21,27,.6);
   --sim-glass:rgba(255,255,255,.42); --sim-glass-line:rgba(255,255,255,.6);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -25,15 +24,14 @@ body{background:var(--bg);color:var(--text);
  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
  -webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
 button,input,textarea{font:inherit}
-button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
 input,textarea{font-size:16px}
 a{color:inherit}
 
-/* ============ 페이지 전환 시스템 ============ */
+/* ============ 페이지 전환 ============ */
 .page{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
  opacity:0;visibility:hidden;transform:translateX(24px);
- transition:opacity .38s cubic-bezier(.3,.8,.3,1),transform .38s cubic-bezier(.3,.8,.3,1),visibility .38s;
- z-index:1}
+ transition:opacity .38s cubic-bezier(.3,.8,.3,1),transform .38s cubic-bezier(.3,.8,.3,1),visibility .38s;z-index:1}
 .page.active{opacity:1;visibility:visible;transform:none;z-index:2}
 .page.exit-left{transform:translateX(-24px)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}}
@@ -51,18 +49,17 @@ a{color:inherit}
 .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;
  display:inline-block;vertical-align:-3px;margin-right:8px;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+h2{font-size:15px;margin:7px 0 13px;letter-spacing:-.02em}
 
 /* ============ ① GATE ============ */
 #page-gate{display:flex;align-items:center;justify-content:center;
  padding:calc(20px + var(--sat)) 18px calc(24px + var(--sab));
- background:
-  radial-gradient(circle at 15% 0%,#ffffff,transparent 42%),
+ background:radial-gradient(circle at 15% 0%,#fff,transparent 42%),
   radial-gradient(circle at 100% 100%,rgba(203,219,242,.85),transparent 48%),var(--bg)}
 .gate-card{width:100%;max-width:420px;padding:30px 24px 26px}
 .gate-orb{width:58px;height:58px;border-radius:50%;margin-bottom:20px;
  background:radial-gradient(circle at 32% 28%,#fff,#c7d6ec 55%,#8fa8c9);
- box-shadow:0 14px 34px rgba(70,95,130,.28),inset 0 1px 2px rgba(255,255,255,.9);
- animation:orb 5s ease-in-out infinite}
+ box-shadow:0 14px 34px rgba(70,95,130,.28),inset 0 1px 2px rgba(255,255,255,.9);animation:orb 5s ease-in-out infinite}
 @keyframes orb{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px) scale(1.03)}}
 .gate-card h1{font-size:26px;margin:0 0 8px;letter-spacing:-.045em;font-weight:750;line-height:1.15}
 .gate-card .sub{font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 22px}
@@ -72,11 +69,9 @@ a{color:inherit}
 .model-badge .dot{width:7px;height:7px;border-radius:50%;background:#4a8cf7;box-shadow:0 0 0 3px rgba(74,140,247,.16)}
 .field-label{font-size:12px;font-weight:700;margin-bottom:8px;display:block}
 .key-row{position:relative}
-.key-row input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:14px;
- padding:14px 74px 14px 14px;outline:none}
+.key-row input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:14px;padding:14px 74px 14px 14px;outline:none}
 .key-row input:focus{border-color:rgba(20,24,32,.3);box-shadow:0 0 0 4px rgba(17,19,24,.05)}
-.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:rgba(17,19,24,.05);
- border-radius:10px;padding:8px 11px;font-size:11px;color:var(--muted)}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:rgba(17,19,24,.05);border-radius:10px;padding:8px 11px;font-size:11px;color:var(--muted)}
 .get-key{display:inline-flex;align-items:center;gap:5px;margin:12px 0 22px;font-size:12.5px;font-weight:600;
  color:#1b56c4;text-decoration:none;border-bottom:1px solid rgba(27,86,196,.25);padding-bottom:2px}
 #gateError{display:none;margin-top:12px;font-size:12px;line-height:1.55;color:#b4232a;
@@ -86,8 +81,7 @@ a{color:inherit}
 
 /* ============ ② ANALYZE ============ */
 #page-analyze{padding:calc(12px + var(--sat)) 16px calc(110px + var(--sab));
- background:
-  radial-gradient(circle at 12% -8%,#fff,transparent 38%),
+ background:radial-gradient(circle at 12% -8%,#fff,transparent 38%),
   radial-gradient(circle at 100% 0%,rgba(215,226,242,.65),transparent 36%),var(--bg)}
 .an-wrap{max-width:560px;margin:0 auto}
 .an-head{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 16px}
@@ -116,28 +110,27 @@ textarea:focus{border-color:rgba(20,24,32,.28);box-shadow:0 0 0 4px rgba(17,19,2
 .ai-comment{margin-top:13px;font-size:12px;line-height:1.7;color:#3d434d;background:rgba(74,140,247,.06);
  border:1px solid rgba(74,140,247,.16);border-radius:14px;padding:11px 13px}
 .ai-comment b{font-size:9.5px;letter-spacing:.12em;color:#2f6bd8;display:block;margin-bottom:4px}
-.behavior{margin-top:14px}
-.behavior-line{display:grid;grid-template-columns:84px 1fr 32px;gap:9px;align-items:center;margin:7px 0;font-size:12px}
-.bar{height:6px;background:rgba(20,24,32,.08);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#20242c,var(--sim-accent));border-radius:inherit;transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.feat-preview{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-.feat-tag{border:1px solid var(--line);background:rgba(255,255,255,.65);border-radius:999px;padding:7px 11px;font-size:11px;color:var(--muted)}
-.feat-tag b{color:var(--text)}
+.ix-list{display:grid;gap:8px;margin-top:14px}
+.ix-row{display:grid;grid-template-columns:24px 1fr 40px;gap:10px;align-items:center;
+ border:1px solid var(--line);background:rgba(255,255,255,.6);border-radius:14px;padding:11px 13px}
+.ix-row .num{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+ background:rgba(17,19,24,.06);font-size:11px;font-weight:700}
+.ix-row b{font-size:13px;display:block}
+.ix-row small{font-size:10.5px;color:var(--muted);display:block;margin-top:2px;line-height:1.45}
+.ix-row .sc{font-weight:750;font-size:13px;text-align:right;font-variant-numeric:tabular-nums;color:var(--sim-accent)}
 .launch-bar{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:12px 16px calc(14px + var(--sab));
  background:linear-gradient(to top,rgba(243,244,247,.96) 55%,transparent);pointer-events:none}
 .launch-bar .primary{max-width:560px;margin:0 auto;display:block;pointer-events:auto}
-.launch-bar .primary[disabled]{box-shadow:none}
 
-/* ============ ③ SIMULATOR (전체화면 앱) ============ */
+/* ============ ③ SIMULATOR ============ */
 #page-sim{overflow:hidden;background:linear-gradient(160deg,var(--sim-bg1),var(--sim-bg2) 55%,var(--sim-bg3));
- transition:opacity .38s,transform .38s,visibility .38s, background 1.2s ease}
+ transition:opacity .38s,transform .38s,visibility .38s,background 1.2s ease}
 #fx{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
-.grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.4;mix-blend-mode:overlay;
+.grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.38;mix-blend-mode:overlay;
  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E")}
 .sim-app{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
  padding:calc(6px + var(--sat)) 0 0;color:var(--sim-ink);touch-action:none}
-.statusbar{display:flex;justify-content:space-between;align-items:center;padding:4px 26px 2px;
- font-size:12.5px;font-weight:600;letter-spacing:.01em}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:4px 26px 2px;font-size:12.5px;font-weight:600}
 .sb-right{display:flex;gap:5px;align-items:center;font-size:10px;opacity:.85}
 .sb-bars{display:inline-flex;gap:2px;align-items:flex-end}
 .sb-bars i{width:3px;background:currentColor;border-radius:1px}
@@ -153,81 +146,84 @@ textarea:focus{border-color:rgba(20,24,32,.28);box-shadow:0 0 0 4px rgba(17,19,2
 .sim-title-mini{text-align:center;line-height:1.25}
 .sim-title-mini b{display:block;font-size:12.5px;letter-spacing:-.02em}
 .sim-title-mini span{font-size:9.5px;color:var(--sim-ink-soft);letter-spacing:.06em;text-transform:uppercase}
-.sim-hero{padding:22px 26px 0}
+.sim-hero{padding:16px 26px 0}
 .sim-hero .eyebrow{font-size:10px;letter-spacing:.14em;color:var(--sim-ink-soft);font-weight:700;text-transform:uppercase}
-.sim-hero h1{font-size:clamp(30px,9vw,40px);line-height:1.02;letter-spacing:-.055em;margin:10px 0 10px;font-weight:750;max-width:300px}
-.sim-hero p{font-size:13px;color:var(--sim-ink-soft);line-height:1.6;margin:0;max-width:280px}
-.demo-zone{margin-top:auto;padding:0 18px;display:grid;gap:13px;position:relative;will-change:transform}
+.sim-hero h1{font-size:clamp(26px,8vw,36px);line-height:1.03;letter-spacing:-.055em;margin:9px 0 8px;font-weight:750;max-width:300px}
+.sim-hero p{font-size:12.5px;color:var(--sim-ink-soft);line-height:1.6;margin:0;max-width:290px}
+.ix-caption{margin:12px 26px 0;display:inline-flex;align-items:flex-start;gap:8px;max-width:calc(100% - 52px);
+ background:var(--sim-glass);border:1px solid var(--sim-glass-line);border-radius:14px;padding:9px 12px;
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+ font-size:11px;line-height:1.5;color:var(--sim-ink-soft)}
+.ix-caption .ai-dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--sim-accent);margin-top:4px;
+ box-shadow:0 0 0 3px color-mix(in srgb,var(--sim-accent) 20%,transparent)}
+.demo-zone{margin-top:auto;padding:0 18px;position:relative;will-change:transform}
+.demo{display:none}
+.demo.on{display:block;animation:demoIn .45s cubic-bezier(.2,.85,.25,1)}
+@keyframes demoIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
 
-/* — 카드 — */
-.material-card{position:relative;border:1px solid var(--sim-glass-line);background:var(--sim-glass);
- backdrop-filter:blur(calc(14px + var(--blur,0)*20px)) saturate(160%);-webkit-backdrop-filter:blur(calc(14px + var(--blur,0)*20px)) saturate(160%);
- border-radius:28px;padding:20px;box-shadow:0 24px 60px rgba(25,38,60,.16),inset 0 1px rgba(255,255,255,.8);
- overflow:hidden;transform-origin:50% 65%;will-change:transform,filter}
-.material-card .glare{position:absolute;inset:-40%;pointer-events:none;
- background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,255,255,.5),transparent 34%);mix-blend-mode:soft-light}
-.material-card .sweep{content:"";position:absolute;inset:-45%;pointer-events:none;
- background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.5),transparent 60%);transform:translateX(var(--shine,-80%))}
-.mc-row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2}
-.mc-row h4{margin:0;font-size:16.5px;letter-spacing:-.02em}
-.mc-badge{font-size:9px;letter-spacing:.1em;font-weight:700;color:var(--sim-accent);
- border:1px solid color-mix(in srgb,var(--sim-accent) 32%,transparent);border-radius:999px;padding:4px 8px;text-transform:uppercase}
-.material-card p{margin:9px 0 0;color:var(--sim-ink-soft);font-size:12px;line-height:1.6;position:relative;z-index:2;max-width:86%}
-.mc-meter{margin-top:15px;position:relative;z-index:2}
-.mc-meter .track{height:5px;border-radius:99px;background:rgba(20,26,36,.10);overflow:hidden}
-.mc-meter .fill{height:100%;width:60%;border-radius:inherit;background:linear-gradient(90deg,var(--sim-accent),color-mix(in srgb,var(--sim-accent) 45%,#fff));transition:width .3s}
-.mc-meter .lab{display:flex;justify-content:space-between;font-size:9.5px;color:var(--sim-ink-soft);margin-top:6px;letter-spacing:.04em}
-
-/* — 슬라이더 — */
-.slider-demo{display:none;padding:4px 2px}
-.slider-caption{display:flex;justify-content:space-between;font-size:11px;color:var(--sim-ink-soft);margin:0 6px 9px;font-weight:600}
-.slider-caption output{font-variant-numeric:tabular-nums;color:var(--sim-ink);font-size:12px}
-.slider-track{height:44px;border-radius:22px;background:var(--sim-glass);border:1px solid var(--sim-glass-line);
- position:relative;backdrop-filter:blur(16px);box-shadow:inset 0 2px 14px rgba(19,28,39,.08),0 10px 30px rgba(25,38,60,.10);touch-action:none}
-.slider-fill{position:absolute;inset:0 auto 0 0;width:50%;border-radius:inherit;
- background:linear-gradient(90deg,color-mix(in srgb,var(--sim-accent) 82%,#101318),var(--sim-accent));opacity:.92}
-.slider-ticks{position:absolute;inset:0 14px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-.slider-ticks i{width:2px;height:6px;border-radius:1px;background:rgba(255,255,255,.5);mix-blend-mode:overlay}
-.slider-knob{position:absolute;left:50%;top:50%;width:56px;height:56px;border-radius:50%;transform:translate(-50%,-50%);
- background:radial-gradient(circle at 34% 30%,#fff,#eef1f6 60%,#dfe4ec);
- box-shadow:0 10px 26px rgba(25,32,43,.24),inset 0 0 0 1px rgba(255,255,255,.9);touch-action:none}
-.slider-knob:after{content:"";position:absolute;inset:38%;border-radius:50%;background:var(--sim-accent);opacity:.85;box-shadow:0 0 12px color-mix(in srgb,var(--sim-accent) 60%,transparent)}
-
-/* — 버튼 — */
-.action{height:60px;border:0;border-radius:20px;position:relative;overflow:hidden;
- background:linear-gradient(155deg,color-mix(in srgb,var(--sim-ink) 90%,var(--sim-accent)),var(--sim-ink));
- color:#fff;font-weight:700;font-size:15px;letter-spacing:-.015em;
- box-shadow:0 16px 36px color-mix(in srgb,var(--sim-ink) 26%,transparent),inset 0 1px rgba(255,255,255,.14);
+/* — 1. 버튼 누르기 — */
+.press-stage{display:grid;gap:14px}
+.press-meter{display:flex;justify-content:space-between;align-items:baseline;padding:0 6px;font-size:10.5px;color:var(--sim-ink-soft);letter-spacing:.06em}
+.press-meter b{font-size:15px;color:var(--sim-ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.action{height:64px;width:100%;border:0;border-radius:21px;position:relative;overflow:hidden;
+ background:linear-gradient(155deg,color-mix(in srgb,var(--sim-ink) 88%,var(--sim-accent)),var(--sim-ink));
+ color:#fff;font-weight:700;font-size:15.5px;letter-spacing:-.015em;
+ box-shadow:0 18px 40px color-mix(in srgb,var(--sim-ink) 28%,transparent),inset 0 1px rgba(255,255,255,.15);
  transform-origin:center;touch-action:none;will-change:transform,border-radius}
 .action .label{position:relative;z-index:2;display:inline-flex;gap:8px;align-items:center}
 .action .spec{position:absolute;inset:0;opacity:.5;
  background:radial-gradient(circle at var(--px,50%) var(--py,50%),rgba(255,255,255,.85),transparent 24%);mix-blend-mode:soft-light}
-.action .edge{position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 -10px 22px rgba(0,0,0,.28);pointer-events:none}
+.action .edge{position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 -12px 24px rgba(0,0,0,.3);pointer-events:none}
+.press-sub{display:flex;gap:10px}
+.press-chip{flex:1;height:48px;border:1px solid var(--sim-glass-line);border-radius:16px;background:var(--sim-glass);
+ color:var(--sim-ink);font-size:12.5px;font-weight:650;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+ box-shadow:0 8px 22px rgba(20,30,50,.10);touch-action:none;will-change:transform}
 
-/* — 팝업 — */
-.pop-backdrop{position:absolute;inset:0;z-index:8;background:rgba(14,18,26,0);backdrop-filter:blur(0px);
- -webkit-backdrop-filter:blur(0px);pointer-events:none;transition:background .4s, backdrop-filter .4s,-webkit-backdrop-filter .4s}
-.pop-backdrop.on{background:rgba(14,18,26,.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);pointer-events:auto}
-.popup{position:absolute;left:50%;bottom:150px;z-index:9;width:min(88%,360px);transform:translate(-50%,34px) scale(.86);
- opacity:0;pointer-events:none;background:var(--sim-glass);border:1px solid var(--sim-glass-line);
+/* — 2. 메뉴 열기 — */
+.menu-stage{position:relative;display:grid;gap:12px}
+.menu-panel{position:absolute;left:0;right:0;bottom:78px;z-index:9;
+ background:var(--sim-glass);border:1px solid var(--sim-glass-line);border-radius:24px;padding:9px;
  backdrop-filter:blur(28px) saturate(170%);-webkit-backdrop-filter:blur(28px) saturate(170%);
- border-radius:26px;padding:20px;box-shadow:0 34px 80px rgba(20,32,52,.3);color:var(--sim-ink)}
-.popup.open{pointer-events:auto}
-.popup h4{margin:0 0 8px;font-size:15.5px;letter-spacing:-.02em}
-.popup p{margin:0;color:var(--sim-ink-soft);font-size:12px;line-height:1.6}
-.popup .pop-actions{display:flex;gap:8px;margin-top:15px}
-.popup .pop-actions button{flex:1;border-radius:13px;padding:11px;font-size:12.5px;font-weight:650;border:1px solid var(--sim-glass-line)}
-.pop-ok{background:var(--sim-ink);color:#fff;border:0!important}
-.pop-cancel{background:rgba(255,255,255,.5);color:var(--sim-ink)}
+ box-shadow:0 30px 70px rgba(20,32,52,.28);opacity:0;pointer-events:none;transform-origin:50% 100%}
+.menu-panel.live{pointer-events:auto}
+.menu-item{display:flex;align-items:center;gap:12px;padding:13px 13px;border-radius:16px;
+ color:var(--sim-ink);opacity:0;will-change:transform,opacity}
+.menu-item:active{background:rgba(255,255,255,.35)}
+.menu-item .mi-ico{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:14px;
+ background:color-mix(in srgb,var(--sim-accent) 14%,transparent);color:var(--sim-accent)}
+.menu-item b{font-size:13.5px;display:block;letter-spacing:-.01em}
+.menu-item small{font-size:10px;color:var(--sim-ink-soft)}
+.menu-sep{height:1px;background:color-mix(in srgb,var(--sim-ink) 8%,transparent);margin:2px 12px}
 
-/* — 바텀시트 — */
-.bottom-sheet{position:absolute;left:0;right:0;bottom:-320px;z-index:7;height:310px;color:var(--sim-ink);
+/* — 3. 슬라이더 — */
+.slider-stage{display:grid;gap:11px}
+.slider-caption{display:flex;justify-content:space-between;font-size:11px;color:var(--sim-ink-soft);margin:0 6px;font-weight:600}
+.slider-caption output{font-variant-numeric:tabular-nums;color:var(--sim-ink);font-size:13px;font-weight:750}
+.slider-track{height:48px;border-radius:24px;background:var(--sim-glass);border:1px solid var(--sim-glass-line);
+ position:relative;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+ box-shadow:inset 0 2px 14px rgba(19,28,39,.08),0 12px 32px rgba(25,38,60,.10);touch-action:none}
+.slider-fill{position:absolute;inset:0 auto 0 0;width:50%;border-radius:inherit;
+ background:linear-gradient(90deg,color-mix(in srgb,var(--sim-accent) 82%,#101318),var(--sim-accent));opacity:.92}
+.slider-detents{position:absolute;inset:0 20px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.slider-detents i{width:3px;height:8px;border-radius:2px;background:rgba(255,255,255,.55);mix-blend-mode:overlay;transition:transform .2s,opacity .2s}
+.slider-knob{position:absolute;left:50%;top:50%;width:60px;height:60px;border-radius:50%;transform:translate(-50%,-50%);
+ background:radial-gradient(circle at 34% 30%,#fff,#eef1f6 60%,#dfe4ec);
+ box-shadow:0 10px 28px rgba(25,32,43,.26),inset 0 0 0 1px rgba(255,255,255,.9);touch-action:none}
+.slider-knob:after{content:"";position:absolute;inset:37%;border-radius:50%;background:var(--sim-accent);opacity:.85;
+ box-shadow:0 0 14px color-mix(in srgb,var(--sim-accent) 55%,transparent)}
+
+/* — 4. 바텀 시트 — */
+.sheet-hintcard{border:1px solid var(--sim-glass-line);background:var(--sim-glass);border-radius:22px;padding:17px;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:var(--sim-ink);box-shadow:0 16px 40px rgba(25,38,60,.12)}
+.sheet-hintcard h4{margin:0 0 6px;font-size:14.5px}
+.sheet-hintcard p{margin:0;font-size:11.5px;color:var(--sim-ink-soft);line-height:1.55}
+.bottom-sheet{position:absolute;left:0;right:0;bottom:-330px;z-index:7;height:320px;color:var(--sim-ink);
  background:color-mix(in srgb,var(--sim-bg2) 55%,rgba(255,255,255,.55));
  backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%);
  border-top:1px solid rgba(255,255,255,.85);border-radius:30px 30px 0 0;
  padding:13px 22px calc(16px + var(--sab));box-shadow:0 -26px 60px rgba(24,36,56,.2);will-change:transform}
 .handle{width:42px;height:5px;background:rgba(30,35,42,.22);border-radius:99px;margin:0 auto 15px}
-.bottom-sheet h4{margin:0 0 6px;font-size:15px;letter-spacing:-.02em}
+.bottom-sheet h4{margin:0 0 6px;font-size:15px}
 .sheet-rows{display:grid;gap:9px;margin-top:13px}
 .sheet-row{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.5);
  border:1px solid rgba(255,255,255,.7);border-radius:14px;padding:11px 13px;font-size:12px}
@@ -235,55 +231,72 @@ textarea:focus{border-color:rgba(20,24,32,.28);box-shadow:0 0 0 4px rgba(17,19,2
 .sheet-row span{color:var(--sim-ink-soft);font-size:10.5px}
 .sheet-row .val{font-weight:700;color:var(--sim-accent);font-variant-numeric:tabular-nums}
 
-/* — 기능 탭바 — */
+/* — 5. 탭바 스크롤 — */
+.scroll-stage{overflow:hidden;margin:0 -18px;padding:6px 0 2px;touch-action:none}
+.scroll-track{display:flex;gap:13px;padding:0 26px;will-change:transform;width:max-content}
+.sc-card{flex:0 0 auto;width:min(66vw,250px);height:150px;border-radius:24px;position:relative;overflow:hidden;
+ border:1px solid var(--sim-glass-line);color:var(--sim-ink);
+ box-shadow:0 18px 44px rgba(25,38,60,.16);will-change:transform}
+.sc-card .bgfill{position:absolute;inset:0}
+.sc-card .in{position:absolute;inset:0;padding:15px;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+.sc-card .in .eb{font-size:8.5px;letter-spacing:.14em;font-weight:700;opacity:.65;text-transform:uppercase}
+.sc-card .in h5{margin:4px 0 0;font-size:16px;letter-spacing:-.03em}
+.sc-card .in .idx{font-size:10px;opacity:.55;font-variant-numeric:tabular-nums}
+.scroll-dots{display:flex;gap:6px;justify-content:center;margin-top:13px}
+.scroll-dots i{width:6px;height:6px;border-radius:99px;background:color-mix(in srgb,var(--sim-ink) 20%,transparent);transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.scroll-dots i.on{width:18px;background:var(--sim-accent)}
+
+/* — 탭바 (5개 인터랙션) — */
 .feature-tabs{position:relative;z-index:6;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;
  padding:15px 16px calc(14px + var(--sab));touch-action:pan-x}
 .feature-tabs::-webkit-scrollbar{display:none}
 .ftab{flex:0 0 auto;border:1px solid var(--sim-glass-line);background:var(--sim-glass);color:var(--sim-ink);
  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
- border-radius:999px;padding:10px 14px;font-size:12px;font-weight:650;display:flex;gap:7px;align-items:center;
+ border-radius:999px;padding:11px 15px;font-size:12.5px;font-weight:650;display:flex;gap:7px;align-items:center;
  box-shadow:0 6px 16px rgba(20,30,50,.08);transition:transform .12s,background .25s,color .25s}
 .ftab:active{transform:scale(.95)}
 .ftab.active{background:var(--sim-ink);color:#fff;border-color:transparent}
-.ftab .sc{font-size:9.5px;opacity:.6;font-variant-numeric:tabular-nums}
-.sensor-hint{position:absolute;z-index:6;top:calc(50% + 60px);left:0;right:0;text-align:center;
+.ftab .num{font-size:9.5px;opacity:.55;font-weight:750}
+.pop-backdrop{position:absolute;inset:0;z-index:8;background:rgba(14,18,26,0);
+ backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);pointer-events:none;
+ transition:background .4s,backdrop-filter .4s,-webkit-backdrop-filter .4s}
+.pop-backdrop.on{pointer-events:auto}
+.sensor-hint{position:absolute;z-index:6;top:calc(50% + 44px);left:0;right:0;text-align:center;
  font-size:10.5px;color:var(--sim-ink-soft);opacity:0;pointer-events:none;transition:opacity .6s}
 .sensor-hint.show{opacity:.8}
 
 /* ============ ④ TUNE ============ */
 #page-tune{padding:calc(12px + var(--sat)) 16px calc(30px + var(--sab));
- background:
-  radial-gradient(circle at 12% -8%,#fff,transparent 38%),
+ background:radial-gradient(circle at 12% -8%,#fff,transparent 38%),
   radial-gradient(circle at 100% 0%,rgba(215,226,242,.65),transparent 36%),var(--bg)}
 .tune-wrap{max-width:560px;margin:0 auto}
 .tune-head{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 16px}
 .tune-head h1{font-size:18px;margin:0;letter-spacing:-.035em;font-weight:750}
 .tune-card{padding:18px;margin-bottom:12px}
-.control-grid{display:grid;gap:11px}
-.control{display:grid;grid-template-columns:1fr 58px;gap:6px;align-items:center}
-.control label{font-size:12.5px;color:#4f5660}
-.control output{text-align:right;font-size:11px;color:#737a85;font-variant-numeric:tabular-nums}
-.control input[type=range]{grid-column:1/-1;width:100%;accent-color:#111318;height:30px;touch-action:pan-y}
-.mode-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.modebtn{border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:9px 14px;font-size:12px;font-weight:600}
-.modebtn.active{background:#111318;color:#fff}
+.tune-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.tune-tabs::-webkit-scrollbar{display:none}
+.ttab{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;
+ padding:9px 13px;font-size:11.5px;font-weight:650}
+.ttab.active{background:#111318;color:#fff;border-color:transparent}
+.tune-demo-name{font-size:17px;font-weight:750;letter-spacing:-.03em;margin:2px 0 3px}
+.tune-demo-cap{font-size:11.5px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.control-grid{display:grid;gap:14px}
+.control label{font-size:13px;color:#3c424c;font-weight:650;display:flex;justify-content:space-between;align-items:baseline}
+.control label output{font-size:11px;color:#737a85;font-weight:600;font-variant-numeric:tabular-nums}
+.control .hint{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+.control input[type=range]{width:100%;accent-color:#111318;height:30px;touch-action:pan-y;margin-top:4px}
 .switch{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 0}
 .switch input{width:44px;height:24px;accent-color:#111318}
-.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.metric{border:1px solid var(--line);background:rgba(255,255,255,.52);border-radius:14px;padding:12px}
-.metric b{display:block;font-size:16px;letter-spacing:-.03em}
-.metric span{font-size:10px;color:var(--muted)}
-h2{font-size:15px;margin:7px 0 13px;letter-spacing:-.02em}
 </style>
 </head>
 <body>
 
-<!-- ============ ① API 키 입력 ============ -->
+<!-- ============ ① API 키 ============ -->
 <div class="page active" id="page-gate">
   <div class="panel gate-card">
     <div class="gate-orb"></div>
     <h1>Interactive Material<br>Simulator</h1>
-    <p class="sub">물성 언어를 AI가 해석해 실제 앱처럼 체험하는 인터랙션 시뮬레이터입니다. 시작하려면 Gemini API 키를 입력하세요.</p>
+    <p class="sub">물성 언어를 AI가 5가지 핵심 인터랙션으로 번역해 실제 앱처럼 체험합니다. 시작하려면 Gemini API 키를 입력하세요.</p>
     <div class="model-badge"><span class="dot"></span>연결 모델 <b>gemini-flash-latest</b> (고정)</div>
     <label class="field-label" for="apiKeyInput">Gemini API 키</label>
     <div class="key-row">
@@ -297,17 +310,13 @@ h2{font-size:15px;margin:7px 0 13px;letter-spacing:-.02em}
   </div>
 </div>
 
-<!-- ============ ② 물성 입력 · 분석 ============ -->
+<!-- ============ ② 분석 ============ -->
 <div class="page" id="page-analyze">
   <div class="an-wrap">
     <div class="an-head">
-      <div>
-        <h1>물성 분석</h1>
-        <p>Gemini가 물성 언어를 인터랙션으로 번역합니다</p>
-      </div>
+      <div><h1>물성 분석</h1><p>Gemini가 물성을 5가지 인터랙션 물리값으로 번역합니다</p></div>
       <button class="ghost" id="changeKeyBtn">키 변경</button>
     </div>
-
     <div class="panel an-card">
       <div class="kicker">01 · Material Input</div>
       <h2>어떤 물성을 시뮬레이션할까요?</h2>
@@ -316,103 +325,113 @@ h2{font-size:15px;margin:7px 0 13px;letter-spacing:-.02em}
       <button class="primary" id="analyzeBtn">Gemini로 물성 분석</button>
       <div id="aiStatus"></div>
     </div>
-
     <div class="panel an-card" id="resultCard">
       <div class="kicker">02 · AI Behavior Analysis</div>
       <div class="result-top" style="margin-top:10px">
-        <div class="theme-dot" id="themeDot"></div>
+        <div class="theme-dot"></div>
         <div>
           <div class="analysis-title" id="materialName">—</div>
           <div class="analysis-desc" id="materialDesc">—</div>
         </div>
       </div>
       <div class="ai-comment" id="aiComment" style="display:none"><b>GEMINI COMMENT</b><span id="aiCommentText"></span></div>
-      <div class="behavior" id="behaviorBars"></div>
-      <div class="feat-preview" id="featPreview"></div>
+      <div class="ix-list" id="ixList"></div>
     </div>
   </div>
-
-  <div class="launch-bar">
-    <button class="primary" id="launchBtn" disabled>시뮬레이션 실행</button>
-  </div>
+  <div class="launch-bar"><button class="primary" id="launchBtn" disabled>시뮬레이션 실행</button></div>
 </div>
 
 <!-- ============ ③ 전체화면 시뮬레이터 ============ -->
 <div class="page" id="page-sim">
   <canvas id="fx"></canvas>
   <div class="grain"></div>
-
   <div class="sim-app" id="simApp">
     <div class="statusbar">
       <span id="clock">9:41</span>
       <span class="sb-right">
         <span class="sb-bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span>
-        <span style="font-weight:700">5G</span>
-        <span class="sb-batt"><i></i></span>
+        <span style="font-weight:700">5G</span><span class="sb-batt"><i></i></span>
       </span>
     </div>
-
     <div class="sim-topnav">
       <button class="navbtn" id="backToAnalyze">‹ 분석</button>
       <div class="sim-title-mini"><b id="simAppName">Materia</b><span id="simMatName">MATERIAL LAB</span></div>
       <button class="navbtn" id="toTune">옵션 ⚙</button>
     </div>
-
     <div class="sim-hero">
       <div class="eyebrow" id="heroEyebrow">REALTIME MATERIALITY</div>
       <h1 id="heroTitle">Touch the material.</h1>
-      <p id="heroCopy">누르고, 드래그하고, 기기를 기울여 물성의 반응을 느껴보세요.</p>
+      <p id="heroCopy">물성의 반응을 다섯 가지 인터랙션으로 느껴보세요.</p>
     </div>
+    <div class="ix-caption"><span class="ai-dot"></span><span id="ixCaption">버튼을 눌러 물성의 눌림과 복원을 느껴보세요.</span></div>
 
     <div class="demo-zone" id="demoZone">
-      <div class="material-card" id="materialCard">
-        <div class="glare"></div><div class="sweep"></div>
-        <div class="mc-row">
-          <h4 id="cardTitle">Adaptive Surface</h4>
-          <span class="mc-badge" id="cardBadge">LIVE</span>
-        </div>
-        <p id="cardCopy">빛과 터치, 움직임에 따라 표면이 미세하게 변형됩니다.</p>
-        <div class="mc-meter">
-          <div class="track"><div class="fill" id="mcFill"></div></div>
-          <div class="lab"><span>RESPONSE</span><span id="mcVal">60%</span></div>
-        </div>
-      </div>
-
-      <div class="slider-demo" id="sliderDemo">
-        <div class="slider-caption"><span id="sliderLabel">Intensity</span><output id="sliderOut">50</output></div>
-        <div class="slider-track" id="sliderTrack">
-          <div class="slider-fill" id="sliderFill"></div>
-          <div class="slider-ticks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="slider-knob" id="sliderKnob"></div>
+      <!-- 1. 버튼 누르기 -->
+      <div class="demo on" id="demo-press">
+        <div class="press-stage">
+          <div class="press-meter"><span>PRESS DEPTH</span><b id="pressVal">0%</b></div>
+          <button class="action" id="pressBtn"><span class="spec"></span><span class="edge"></span><span class="label" id="pressLabel">Press me</span></button>
+          <div class="press-sub">
+            <button class="press-chip pchip">Light tap</button>
+            <button class="press-chip pchip">Hold</button>
+          </div>
         </div>
       </div>
-
-      <button class="action" id="actionBtn"><span class="spec"></span><span class="edge"></span><span class="label" id="actionLabel">Press &amp; Drag</span></button>
+      <!-- 2. 메뉴 열기 -->
+      <div class="demo" id="demo-menu">
+        <div class="menu-stage">
+          <div class="menu-panel" id="menuPanel">
+            <div class="menu-item"><span class="mi-ico">✦</span><span><b>Share material</b><small>물성 프리셋 공유</small></span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="mi-ico">◈</span><span><b>Duplicate</b><small>현재 상태 복제</small></span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="mi-ico">✧</span><span><b>Add to favorites</b><small>즐겨찾기에 추가</small></span></div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="mi-ico">⌘</span><span><b>Details</b><small>물성 정보 보기</small></span></div>
+          </div>
+          <button class="action" id="menuBtn"><span class="spec"></span><span class="edge"></span><span class="label" id="menuLabel">Open menu</span></button>
+        </div>
+      </div>
+      <!-- 3. 슬라이더 -->
+      <div class="demo" id="demo-slider">
+        <div class="slider-stage">
+          <div class="slider-caption"><span id="sliderLabel">Intensity</span><output id="sliderOut">50</output></div>
+          <div class="slider-track" id="sliderTrack">
+            <div class="slider-fill" id="sliderFill"></div>
+            <div class="slider-detents" id="sliderDetents"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="slider-knob" id="sliderKnob"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 4. 바텀 시트 -->
+      <div class="demo" id="demo-sheet">
+        <div class="sheet-hintcard">
+          <h4>화면 아무 곳이나 위로 끌어올려 보세요</h4>
+          <p>시트가 물성의 질량감·탄성·감쇠 그대로 따라옵니다. 빠르게 튕기면 관성으로 열리고 닫힙니다.</p>
+        </div>
+      </div>
+      <!-- 5. 탭바 스크롤 -->
+      <div class="demo" id="demo-scroll">
+        <div class="scroll-stage" id="scrollStage">
+          <div class="scroll-track" id="scrollTrack"></div>
+        </div>
+        <div class="scroll-dots" id="scrollDots"></div>
+      </div>
     </div>
 
     <div class="feature-tabs" id="featureTabs"></div>
-
     <div class="pop-backdrop" id="popBackdrop"></div>
-    <div class="popup" id="popup">
-      <h4 id="popupTitle">Material Response</h4>
-      <p id="popupCopy">팝업이 선택된 물성의 탄성·점성·복원 특성에 맞춰 등장합니다.</p>
-      <div class="pop-actions">
-        <button class="pop-cancel" id="popCancel">닫기</button>
-        <button class="pop-ok" id="popOk">확인</button>
-      </div>
-    </div>
 
     <div class="bottom-sheet" id="bottomSheet">
       <div class="handle"></div>
       <h4>Responsive Sheet</h4>
       <p class="small" style="color:var(--sim-ink-soft)">당김·관성·복원·탄성이 물성 그대로 반영됩니다.</p>
       <div class="sheet-rows">
-        <div class="sheet-row"><div><b>Elasticity</b><br><span>스프링 강성 기반</span></div><span class="val" id="shElastic">—</span></div>
-        <div class="sheet-row"><div><b>Recovery</b><br><span>복원 속도</span></div><span class="val" id="shRecovery">—</span></div>
-        <div class="sheet-row"><div><b>Damping</b><br><span>진동 감쇠</span></div><span class="val" id="shDamping">—</span></div>
+        <div class="sheet-row"><div><b>Elasticity</b><br><span>스프링 강성</span></div><span class="val" id="shElastic">—</span></div>
+        <div class="sheet-row"><div><b>Inertia</b><br><span>질량감</span></div><span class="val" id="shMass">—</span></div>
+        <div class="sheet-row"><div><b>Damping</b><br><span>출렁임 감쇠</span></div><span class="val" id="shDamping">—</span></div>
       </div>
     </div>
-
     <div class="sensor-hint" id="sensorHint">기기를 천천히 기울여 보세요</div>
   </div>
 </div>
@@ -423,42 +442,22 @@ h2{font-size:15px;margin:7px 0 13px;letter-spacing:-.02em}
     <div class="tune-head">
       <button class="ghost" id="backToSim">‹ 시뮬레이터</button>
       <h1>디테일 옵션</h1>
-      <button class="ghost" id="tuneReset">초기화</button>
+      <button class="ghost" id="tuneReset">AI 값 복원</button>
     </div>
-
     <div class="panel tune-card">
-      <div class="kicker">Material Tuning</div>
-      <h2>물리 파라미터</h2>
+      <div class="kicker">Interaction</div>
+      <div class="tune-tabs" id="tuneTabs"></div>
+      <div class="tune-demo-name" id="tuneDemoName">버튼 누르기</div>
+      <div class="tune-demo-cap" id="tuneDemoCap">—</div>
       <div class="control-grid" id="controls"></div>
-      <div class="mode-row">
-        <button class="modebtn active" data-mode="auto">Auto</button>
-        <button class="modebtn" data-mode="calm">Calm</button>
-        <button class="modebtn" data-mode="dynamic">Dynamic</button>
-        <button class="modebtn" data-mode="extreme">Extreme</button>
-      </div>
     </div>
-
     <div class="panel tune-card">
-      <div class="kicker">Environment &amp; Sensor</div>
-      <h2>환경 / 센서</h2>
-      <div class="control-grid" id="envControls"></div>
+      <div class="kicker">Sensor &amp; Feedback</div>
+      <h2>센서 / 피드백</h2>
       <div class="switch"><span>진동 피드백</span><input type="checkbox" id="hapticToggle" checked></div>
       <div class="switch"><span>자이로스코프 / 기울기</span><input type="checkbox" id="gyroToggle" checked></div>
       <button class="ghost" id="sensorBtn" style="width:100%;margin-top:6px">기울기 센서 권한 요청 (iOS)</button>
     </div>
-
-    <div class="panel tune-card">
-      <div class="kicker">Live Evaluation</div>
-      <h2>현재 반응 특성</h2>
-      <div class="metric-grid">
-        <div class="metric"><b id="mResponse">84 ms</b><span>Response</span></div>
-        <div class="metric"><b id="mSettle">0.62 s</b><span>Settle time</span></div>
-        <div class="metric"><b id="mDeform">18 %</b><span>Deformation</span></div>
-        <div class="metric"><b id="mEnergy">0.73</b><span>Motion energy</span></div>
-      </div>
-      <p class="small" style="margin-top:10px">실험용 상대 지표입니다. 인터랙션 엔진의 현재 설정을 요약합니다.</p>
-    </div>
-
     <button class="primary" id="applyTune">적용하고 시뮬레이터로 돌아가기</button>
   </div>
 </div>
@@ -471,7 +470,46 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
 
 /* =====================================================
-   Gemini — 모델 gemini-flash-latest 고정
+   5개 인터랙션 정의 (고정)
+===================================================== */
+const DEMOS=['press','menu','slider','sheet','scroll'];
+const demoMeta={
+ press:{num:1,label:'버튼 누르기',desc:'터치의 눌림 깊이·복원 탄성·햅틱으로 물성의 단단함을 전달',
+  controls:[
+   ['stiffness','표면 강성','낮을수록 깊고 부드럽게 눌리고, 높을수록 단단하게 저항합니다'],
+   ['damping','복원 감쇠','낮을수록 놓았을 때 통통 튀며 복원되고, 높을수록 차분히 멈춥니다'],
+   ['sensitivity','반응 속도','터치에 얼마나 즉각적으로 눌림이 시작되는지'],
+   ['vibration','햅틱 강도','누르고 뗄 때의 진동 세기']]},
+ menu:{num:2,label:'버튼에서 메뉴 열기',desc:'버튼에서 메뉴가 피어나는 등장 속도·바운스·시차·배경 블러',
+  controls:[
+   ['stiffness','펼침 속도','메뉴가 튀어나오는 스프링의 빠르기'],
+   ['damping','오버슈트','낮을수록 크게 튕기며 열리고, 높을수록 정확하게 멈춥니다'],
+   ['sensitivity','항목 시차','높을수록 메뉴 항목이 촘촘하게, 낮을수록 여유 있는 리듬으로 순차 등장'],
+   ['refraction','배경 블러','메뉴가 열릴 때 뒤 화면이 흐려지는 깊이']]},
+ slider:{num:3,label:'슬라이더 드래그',desc:'손가락을 따라오는 점성·자석 스냅·정착 감쇠·틱 햅틱',
+  controls:[
+   ['viscosity','점성','높을수록 노브가 끈적하게 손가락을 늦게 따라옵니다'],
+   ['tension','자석 스냅','높을수록 손을 놓으면 0·25·50·75·100 눈금에 자석처럼 붙습니다'],
+   ['damping','정착 감쇠','낮을수록 목표점 주변에서 출렁이며 멈춥니다'],
+   ['vibration','틱 햅틱','눈금을 지날 때의 미세 진동 세기']]},
+ sheet:{num:4,label:'바텀 시트 끌어올리기',desc:'끌어올릴 때의 질량감·탄성·러버밴드·플링 관성',
+  controls:[
+   ['stiffness','스프링 강성','손을 놓았을 때 제자리로 끌려가는 힘의 세기'],
+   ['mass','질량감','높을수록 무겁게 따라오고 관성이 오래 남습니다'],
+   ['damping','출렁임 감쇠','낮을수록 도착 지점에서 출렁이고, 높을수록 묵직하게 정지'],
+   ['tension','러버밴드','끝까지 당겼을 때 고무줄처럼 저항하는 강도']]},
+ scroll:{num:5,label:'탭바 스크롤',desc:'플릭의 관성·마찰 감속·가장자리 반동·카드 스냅',
+  controls:[
+   ['mass','관성','높을수록 한 번의 플릭으로 멀리 미끄러집니다'],
+   ['damping','마찰','높을수록 빠르게 감속하고, 낮을수록 얼음판처럼 미끄러집니다'],
+   ['tension','스냅 · 반동','높을수록 카드에 자석처럼 정렬되고 가장자리에서 탄력 있게 튕깁니다'],
+   ['sensitivity','플릭 민감도','같은 손짓에서 얼마나 큰 속도를 얻는지']]}
+};
+const PKEYS=['stiffness','damping','mass','viscosity','tension','sensitivity','recovery','refraction','vibration'];
+const AMB_KEYS=['light','refraction','viscosity','wind','time'];
+
+/* =====================================================
+   Gemini — gemini-flash-latest 고정 · 정교한 프롬프트
 ===================================================== */
 const GEMINI_MODEL='gemini-flash-latest';
 const GEMINI_BASE='https://generativelanguage.googleapis.com/v1beta/models/';
@@ -482,44 +520,90 @@ async function geminiValidateKey(key){
   if(res.ok)return true;
   let msg='API 키를 확인할 수 없습니다.';
   try{const j=await res.json();if(j.error&&j.error.message)msg=j.error.message}catch(e){}
-  if(res.status===400||res.status===401||res.status===403)msg='API 키가 올바르지 않거나 권한이 없습니다. 키를 다시 확인해 주세요.';
+  if(res.status===400||res.status===401||res.status===403)msg='API 키가 올바르지 않거나 권한이 없습니다.';
   if(res.status===404)msg='모델(gemini-flash-latest)에 접근할 수 없습니다.';
   if(res.status===429)msg='요청 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.';
   throw new Error(msg);
 }
 
-async function geminiAnalyze(text){
-  const prompt=`당신은 세계적인 인터랙션 디자인 스튜디오의 크리에이티브 디렉터이자, 물성(재질의 물리적 특성) 언어를 디지털 인터랙션으로 번역하는 전문가입니다.
-사용자가 묘사한 물성: "${text}"
+function buildPrompt(text){
+return `# 역할
+당신은 Apple Human Interface Guidelines의 모션 원칙(스프링 물리, 인터럽터블 애니메이션, 감각적 절제)에 정통한 시니어 인터랙션 엔지니어이자, 재질의 물리적 특성(물성)을 디지털 모션 파라미터로 번역하는 전문가입니다.
 
-이 물성을 최고급 모바일 앱의 마이크로 인터랙션으로 구현한다고 생각하고, 아래 JSON 스키마로만 응답하세요. 다른 텍스트 절대 금지.
+# 입력된 물성
+"${text}"
+
+# 과제
+이 물성을 모바일 앱의 5가지 핵심 인터랙션의 스프링 물리 파라미터로 번역하세요. 모든 파라미터는 0~100 정수이며, 실제 시뮬레이터의 스프링-댐퍼 엔진(k=강성, c=감쇠, m=질량)에 직접 매핑됩니다. 사용자는 손끝으로 차이를 "느껴야" 하므로, 물성이 뚜렷하면 파라미터도 과감하게 양 극단을 사용하세요. 애매한 중간값(40~60)만 나열하면 실패입니다.
+
+# 5가지 인터랙션과 파라미터의 물리적 의미
+
+## 1. press (버튼 누르기)
+- stiffness: 표면 강성. 낮음(10~30)=깊고 무르게 눌림(젤리·쿠션), 높음(75~95)=거의 안 눌리는 단단함(금속·유리)
+- damping: 복원 감쇠. 낮음(10~35)=놓으면 통통 튀며 복원(탱탱볼·젤리), 높음(75~95)=바운스 없이 차분히 복귀(점토·벨벳)
+- sensitivity: 반응 속도. 높음=터치 즉시 눌림 시작(가볍고 민감한 막), 낮음=한 박자 늦게 반응(무겁고 둔한 재질)
+- vibration: 햅틱 강도. 단단하고 명확한 재질=강한 클릭감, 부드럽고 젖은 재질=약하고 뭉근함
+
+## 2. menu (버튼에서 메뉴 열기)
+- stiffness: 메뉴가 피어나는 스프링 속도. 높음=경쾌하게 팟 하고 등장, 낮음=천천히 부풀어 오름
+- damping: 오버슈트. 낮음=크기가 살짝 커졌다 줄어드는 탄성 등장, 높음=정확한 크기로 단정하게 멈춤
+- sensitivity: 항목 등장 시차(스태거). 높음(80~100)=항목들이 거의 동시에 촤르륵, 낮음(10~40)=하나씩 여유 있는 리듬
+- refraction: 배경 블러 깊이. 빛을 다루는 재질(물·유리·크리스탈)=깊은 블러, 불투명 재질(돌·목재)=얕은 블러
+
+## 3. slider (슬라이더 드래그)
+- viscosity: 점성. 높음(70~95)=노브가 꿀처럼 손가락을 늦게 따라옴, 낮음(5~25)=즉각 밀착 추적
+- tension: 자석 스냅. 높음=손을 놓으면 가까운 눈금(0/25/50/75/100)에 자석처럼 흡착, 낮음=놓은 자리에 그대로
+- damping: 정착 감쇠. 낮음=목표점 주변에서 출렁이다 멈춤, 높음=한 번에 정확히 정지
+- vibration: 눈금 통과 시 틱 햅틱 강도
+
+## 4. sheet (바텀 시트 끌어올리기)
+- stiffness: 손을 놓았을 때 열림/닫힘 위치로 끌려가는 스프링 세기
+- mass: 질량감. 높음(65~95)=무겁게 따라오고 관성이 오래 감(가죽·금속판), 낮음(5~30)=종잇장처럼 가볍게
+- damping: 도착 지점 출렁임. 낮음=출렁출렁(액체·젤리), 높음=묵직하게 착 멈춤
+- tension: 러버밴드. 끝까지 당겼을 때 고무줄처럼 저항하는 강도. 탄성 재질=높게
+
+## 5. scroll (탭바 스크롤)
+- mass: 플릭 관성. 높음=한 번 튕기면 멀리 미끄러짐, 낮음=금방 멈춤
+- damping: 마찰. 높음(70~95)=끈적하게 빨리 감속(벨벳·고무), 낮음(10~30)=얼음판처럼 계속 미끄러짐(유리·금속)
+- tension: 카드 스냅+가장자리 반동. 높음=카드 단위로 자석 정렬되고 끝에서 탄력 있게 튕김
+- sensitivity: 플릭 민감도. 가볍고 민감한 재질=높게
+
+# 캘리브레이션 예시 (반드시 이 대비 감각을 따를 것)
+- "말랑한 젤리": press{stiffness:15,damping:18,sensitivity:85,vibration:35} / sheet{mass:30,damping:20,tension:88} / scroll{damping:55,tension:80}
+- "차가운 브러시드 메탈": press{stiffness:92,damping:88,sensitivity:70,vibration:90} / slider{viscosity:8,tension:95,damping:85} / scroll{mass:80,damping:15,tension:90}
+- "두꺼운 벨벳 커튼": press{stiffness:35,damping:90,sensitivity:40,vibration:20} / sheet{mass:85,damping:80,tension:30} / scroll{mass:60,damping:88,tension:25}
+- "수면 위의 물방울": slider{viscosity:82,tension:40,damping:35} / menu{refraction:92,damping:45}
+
+# 출력 (JSON만, 다른 텍스트·마크다운 절대 금지)
 {
- "name":"영문 물성 이름 (2~4단어, Title Case, 시적이고 세련되게)",
- "appName":"이 물성에 어울리는 가상의 프리미엄 앱 이름 (영문 1~2단어)",
- "desc":"한국어 한 줄 요약 (45자 이내)",
- "comment":"인터랙션 디자이너 관점의 한국어 해설 2~3문장. 이 물성이 사용자 경험에서 어떤 감각적 인상을 주는지, 어떤 UI에 쓰면 좋은지.",
- "params":{"stiffness":0,"damping":0,"mass":0,"viscosity":0,"tension":0,"sensitivity":0,"recovery":0,"refraction":0,"vibration":0,"wind":0,"light":0,"time":0},
- "behaviors":[{"label":"한국어 특성명(2~4글자)","value":0}],
- "features":{"button":0,"popup":0,"slider":0,"card":0,"sheet":0,"background":0},
+ "name":"영문 물성 이름 2~4단어, Title Case, 시적으로",
+ "appName":"이 물성에 어울리는 가상 프리미엄 앱 이름, 영문 1~2단어",
+ "desc":"한국어 한 줄 요약, 45자 이내",
+ "comment":"인터랙션 디자이너 관점의 한국어 해설 2~3문장. 이 물성이 5가지 인터랙션에서 어떤 감각적 차이를 만드는지 핵심만.",
  "theme":{"bg1":"#RRGGBB","bg2":"#RRGGBB","bg3":"#RRGGBB","accent":"#RRGGBB","dark":false},
- "hero":{"eyebrow":"짧은 영문 대문자 문구","title":"영문 헤드라인 2~4단어 (감각적으로)","copy":"한국어 안내 문장 1개"},
- "card":{"title":"영문 카드 제목 2~3단어","badge":"영문 대문자 한 단어","copy":"한국어 카드 설명 1문장"},
- "slider":{"label":"영문 슬라이더 라벨 1단어"},
- "popup":{"title":"영문 팝업 제목 2~3단어","copy":"한국어 팝업 설명 1문장"},
- "action":"영문 버튼 문구 2~3단어"
+ "hero":{"eyebrow":"영문 대문자 짧은 문구","title":"영문 헤드라인 2~4단어","copy":"한국어 안내 1문장"},
+ "ambient":{"light":0,"refraction":0,"viscosity":0,"wind":0,"time":0},
+ "interactions":{
+  "press":{"stiffness":0,"damping":0,"sensitivity":0,"vibration":0,"caption":"이 물성의 버튼 눌림이 어떻게 느껴지는지 한국어 1문장(40자 이내)","score":0},
+  "menu":{"stiffness":0,"damping":0,"sensitivity":0,"refraction":0,"caption":"...","score":0},
+  "slider":{"viscosity":0,"tension":0,"damping":0,"vibration":0,"caption":"...","score":0},
+  "sheet":{"stiffness":0,"mass":0,"damping":0,"tension":0,"caption":"...","score":0},
+  "scroll":{"mass":0,"damping":0,"tension":0,"sensitivity":0,"caption":"...","score":0}
+ }
 }
 
-규칙:
-- params 값은 0~100 정수. stiffness=강성, damping=감쇠, mass=질량감, viscosity=점성, tension=표면장력, sensitivity=민감도, recovery=복원속도, refraction=빛굴절, vibration=햅틱강도, wind=바람/외력, light=빛반응, time=시간변화.
-- behaviors는 핵심 특성 5개(value 0~100, 높은 순).
-- theme은 이 물성의 감각을 색으로 번역한 팔레트. bg1→bg2→bg3은 배경 그라디언트(서로 조화롭고 은은하게, 채도 과하지 않게), accent는 포인트 색. 밝은 배경이면 dark:false, 어두운 배경이면 dark:true.
-  예) 촉촉한 물성→서늘한 블루 그레이 톤, 따뜻한 벨벳→딥 와인/앰버 톤, 금속→쿨 실버/차콜 톤, 숲/이끼→세이지 그린 톤.
-- 물성 묘사와 물리적으로 일관되게: '단단함'→stiffness↑, '촉촉함'→viscosity·refraction↑, '느린 복원'→recovery↓ time↑, '가벼움'→mass↓.`;
+# 추가 규칙
+- theme: 물성의 감각을 색으로 번역. bg1→bg2→bg3은 은은하고 조화로운 배경 그라디언트(과채도 금지), accent는 포인트색. 밝은 팔레트면 dark:false, 어두우면 dark:true. 예) 촉촉함→서늘한 블루그레이, 벨벳→딥 와인, 금속→쿨 실버, 이끼→세이지 그린.
+- ambient: 배경 필드 효과. light=빛 입자량, refraction=광학 블롭, viscosity=흐름의 끈적임, wind=공기 흐름, time=느린 변화.
+- score: 이 물성을 표현하기에 각 인터랙션이 얼마나 적합한지 0~100. 다섯 값이 서로 달라야 합니다.
+- caption: 사용자가 시뮬레이터에서 읽을 안내문. 감각적이되 구체적으로("놓는 순간 두 번 출렁이며 복원됩니다" 같은 톤).`;
+}
 
+async function geminiAnalyze(text){
   const res=await fetch(GEMINI_BASE+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(apiKey),{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
-      generationConfig:{temperature:0.7,responseMimeType:'application/json'}})
+    body:JSON.stringify({contents:[{role:'user',parts:[{text:buildPrompt(text)}]}],
+      generationConfig:{temperature:0.65,responseMimeType:'application/json'}})
   });
   if(!res.ok){
     let msg='Gemini 호출 실패 ('+res.status+')';
@@ -533,120 +617,149 @@ async function geminiAnalyze(text){
   return sanitizeAI(JSON.parse(raw),text);
 }
 
-const PARAM_KEYS=['stiffness','damping','mass','viscosity','tension','sensitivity','recovery','refraction','vibration','wind','light','time'];
-const FEATURE_KEYS=['button','popup','slider','card','sheet','background'];
 const HEX=/^#[0-9a-fA-F]{6}$/;
-
 function sanitizeAI(j,src){
   const out=localFallback(src);
   const str=(v,d,n)=>typeof v==='string'&&v.trim()?v.trim().slice(0,n):d;
+  const num=(v,d)=>{const x=Number(v);return isFinite(x)?clamp(Math.round(x),0,100):d};
   out.name=str(j.name,out.name,60);
   out.appName=str(j.appName,out.appName,24);
   out.desc=str(j.desc,out.desc,120);
   out.comment=str(j.comment,'',400);
-  if(j.params&&typeof j.params==='object')PARAM_KEYS.forEach(k=>{const v=Number(j.params[k]);if(isFinite(v))out.params[k]=clamp(Math.round(v),0,100)});
-  if(Array.isArray(j.behaviors)&&j.behaviors.length){
-    const b={};
-    j.behaviors.slice(0,5).forEach(x=>{if(x&&typeof x.label==='string'){const v=Number(x.value);b[x.label.trim().slice(0,8)]=isFinite(v)?clamp(Math.round(v),0,100):50}});
-    if(Object.keys(b).length>=3)out.behaviors=b;
-  }
-  if(j.features&&typeof j.features==='object')FEATURE_KEYS.forEach(k=>{const v=Number(j.features[k]);if(isFinite(v))out.features[k]=clamp(Math.round(v),0,100)});
   if(j.theme&&typeof j.theme==='object'){
     const t={};['bg1','bg2','bg3','accent'].forEach(k=>{if(HEX.test(j.theme[k]||''))t[k]=j.theme[k]});
-    if(t.bg1&&t.accent){out.theme={...out.theme,...t,dark:!!j.theme.dark};if(!t.bg2)out.theme.bg2=t.bg1;if(!t.bg3)out.theme.bg3=out.theme.bg2}
+    if(t.bg1&&t.accent){out.theme={...out.theme,...t,dark:!!j.theme.dark};
+      if(!t.bg2)out.theme.bg2=t.bg1;if(!t.bg3)out.theme.bg3=out.theme.bg2}
   }
   if(j.hero&&typeof j.hero==='object')out.hero={eyebrow:str(j.hero.eyebrow,out.hero.eyebrow,40),title:str(j.hero.title,out.hero.title,60),copy:str(j.hero.copy,out.hero.copy,120)};
-  if(j.card&&typeof j.card==='object')out.card={title:str(j.card.title,out.card.title,40),badge:str(j.card.badge,out.card.badge,14),copy:str(j.card.copy,out.card.copy,120)};
-  if(j.slider&&typeof j.slider==='object')out.slider={label:str(j.slider.label,out.slider.label,20)};
-  if(j.popup&&typeof j.popup==='object')out.popup={title:str(j.popup.title,out.popup.title,40),copy:str(j.popup.copy,out.popup.copy,140)};
-  out.action=str(j.action,out.action,26);
+  if(j.ambient&&typeof j.ambient==='object')AMB_KEYS.forEach(k=>out.ambient[k]=num(j.ambient[k],out.ambient[k]));
+  if(j.interactions&&typeof j.interactions==='object'){
+    DEMOS.forEach(d=>{
+      const src2=j.interactions[d];if(!src2||typeof src2!=='object')return;
+      const tgt=out.interactions[d];
+      demoMeta[d].controls.forEach(([k])=>{tgt[k]=num(src2[k],tgt[k])});
+      tgt.caption=str(src2.caption,tgt.caption,90);
+      tgt.score=num(src2.score,tgt.score);
+    });
+  }
   return out;
 }
 
 /* =====================================================
-   프리셋 (칩 + 폴백)
+   프리셋 (칩 + 폴백) — 인터랙션별 기본값
 ===================================================== */
+function mkInteractions(o){
+ return{
+  press:{stiffness:o.st,damping:o.dp,sensitivity:o.sn,vibration:o.vb,caption:o.pc,score:o.ps},
+  menu:{stiffness:clamp(o.st+15,0,100),damping:o.dp,sensitivity:o.sn,refraction:o.rf,caption:o.mc,score:o.ms},
+  slider:{viscosity:o.vs,tension:o.tn,damping:o.dp,vibration:o.vb,caption:o.sc,score:o.ss},
+  sheet:{stiffness:o.st,mass:o.ma,damping:o.dp,tension:o.tn,caption:o.hc,score:o.hs},
+  scroll:{mass:o.ma,damping:clamp(100-o.st*.4,10,95),tension:o.tn,sensitivity:o.sn,caption:o.rc,score:o.rs}
+ };
+}
 const presets=[
- {label:'바람에 흔들리는 유연한 움직임',name:'Flexible Wind Surface',appName:'Breeze',desc:'외력·관성·유연성이 만드는 자연스러운 흔들림',
-  keys:['바람','흔들','유연','공기','움직'],params:{stiffness:30,damping:28,mass:28,viscosity:20,tension:38,sensitivity:72,recovery:50,refraction:20,vibration:18,wind:72,light:45,time:40},
-  behaviors:{유연성:88,관성:72,흔들림:90,복원성:62,광학반응:25},features:{card:94,sheet:91,background:88,popup:74,button:62,slider:58},
-  theme:{bg1:'#e8eef2',bg2:'#f4f8f9',bg3:'#d5e4e8',accent:'#3f8f9f',dark:false}},
- {label:'빛에 따라 변하는 반응적인 패턴',name:'Photo-Reactive Pattern',appName:'Prism',desc:'광량에 따라 투명도·패턴·굴절이 변하는 표면',
-  keys:['빛','패턴','광','반응'],params:{stiffness:58,damping:70,mass:36,viscosity:34,tension:55,sensitivity:76,recovery:64,refraction:86,vibration:8,wind:12,light:86,time:48},
-  behaviors:{광학반응:96,민감도:84,연속변화:82,복원성:58,유연성:30},features:{background:97,card:91,slider:86,popup:72,button:66,sheet:62},
-  theme:{bg1:'#ece7f4',bg2:'#f7f4fb',bg3:'#dcd3ee',accent:'#7a5bd6',dark:false}},
- {label:'터치에 반응하는 섬세한 진동',name:'Micro Haptic Surface',appName:'Pulse',desc:'짧은 지연, 작은 변형, 촉각 피드백 중심의 표면',
-  keys:['터치','진동','섬세','촉각'],params:{stiffness:72,damping:76,mass:20,viscosity:12,tension:68,sensitivity:94,recovery:84,refraction:24,vibration:88,wind:5,light:40,time:28},
-  behaviors:{민감도:96,진동성:92,복원성:88,변형량:34,광학반응:28},features:{button:98,slider:94,popup:83,card:79,sheet:72,background:52},
-  theme:{bg1:'#eeeae6',bg2:'#f8f6f3',bg3:'#e2d9d1',accent:'#c96a3b',dark:false}},
  {label:'수분감 있는 촉촉한 표면 반응',name:'Moist Elastic Surface',appName:'Dew',desc:'점성·굴절·표면장력·느린 복원의 촉촉한 물성',
-  keys:['수분','촉촉','물','젖','액체'],params:{stiffness:42,damping:62,mass:38,viscosity:78,tension:82,sensitivity:75,recovery:58,refraction:88,vibration:32,wind:10,light:68,time:58},
-  behaviors:{점성:84,굴절:92,표면장력:88,복원성:66,민감도:76},features:{button:94,slider:92,popup:90,card:87,sheet:82,background:74},
-  theme:{bg1:'#dde7ef',bg2:'#f2f7fa',bg3:'#c9dbe9',accent:'#2f7fb8',dark:false}},
- {label:'부드럽게 휘어지는 탄성 반응',name:'Soft Elastic Membrane',appName:'Flexa',desc:'변형과 복원이 명확한 스프링-댐퍼형 탄성 면',
-  keys:['휘어','탄성','부드럽','복원'],params:{stiffness:48,damping:48,mass:42,viscosity:18,tension:72,sensitivity:76,recovery:88,refraction:28,vibration:25,wind:8,light:45,time:42},
-  behaviors:{탄성:94,변형량:82,복원성:94,감쇠:58,민감도:72},features:{sheet:98,card:96,popup:92,button:88,slider:80,background:64},
-  theme:{bg1:'#e9ece4',bg2:'#f6f7f2',bg3:'#d8ddc9',accent:'#6b8f3f',dark:false}},
- {label:'가볍고 민감한 터치 반응',name:'Light Sensitive Touch',appName:'Feather',desc:'낮은 질량감과 높은 민감도로 즉각 반응',
-  keys:['가볍','민감','빠른','즉각'],params:{stiffness:62,damping:64,mass:12,viscosity:8,tension:58,sensitivity:98,recovery:92,refraction:22,vibration:48,wind:8,light:52,time:18},
-  behaviors:{민감도:99,반응속도:96,가벼움:94,복원성:90,변형량:48},features:{button:99,slider:96,popup:86,card:83,sheet:77,background:58},
-  theme:{bg1:'#f0eef2',bg2:'#fafafc',bg3:'#e2dfe8',accent:'#5d6ad1',dark:false}},
- {label:'공기 흐름에 따른 자연스러운 움직임',name:'Airflow Responsive Field',appName:'Aeris',desc:'방향성 있는 외력과 난류의 유기적 움직임',
-  keys:['공기','흐름','자연','난류'],params:{stiffness:24,damping:32,mass:24,viscosity:16,tension:34,sensitivity:66,recovery:46,refraction:18,vibration:10,wind:94,light:42,time:54},
-  behaviors:{흐름성:98,방향성:90,흔들림:92,관성:76,복원성:52},features:{background:99,card:91,sheet:88,popup:70,slider:66,button:54},
-  theme:{bg1:'#e4ecec',bg2:'#f3f8f8',bg3:'#cfe0e0',accent:'#3a9188',dark:false}},
- {label:'시간에 따라 천천히 변화하고 회복',name:'Slow Recovery Material',appName:'Trace',desc:'입력의 흔적을 보존하고 점진적으로 회복',
-  keys:['시간','천천히','회복','흔적','기억'],params:{stiffness:38,damping:82,mass:58,viscosity:68,tension:45,sensitivity:58,recovery:24,refraction:38,vibration:8,wind:4,light:48,time:94},
-  behaviors:{시간성:98,기억성:92,복원지연:96,점성:74,민감도:54},features:{popup:96,card:94,background:91,sheet:88,slider:78,button:69},
-  theme:{bg1:'#ebe6e0',bg2:'#f7f4f0',bg3:'#dcd2c6',accent:'#9a6b45',dark:false}}
+  keys:['수분','촉촉','물','젖','액체'],
+  theme:{bg1:'#dde7ef',bg2:'#f2f7fa',bg3:'#c9dbe9',accent:'#2f7fb8',dark:false},
+  ambient:{light:68,refraction:88,viscosity:78,wind:10,time:58},
+  ix:mkInteractions({st:38,dp:48,sn:75,vb:32,vs:78,tn:62,ma:42,rf:88,
+   pc:'물방울을 누르듯 깊게 눌리고 출렁이며 복원됩니다',ps:88,
+   mc:'배경이 물속처럼 흐려지며 메뉴가 부풀어 오릅니다',ms:78,
+   sc:'노브가 수막 위를 미끄러지듯 끈적하게 따라옵니다',ss:92,
+   hc:'시트가 물결처럼 출렁이며 따라 올라옵니다',hs:82,
+   rc:'카드가 물살에 실린 듯 부드럽게 흘러갑니다',rs:70})},
+ {label:'차갑고 단단한 브러시드 메탈',name:'Brushed Metal Plate',appName:'Alloy',desc:'거의 눌리지 않는 강성과 명확한 클릭, 긴 관성',
+  keys:['금속','메탈','차갑','단단','철'],
+  theme:{bg1:'#e2e5e9',bg2:'#f2f4f6',bg3:'#c9ced6',accent:'#4a6072',dark:false},
+  ambient:{light:55,refraction:30,viscosity:8,wind:6,time:15},
+  ix:mkInteractions({st:92,dp:85,sn:72,vb:90,vs:8,tn:92,ma:78,rf:26,
+   pc:'거의 눌리지 않는 단단함과 강한 클릭 햅틱',ps:95,
+   mc:'기계식 스위치처럼 정확하게 팟 하고 열립니다',ms:72,
+   sc:'노브가 즉각 밀착되고 눈금에 정밀하게 스냅됩니다',ss:85,
+   hc:'무거운 금속판이 묵직하게 끌려 올라옵니다',hs:68,
+   rc:'얼음판 위의 금속처럼 길게 미끄러집니다',rs:90})},
+ {label:'말랑하게 튀는 젤리 질감',name:'Bouncy Jelly Form',appName:'Jello',desc:'깊은 눌림과 통통 튀는 복원의 탄성 물성',
+  keys:['젤리','말랑','탱글','통통','탄력'],
+  theme:{bg1:'#f4e7ec',bg2:'#fbf3f6',bg3:'#ecd3dd',accent:'#c9527e',dark:false},
+  ambient:{light:60,refraction:55,viscosity:40,wind:8,time:30},
+  ix:mkInteractions({st:16,dp:16,sn:88,vb:40,vs:35,tn:82,ma:28,rf:48,
+   pc:'푹 꺼졌다가 두세 번 통통 튀며 복원됩니다',ps:96,
+   mc:'메뉴가 젤리처럼 탱글하게 튀어나옵니다',ms:85,
+   sc:'놓으면 눈금 주위에서 출렁이다 착 붙습니다',ss:78,
+   hc:'시트가 탱탱볼처럼 튕기며 자리를 잡습니다',hs:92,
+   rc:'카드가 스냅 지점에서 살짝 튕기며 정렬됩니다',rs:74})},
+ {label:'두껍고 묵직한 벨벳 커튼',name:'Heavy Velvet Drape',appName:'Velour',desc:'느리고 무겁게 따라오는 깊은 감쇠의 직물감',
+  keys:['벨벳','커튼','천','묵직','부드럽'],
+  theme:{bg1:'#e8e0e4',bg2:'#f5f0f3',bg3:'#d6c8d1',accent:'#7b4a63',dark:false},
+  ambient:{light:38,refraction:22,viscosity:55,wind:18,time:62},
+  ix:mkInteractions({st:34,dp:90,sn:42,vb:18,vs:62,tn:26,ma:85,rf:34,
+   pc:'천을 누르듯 뭉근하게 눌리고 소리 없이 복원',ps:70,
+   mc:'커튼이 젖혀지듯 여유 있는 리듬으로 열립니다',ms:76,
+   sc:'노브가 무거운 천을 끌듯 지그시 따라옵니다',ss:72,
+   hc:'묵직한 커튼을 걷어 올리는 관성이 느껴집니다',hs:94,
+   rc:'끈적하게 감속하며 무게감 있게 멈춥니다',rs:80})},
+ {label:'가볍고 민감한 종이의 결',name:'Featherlight Paper',appName:'Leaf',desc:'즉각 반응하고 금세 멈추는 가벼운 물성',
+  keys:['가볍','종이','민감','얇','즉각'],
+  theme:{bg1:'#f0efe9',bg2:'#faf9f5',bg3:'#e3e0d4',accent:'#8a8355',dark:false},
+  ambient:{light:72,refraction:18,viscosity:10,wind:45,time:25},
+  ix:mkInteractions({st:66,dp:60,sn:98,vb:30,vs:10,tn:48,ma:10,rf:16,
+   pc:'스치기만 해도 즉각 반응하는 가벼운 눌림',ps:82,
+   mc:'종잇장이 팔랑이듯 경쾌하게 펼쳐집니다',ms:74,
+   sc:'노브가 손끝에 딱 붙어 정확히 따라옵니다',ss:88,
+   hc:'가볍게 딸려 올라와 산뜻하게 자리 잡습니다',hs:66,
+   rc:'짧게 미끄러지고 산뜻하게 멈춥니다',rs:78})},
+ {label:'시간에 따라 천천히 회복하는 메모리폼',name:'Slow Memory Foam',appName:'Trace',desc:'흔적을 잠시 보존하고 점진적으로 회복',
+  keys:['시간','천천히','회복','흔적','기억','폼'],
+  theme:{bg1:'#ebe6e0',bg2:'#f7f4f0',bg3:'#dcd2c6',accent:'#9a6b45',dark:false},
+  ambient:{light:48,refraction:38,viscosity:68,wind:4,time:94},
+  ix:mkInteractions({st:30,dp:95,sn:55,vb:12,vs:85,tn:20,ma:62,rf:38,
+   pc:'눌린 자국이 남았다가 천천히 차오릅니다',ps:90,
+   mc:'메뉴가 스며들 듯 서서히 떠오릅니다',ms:68,
+   sc:'노브가 한 박자 늦게, 그러나 끝까지 따라옵니다',ss:84,
+   hc:'느긋하게 따라와 소리 없이 안착합니다',hs:76,
+   rc:'긴 여운을 남기며 아주 천천히 감속합니다',rs:72})}
 ];
-const featureMeta={
- button:['Button','명확한 촉각 피드백'],popup:['Popup','등장·복원의 움직임'],
- slider:['Slider','연속 입력 · 점성'],card:['Card','휘어짐 · 빛 · 기울기'],
- sheet:['Sheet','당김 · 관성 · 복원'],background:['Field','빛 · 공기 · 시간']
-};
 function localFallback(text){
- let best=presets[3],bestScore=-1;
+ let best=presets[0],bestScore=-1;
  presets.forEach(p=>{let s=0;p.keys.forEach(k=>{if(text.includes(k))s+=3});
   p.label.split(' ').forEach(k=>{if(k.length>1&&text.includes(k))s+=.4});
   if(s>bestScore){bestScore=s;best=p}});
  const p=JSON.parse(JSON.stringify(best));
- if(bestScore<=0){
-   p.name='Custom Material Behavior';p.desc='입력 문장에서 물리 특성을 추정한 사용자 정의 물성';
-   [['부드럽','stiffness',-18],['단단','stiffness',22],['느리','recovery',-24],['빠르','recovery',22],
-    ['점성','viscosity',28],['액체','viscosity',22],['빛','refraction',32],['투명','refraction',24],
-    ['민감','sensitivity',26],['진동','vibration',35],['바람','wind',42],['공기','wind',36],['시간','time',40],
-    ['탄성','tension',28],['무겁','mass',24],['가볍','mass',-25]
-   ].forEach(([w,k,v])=>{if(text.includes(w))p.params[k]=clamp(p.params[k]+v,0,100)});
- }
- p.comment='';
- p.hero={eyebrow:'REALTIME MATERIALITY',title:'Touch the material.',copy:'누르고, 드래그하고, 기기를 기울여 반응을 느껴보세요.'};
- p.card={title:'Adaptive Surface',badge:'LIVE',copy:'터치와 움직임에 따라 표면이 변형됩니다.'};
- p.slider={label:'Intensity'};
- p.popup={title:'Material Response',copy:'선택된 물성의 탄성·점성·복원 특성에 맞춰 등장합니다.'};
- p.action='Press & Drag';
- return p;
+ return{name:p.name,appName:p.appName,desc:p.desc,comment:'',
+  theme:p.theme,ambient:p.ambient,
+  hero:{eyebrow:'REALTIME MATERIALITY',title:'Feel the material.',copy:'다섯 가지 인터랙션으로 물성의 반응을 느껴보세요.'},
+  interactions:p.ix};
 }
 
 /* =====================================================
    상태
 ===================================================== */
 let current=localFallback('수분감 있는 촉촉한 표면');
-let currentFeature='button';
-let params={...current.params};
-let sensorEnabled=false, analyzing=false, hasResult=false;
-let themeRGB={accent:[61,107,221],ink:[18,21,27],isDark:false};
+let currentDemo='press';
+let tuneDemo='press';
+let ixParams={};        // 인터랙션별 현재 파라미터(조절 가능)
+let ambient={...current.ambient};
+let sensorEnabled=false,analyzing=false,hasResult=false;
+let themeRGB={accent:[47,127,184],isDark:false};
 const state={
- px:.5,py:.65,pressed:0,targetPressed:0,
+ px:.5,py:.6,pressed:0,targetPressed:0,
  x:0,y:0,vx:0,vy:0,tiltX:0,tiltY:0,manualTiltX:0,manualTiltY:0,
- popup:0,popupV:0,sheet:0,sheetV:0,slider:.5,sliderShow:.5,sliderV:0,pointerDown:false,
- ripple:[],particles:[],last:performance.now(),dragStartY:0,sheetStart:0,sheetVel:0,lastY:0,lastT:0,
- lastTick:-1,simActive:false
+ slider:.5,sliderShow:.5,sliderV:0,lastDetent:-1,
+ sheet:0,sheetV:0,sheetTgt:0,sheetVel:0,dragStartY:0,sheetStart:0,lastY:0,lastT:0,
+ menuOpen:false,menuT0:0,
+ sx:0,sv:0,scDrag:false,scLastX:0,scLastT:0,scMax:0,scStep:0,scIdx:0,
+ pointerDown:false,downOnBtn:false,
+ ripple:[],particles:[],last:performance.now(),simActive:false
 };
-const controlsDef=[['stiffness','Stiffness'],['damping','Damping'],['mass','Mass'],
- ['viscosity','Viscosity'],['tension','Surface tension'],['sensitivity','Sensitivity'],
- ['recovery','Recovery'],['refraction','Refraction'],['vibration','Haptic strength']];
-const envDef=[['wind','Wind / airflow'],['light','Light intensity'],['time','Time effect']];
+const menuItems=[{p:0,v:0},{p:0,v:0},{p:0,v:0},{p:0,v:0}];
+
+function seedIxParams(){
+ ixParams={};
+ DEMOS.forEach(d=>{ixParams[d]={...current.interactions[d]}});
+ ambient={...current.ambient};
+}
+function P(k){return ixParams[currentDemo][k]??50}
+function PD(d,k){return ixParams[d][k]??50}
 
 /* =====================================================
    페이지 네비게이션
@@ -654,17 +767,15 @@ const envDef=[['wind','Wind / airflow'],['light','Light intensity'],['time','Tim
 const pages={gate:$('#page-gate'),analyze:$('#page-analyze'),sim:$('#page-sim'),tune:$('#page-tune')};
 let currentPage='gate';
 function showPage(id,dir=1){
-  const from=pages[currentPage],to=pages[id];
-  if(from===to)return;
-  from.classList.remove('active');
-  from.classList.toggle('exit-left',dir>0);
-  to.classList.remove('exit-left');
-  to.classList.add('active');
-  currentPage=id;
-  state.simActive=(id==='sim');
-  if(id==='sim'){resizeCanvas();updateClock();
-    if(!sensorEnabled){const h=$('#sensorHint');h.classList.add('show');setTimeout(()=>h.classList.remove('show'),3200)}}
-  to.scrollTop=0;
+ const from=pages[currentPage],to=pages[id];
+ if(from===to)return;
+ from.classList.remove('active');from.classList.toggle('exit-left',dir>0);
+ to.classList.remove('exit-left');to.classList.add('active');
+ currentPage=id;state.simActive=(id==='sim');
+ if(id==='sim'){resizeCanvas();updateClock();layoutScroll();
+  if(!sensorEnabled){const h=$('#sensorHint');h.classList.add('show');setTimeout(()=>h.classList.remove('show'),3000)}}
+ if(id==='tune'){tuneDemo=currentDemo;renderTune()}
+ to.scrollTop=0;
 }
 
 /* =====================================================
@@ -675,15 +786,11 @@ $('#toggleKey').onclick=()=>{const pw=keyInput.type==='password';keyInput.type=p
 keyInput.addEventListener('keydown',e=>{if(e.key==='Enter')startBtn.click()});
 keyInput.addEventListener('input',()=>gateError.classList.remove('show'));
 startBtn.onclick=async()=>{
-  const key=keyInput.value.trim();
-  gateError.classList.remove('show');
-  if(!key){gErr('API 키를 입력해 주세요. 아래 링크에서 무료로 발급받을 수 있습니다.');return}
-  startBtn.disabled=true;startBtn.innerHTML='<span class="spinner"></span>gemini-flash-latest 연결 확인 중…';
-  try{
-    await geminiValidateKey(key);apiKey=key;
-    startBtn.textContent='연결 완료';
-    setTimeout(()=>showPage('analyze'),300);
-  }catch(err){gErr(err.message);startBtn.disabled=false;startBtn.textContent='시뮬레이션 시작'}
+ const key=keyInput.value.trim();gateError.classList.remove('show');
+ if(!key){gErr('API 키를 입력해 주세요. 아래 링크에서 무료로 발급받을 수 있습니다.');return}
+ startBtn.disabled=true;startBtn.innerHTML='<span class="spinner"></span>gemini-flash-latest 연결 확인 중…';
+ try{await geminiValidateKey(key);apiKey=key;startBtn.textContent='연결 완료';setTimeout(()=>showPage('analyze'),300)}
+ catch(err){gErr(err.message);startBtn.disabled=false;startBtn.textContent='시뮬레이션 시작'}
 };
 function gErr(m){gateError.textContent=m;gateError.classList.add('show')}
 $('#changeKeyBtn').onclick=()=>{apiKey='';keyInput.value='';startBtn.disabled=false;startBtn.textContent='시뮬레이션 시작';showPage('gate',-1)};
@@ -693,117 +800,96 @@ $('#changeKeyBtn').onclick=()=>{apiKey='';keyInput.value='';startBtn.disabled=fa
 ===================================================== */
 const aiStatus=$('#aiStatus'),analyzeBtn=$('#analyzeBtn'),launchBtn=$('#launchBtn');
 async function analyze(){
-  if(analyzing)return;
-  const text=$('#materialInput').value.trim();
-  if(!text){aiStatus.textContent='물성 문장을 입력해 주세요.';aiStatus.classList.add('err');return}
-  analyzing=true;aiStatus.classList.remove('err');aiStatus.textContent='';
-  analyzeBtn.disabled=true;analyzeBtn.innerHTML='<span class="spinner"></span>Gemini가 물성을 분석하는 중…';
-  launchBtn.disabled=true;
-  try{
-    current=await geminiAnalyze(text);
-    aiStatus.textContent='gemini-flash-latest 분석 완료 — 시뮬레이션을 실행해 보세요';
-  }catch(err){
-    current=localFallback(text);
-    aiStatus.classList.add('err');
-    aiStatus.textContent='AI 분석 실패 → 로컬 해석으로 대체 ('+err.message.slice(0,70)+')';
-  }
-  applyAnalysis();
-  hasResult=true;launchBtn.disabled=false;
-  analyzing=false;analyzeBtn.disabled=false;analyzeBtn.textContent='Gemini로 다시 분석';
+ if(analyzing)return;
+ const text=$('#materialInput').value.trim();
+ if(!text){aiStatus.textContent='물성 문장을 입력해 주세요.';aiStatus.classList.add('err');return}
+ analyzing=true;aiStatus.classList.remove('err');aiStatus.textContent='';
+ analyzeBtn.disabled=true;analyzeBtn.innerHTML='<span class="spinner"></span>Gemini가 5가지 인터랙션으로 번역하는 중…';
+ launchBtn.disabled=true;
+ try{current=await geminiAnalyze(text);
+  aiStatus.textContent='gemini-flash-latest 분석 완료 — 시뮬레이션을 실행해 보세요'}
+ catch(err){current=localFallback(text);
+  aiStatus.classList.add('err');
+  aiStatus.textContent='AI 분석 실패 → 로컬 해석으로 대체 ('+err.message.slice(0,70)+')'}
+ applyAnalysis();
+ hasResult=true;launchBtn.disabled=false;
+ analyzing=false;analyzeBtn.disabled=false;analyzeBtn.textContent='Gemini로 다시 분석';
 }
 analyzeBtn.onclick=analyze;
 launchBtn.onclick=()=>{if(hasResult)showPage('sim')};
 
 function applyAnalysis(){
-  params={...current.params};
-  applyTheme(current.theme);
-  $('#materialName').textContent=current.name;
-  $('#materialDesc').textContent=current.desc;
-  const c=$('#aiComment');
-  if(current.comment){$('#aiCommentText').textContent=current.comment;c.style.display='block'}else c.style.display='none';
-  $('#resultCard').classList.add('show');
-  renderBehaviors();renderFeatPreview();renderFeatureTabs();
-  // 시뮬레이터 텍스트
-  $('#simAppName').textContent=current.appName||'Materia';
-  $('#simMatName').textContent=current.name;
-  $('#heroEyebrow').textContent=current.hero.eyebrow;
-  $('#heroTitle').textContent=current.hero.title;
-  $('#heroCopy').textContent=current.hero.copy;
-  $('#cardTitle').textContent=current.card.title;
-  $('#cardBadge').textContent=current.card.badge||'LIVE';
-  $('#cardCopy').textContent=current.card.copy;
-  $('#sliderLabel').textContent=current.slider.label||'Intensity';
-  $('#popupTitle').textContent=current.popup.title;
-  $('#popupCopy').textContent=current.popup.copy;
-  $('#actionLabel').textContent=current.action||'Press & Drag';
-  $('#shElastic').textContent=params.stiffness+'%';
-  $('#shRecovery').textContent=params.recovery+'%';
-  $('#shDamping').textContent=params.damping+'%';
-  syncControls();
-  document.querySelectorAll('.modebtn').forEach(x=>x.classList.toggle('active',x.dataset.mode==='auto'));
-  applyFeature(Object.entries(current.features).sort((a,b)=>b[1]-a[1])[0][0]);
-  updateMetrics();
-  state.x=state.y=state.vx=state.vy=0;state.ripple=[];seedParticles();
-  addRipple(.5,.55,1.1);
-}
-
-/* 테마 적용 (Gemini 팔레트 → CSS 변수 + 캔버스 색) */
-function hexToRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
-function applyTheme(t){
-  const root=document.documentElement.style;
-  root.setProperty('--sim-bg1',t.bg1);root.setProperty('--sim-bg2',t.bg2);root.setProperty('--sim-bg3',t.bg3);
-  root.setProperty('--sim-accent',t.accent);
-  const ink=t.dark?'#f2f4f8':'#12151b';
-  const inkSoft=t.dark?'rgba(240,244,250,.62)':'rgba(18,21,27,.6)';
-  root.setProperty('--sim-ink',ink);
-  root.setProperty('--sim-ink-soft',inkSoft);
-  root.setProperty('--sim-glass',t.dark?'rgba(255,255,255,.10)':'rgba(255,255,255,.42)');
-  root.setProperty('--sim-glass-line',t.dark?'rgba(255,255,255,.18)':'rgba(255,255,255,.62)');
-  themeRGB={accent:hexToRgb(t.accent),ink:hexToRgb(t.dark?'#f2f4f8':'#12151b'),isDark:!!t.dark};
-  document.querySelector('meta[name=theme-color]').setAttribute('content',t.bg1);
-}
-
-function renderBehaviors(){
- const host=$('#behaviorBars');host.innerHTML='';
- Object.entries(current.behaviors).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
-  const row=document.createElement('div');row.className='behavior-line';
-  row.innerHTML=`<span>${k}</span><div class="bar"><i></i></div><b>${v}</b>`;
+ seedIxParams();
+ applyTheme(current.theme);
+ $('#materialName').textContent=current.name;
+ $('#materialDesc').textContent=current.desc;
+ const c=$('#aiComment');
+ if(current.comment){$('#aiCommentText').textContent=current.comment;c.style.display='block'}else c.style.display='none';
+ $('#resultCard').classList.add('show');
+ // 인터랙션 리스트 (분석 화면)
+ const host=$('#ixList');host.innerHTML='';
+ DEMOS.forEach(d=>{
+  const m=demoMeta[d],ix=current.interactions[d];
+  const row=document.createElement('div');row.className='ix-row';
+  row.innerHTML=`<span class="num">${m.num}</span><span><b>${m.label}</b><small>${ix.caption}</small></span><span class="sc">${ix.score}</span>`;
   host.appendChild(row);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{row.querySelector('i').style.width=v+'%'}));
  });
+ // 시뮬레이터 텍스트
+ $('#simAppName').textContent=current.appName||'Materia';
+ $('#simMatName').textContent=current.name;
+ $('#heroEyebrow').textContent=current.hero.eyebrow;
+ $('#heroTitle').textContent=current.hero.title;
+ $('#heroCopy').textContent=current.hero.copy;
+ renderFeatureTabs();
+ setDemo('press');
+ updateSheetVals();
+ state.x=state.y=state.vx=state.vy=0;state.ripple=[];seedParticles();
 }
-function renderFeatPreview(){
- const host=$('#featPreview');host.innerHTML='';
- Object.entries(current.features).sort((a,b)=>b[1]-a[1]).slice(0,4).forEach(([k,s])=>{
-  const el=document.createElement('span');el.className='feat-tag';
-  el.innerHTML=`<b>${featureMeta[k][0]}</b> ${s}%`;host.appendChild(el);
- });
-}
-function renderFeatureTabs(){
- const host=$('#featureTabs');host.innerHTML='';
- Object.entries(current.features).sort((a,b)=>b[1]-a[1]).forEach(([k,s])=>{
-  const b=document.createElement('button');b.className='ftab';b.dataset.feature=k;
-  b.innerHTML=`${featureMeta[k][0]}<span class="sc">${s}</span>`;
-  b.onclick=()=>{applyFeature(k);haptic('tap')};
-  host.appendChild(b);
- });
-}
-function applyFeature(k){
- if(!featureMeta[k])k='button';
- currentFeature=k;
- document.querySelectorAll('.ftab').forEach(x=>x.classList.toggle('active',x.dataset.feature===k));
- $('#sliderDemo').style.display=k==='slider'?'block':'none';
- $('#materialCard').style.display=['card','background','button','popup'].includes(k)?'block':'none';
- $('#actionBtn').style.display=['button','popup','sheet'].includes(k)?'block':'none';
- $('#materialCard').style.opacity=k==='background'?.0:1;
- $('#materialCard').style.pointerEvents=k==='background'?'none':'auto';
- $('#actionLabel').textContent=k==='popup'?(current.popup.title||'Open'):k==='sheet'?'Pull the sheet':(current.action||'Press & Drag');
- if(k!=='popup'){state.popup=0;closePopup()}
- state.sheet=0;
+
+function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+function applyTheme(t){
+ const r=document.documentElement.style;
+ r.setProperty('--sim-bg1',t.bg1);r.setProperty('--sim-bg2',t.bg2);r.setProperty('--sim-bg3',t.bg3);
+ r.setProperty('--sim-accent',t.accent);
+ r.setProperty('--sim-ink',t.dark?'#f2f4f8':'#12151b');
+ r.setProperty('--sim-ink-soft',t.dark?'rgba(240,244,250,.62)':'rgba(18,21,27,.6)');
+ r.setProperty('--sim-glass',t.dark?'rgba(255,255,255,.10)':'rgba(255,255,255,.42)');
+ r.setProperty('--sim-glass-line',t.dark?'rgba(255,255,255,.18)':'rgba(255,255,255,.62)');
+ themeRGB={accent:hexToRgb(t.accent),isDark:!!t.dark};
+ document.querySelector('meta[name=theme-color]').setAttribute('content',t.bg1);
+ buildScrollCards();
 }
 
 /* =====================================================
-   프리셋 칩 / 컨트롤
+   데모 전환
+===================================================== */
+function renderFeatureTabs(){
+ const host=$('#featureTabs');host.innerHTML='';
+ DEMOS.forEach(d=>{
+  const m=demoMeta[d];
+  const b=document.createElement('button');b.className='ftab'+(d===currentDemo?' active':'');b.dataset.demo=d;
+  b.innerHTML=`<span class="num">${m.num}</span>${m.label}`;
+  b.onclick=()=>{setDemo(d);haptic('tap')};
+  host.appendChild(b);
+ });
+}
+function setDemo(d){
+ currentDemo=d;
+ document.querySelectorAll('.ftab').forEach(x=>x.classList.toggle('active',x.dataset.demo===d));
+ DEMOS.forEach(k=>$('#demo-'+k).classList.toggle('on',k===d));
+ $('#ixCaption').textContent=ixParams[d].caption||demoMeta[d].desc;
+ closeMenu();state.sheet=0;state.sheetV=0;state.sheetTgt=0;
+ if(d==='scroll')requestAnimationFrame(layoutScroll);
+ updateSheetVals();
+}
+function updateSheetVals(){
+ $('#shElastic').textContent=PD('sheet','stiffness')+'%';
+ $('#shMass').textContent=PD('sheet','mass')+'%';
+ $('#shDamping').textContent=PD('sheet','damping')+'%';
+}
+
+/* =====================================================
+   프리셋 칩
 ===================================================== */
 function makePresetChips(){
  const host=$('#presetChips');host.innerHTML='';
@@ -813,29 +899,50 @@ function makePresetChips(){
   host.appendChild(b);
  });
 }
-function makeControls(){
+
+/* =====================================================
+   ④ 튜닝 (인터랙션별 옵션)
+===================================================== */
+function renderTune(){
+ const tabs=$('#tuneTabs');tabs.innerHTML='';
+ DEMOS.forEach(d=>{
+  const b=document.createElement('button');b.className='ttab'+(d===tuneDemo?' active':'');
+  b.textContent=demoMeta[d].num+'. '+demoMeta[d].label;
+  b.onclick=()=>{tuneDemo=d;renderTune()};
+  tabs.appendChild(b);
+ });
+ $('#tuneDemoName').textContent=demoMeta[tuneDemo].label;
+ $('#tuneDemoCap').textContent=ixParams[tuneDemo].caption||demoMeta[tuneDemo].desc;
  const host=$('#controls');host.innerHTML='';
- controlsDef.forEach(([k,l])=>host.appendChild(controlRow(k,l)));
- const env=$('#envControls');env.innerHTML='';
- envDef.forEach(([k,l])=>env.appendChild(controlRow(k,l)));
+ demoMeta[tuneDemo].controls.forEach(([k,label,hint])=>{
+  const d=document.createElement('div');d.className='control';
+  d.innerHTML=`<label>${label}<output>${ixParams[tuneDemo][k]}</output></label>
+   <div class="hint">${hint}</div>
+   <input type="range" min="0" max="100" step="1" value="${ixParams[tuneDemo][k]}">`;
+  d.querySelector('input').addEventListener('input',e=>{
+   ixParams[tuneDemo][k]=+e.target.value;
+   d.querySelector('output').textContent=e.target.value;
+   if(tuneDemo==='sheet')updateSheetVals();
+  });
+  host.appendChild(d);
+ });
 }
-function controlRow(k,label){
- const d=document.createElement('div');d.className='control';
- d.innerHTML=`<label>${label}</label><output id="out-${k}">0</output><input id="ctrl-${k}" type="range" min="0" max="100" step="1">`;
- d.querySelector('input').addEventListener('input',e=>{params[k]=+e.target.value;d.querySelector('output').textContent=e.target.value;updateMetrics()});
- return d;
-}
-function syncControls(){
- [...controlsDef,...envDef].forEach(([k])=>{const i=$('#ctrl-'+k),o=$('#out-'+k);if(i){i.value=params[k];o.textContent=Math.round(params[k])}});
-}
+$('#tuneReset').onclick=()=>{
+ ixParams[tuneDemo]={...current.interactions[tuneDemo]};
+ renderTune();updateSheetVals();haptic('tap');
+};
+$('#backToSim').onclick=()=>{setDemo(tuneDemo);showPage('sim',-1)};
+$('#applyTune').onclick=()=>{setDemo(tuneDemo);showPage('sim',-1)};
+$('#backToAnalyze').onclick=()=>{closeMenu();showPage('analyze',-1)};
+$('#toTune').onclick=()=>{closeMenu();showPage('tune')};
 
 /* =====================================================
    햅틱 / 센서
 ===================================================== */
 function haptic(kind='tap'){
  if(!$('#hapticToggle').checked||!navigator.vibrate)return;
- const s=params.vibration/100;
- const p=kind==='impact'?[Math.round(12+30*s),18,Math.round(10+22*s)]:kind==='tick'?[Math.round(4+8*s)]:[Math.round(8+22*s)];
+ const s=(PD(currentDemo,'vibration')??45)/100;
+ const p=kind==='impact'?[Math.round(12+30*s),18,Math.round(10+22*s)]:kind==='tick'?[Math.round(3+9*s)]:[Math.round(7+20*s)];
  navigator.vibrate(p);
 }
 function requestSensors(){
@@ -855,7 +962,7 @@ function requestSensors(){
   else $('#sensorBtn').textContent='센서 미지원 기기';
  }catch(e){$('#sensorBtn').textContent='센서 사용 불가'}
 }
-// 안드로이드 등 권한 불필요 기기는 자동 시도
+$('#sensorBtn').onclick=requestSensors;
 if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission!=='function'){
  window.addEventListener('deviceorientation',function auto(e){
   if(e.gamma===null&&e.beta===null)return;
@@ -865,7 +972,7 @@ if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.re
 }
 
 /* =====================================================
-   시뮬레이터 인터랙션
+   공용 포인터 (배경 틸트 · 리플 · 시트 드래그)
 ===================================================== */
 function localPoint(ev,el){
  const r=el.getBoundingClientRect();const t=ev.touches?ev.touches[0]:ev;
@@ -873,18 +980,18 @@ function localPoint(ev,el){
 }
 function addRipple(x,y,p=1){state.ripple.push({x,y,a:1,r:5,p});if(state.ripple.length>16)state.ripple.shift()}
 
-const simApp=$('#simApp'),action=$('#actionBtn'),sheet=$('#bottomSheet'),card=$('#materialCard');
+const simApp=$('#simApp'),sheetEl=$('#bottomSheet');
+const skip=e=>e.target.closest('.navbtn')||e.target.closest('.ftab')||e.target.closest('.menu-panel')||e.target.closest('.slider-track')||e.target.closest('.scroll-stage');
 
 simApp.addEventListener('pointermove',e=>{
- if(e.target.closest('.navbtn')||e.target.closest('.ftab'))return;
+ if(skip(e))return;
  const p=localPoint(e,simApp);state.px=p.x;state.py=p.y;
- card.style.setProperty('--gx',(p.x*100)+'%');card.style.setProperty('--gy',(p.y*100)+'%');
- if(state.pointerDown&&currentFeature==='sheet'){
+ if(state.pointerDown&&currentDemo==='sheet'){
    const r=simApp.getBoundingClientRect();
    const dy=(e.clientY-state.dragStartY)/r.height;
-   state.sheet=clamp(state.sheetStart-dy*2.0,0,1.06);
+   state.sheet=clamp(state.sheetStart-dy*2.0,0,1.18);
    const now=performance.now(),dt=Math.max(now-state.lastT,1);
-   state.sheetVel=(state.lastY-e.clientY)/dt;  // 위로 양수
+   state.sheetVel=(state.lastY-e.clientY)/dt;
    state.lastY=e.clientY;state.lastT=now;
  }
  if(!sensorEnabled&&$('#gyroToggle').checked){
@@ -893,80 +1000,149 @@ simApp.addEventListener('pointermove',e=>{
  }
 });
 simApp.addEventListener('pointerdown',e=>{
- if(e.target.closest('.navbtn')||e.target.closest('.ftab')||e.target.closest('.popup'))return;
+ if(skip(e))return;
  state.pointerDown=true;simApp.setPointerCapture?.(e.pointerId);
- state.downOnAction=!!e.target.closest('.action');
- const p=localPoint(e,simApp);state.px=p.x;state.py=p.y;state.targetPressed=1;
- state.dragStartY=e.clientY;state.sheetStart=state.sheet;
+ state.downOnBtn=!!e.target.closest('.action')||!!e.target.closest('.press-chip');
+ const p=localPoint(e,simApp);state.px=p.x;state.py=p.y;
+ if(state.downOnBtn||currentDemo==='sheet')state.targetPressed=1;
+ state.dragStartY=e.clientY;state.sheetStart=Math.min(state.sheet,1);
  state.lastY=e.clientY;state.lastT=performance.now();state.sheetVel=0;
- addRipple(p.x,p.y,1.25);haptic('tap');
+ addRipple(p.x,p.y,1.25);
+ if(state.downOnBtn)haptic('tap');
 });
 simApp.addEventListener('pointerup',e=>{
- if(e.target.closest('.navbtn')||e.target.closest('.ftab'))return;
  state.pointerDown=false;state.targetPressed=0;
- if(currentFeature==='popup'&&state.downOnAction){openPopup(!$('#popup').classList.contains('open'));haptic('impact')}
- state.downOnAction=false;
- if(currentFeature==='sheet'){
-   if(Math.abs(state.sheetVel)>.4)state.sheet=state.sheetVel>0?1:0;
-   else state.sheet=state.sheet>.4?1:0;
+ if(currentDemo==='press'&&state.downOnBtn)haptic('impact');
+ if(currentDemo==='menu'&&state.downOnBtn){toggleMenu();haptic('impact')}
+ if(currentDemo==='sheet'){
+   const v=state.sheetVel;
+   state.sheetTgt=(Math.abs(v)>.35)?(v>0?1:0):(state.sheet>.42?1:0);
+   state.sheetV=v*2.4;  // 플링 관성을 스프링에 이어받기
    haptic('impact');
  }
+ state.downOnBtn=false;
 });
-simApp.addEventListener('pointercancel',()=>{state.pointerDown=false;state.targetPressed=0});
+simApp.addEventListener('pointercancel',()=>{state.pointerDown=false;state.targetPressed=0;state.downOnBtn=false});
 simApp.addEventListener('pointerleave',()=>{if(!sensorEnabled){state.manualTiltX=0;state.manualTiltY=0}});
 
-action.addEventListener('pointermove',e=>{
- const p=localPoint(e,action);
- action.style.setProperty('--px',(p.x*100)+'%');action.style.setProperty('--py',(p.y*100)+'%');
-});
+document.querySelectorAll('.action').forEach(a=>a.addEventListener('pointermove',e=>{
+ const p=localPoint(e,a);a.style.setProperty('--px',(p.x*100)+'%');a.style.setProperty('--py',(p.y*100)+'%');
+}));
 
-function openPopup(on){
- $('#popup').classList.toggle('open',on);
- $('#popBackdrop').classList.toggle('on',on);
+/* =====================================================
+   2. 메뉴 (스태거 스프링)
+===================================================== */
+function toggleMenu(){state.menuOpen?closeMenu():openMenu()}
+function openMenu(){
+ state.menuOpen=true;state.menuT0=performance.now();
+ $('#menuPanel').classList.add('live');
+ const blur=lerp(1,10,PD('menu','refraction')/100);
+ const bd=$('#popBackdrop');
+ bd.classList.add('on');
+ bd.style.background=`rgba(14,18,26,${lerp(.06,.3,PD('menu','refraction')/100)})`;
+ bd.style.backdropFilter=`blur(${blur}px)`;bd.style.webkitBackdropFilter=`blur(${blur}px)`;
+ $('#menuLabel').textContent='Close menu';
 }
-function closePopup(){openPopup(false)}
-$('#popBackdrop').onclick=closePopup;
-$('#popCancel').onclick=e=>{e.stopPropagation();closePopup();haptic('tap')};
-$('#popOk').onclick=e=>{e.stopPropagation();closePopup();haptic('impact')};
+function closeMenu(){
+ if(!state.menuOpen&&!$('#popBackdrop').classList.contains('on'))return;
+ state.menuOpen=false;
+ const bd=$('#popBackdrop');
+ bd.classList.remove('on');bd.style.background='rgba(14,18,26,0)';
+ bd.style.backdropFilter='blur(0px)';bd.style.webkitBackdropFilter='blur(0px)';
+ $('#menuLabel').textContent='Open menu';
+ setTimeout(()=>{if(!state.menuOpen)$('#menuPanel').classList.remove('live')},450);
+}
+$('#popBackdrop').addEventListener('click',()=>{closeMenu();haptic('tap')});
+document.querySelectorAll('.menu-item').forEach(mi=>mi.addEventListener('click',()=>{haptic('tick');closeMenu()}));
 
+/* =====================================================
+   3. 슬라이더
+===================================================== */
 $('#sliderTrack').addEventListener('pointerdown',e=>{
  e.stopPropagation();
  const track=e.currentTarget;track.setPointerCapture(e.pointerId);
  state.targetPressed=1;
  const move=ev=>{
   const p=localPoint(ev,track);state.slider=p.x;
-  const tick=Math.round(p.x*10);
-  if(tick!==state.lastTick){state.lastTick=tick;haptic('tick');addRipple(.12+.76*p.x,.8,.4)}
+  const det=Math.round(p.x*20);
+  if(det!==state.lastDetent){state.lastDetent=det;haptic('tick');addRipple(.12+.76*p.x,.78,.35)}
  };
  move(e);haptic('tap');
- const up=()=>{state.targetPressed=0;track.removeEventListener('pointermove',move);track.removeEventListener('pointerup',up)};
+ const up=()=>{
+  state.targetPressed=0;
+  const tn=PD('slider','tension')/100;
+  if(tn>.45){
+   const near=Math.round(state.slider*4)/4;
+   state.slider=lerp(state.slider,near,(tn-.45)/.55);
+   haptic('impact');
+  }
+  track.removeEventListener('pointermove',move);track.removeEventListener('pointerup',up);
+ };
  track.addEventListener('pointermove',move);track.addEventListener('pointerup',up);
 });
 
-/* 네비게이션 버튼 */
-$('#backToAnalyze').onclick=()=>{closePopup();showPage('analyze',-1)};
-$('#toTune').onclick=()=>{closePopup();showPage('tune')};
-$('#backToSim').onclick=()=>showPage('sim',-1);
-$('#applyTune').onclick=()=>showPage('sim',-1);
-$('#tuneReset').onclick=()=>{params={...current.params};syncControls();updateMetrics();
- document.querySelectorAll('.modebtn').forEach(x=>x.classList.toggle('active',x.dataset.mode==='auto'))};
-$('#sensorBtn').onclick=requestSensors;
-
-document.querySelectorAll('.modebtn').forEach(b=>b.onclick=()=>{
- document.querySelectorAll('.modebtn').forEach(x=>x.classList.toggle('active',x===b));
- const m=b.dataset.mode;
- if(m==='auto')params={...current.params};
- if(m==='calm')params={...current.params,damping:82,wind:Math.min(current.params.wind,28),sensitivity:Math.min(current.params.sensitivity,66),vibration:Math.min(current.params.vibration,28)};
- if(m==='dynamic')params={...current.params,stiffness:clamp(current.params.stiffness-10,0,100),damping:38,wind:Math.max(current.params.wind,52),sensitivity:Math.max(current.params.sensitivity,82)};
- if(m==='extreme')params={...current.params,stiffness:22,damping:22,mass:18,wind:92,sensitivity:98,refraction:Math.max(current.params.refraction,82),vibration:80};
- syncControls();updateMetrics();
+/* =====================================================
+   5. 탭바 스크롤 (관성 물리)
+===================================================== */
+const scrollStage=$('#scrollStage'),scrollTrack=$('#scrollTrack');
+function buildScrollCards(){
+ const names=['Texture','Motion','Optics','Haptics','Ambient'];
+ scrollTrack.innerHTML='';
+ const[ar,ag,ab]=themeRGB.accent;
+ names.forEach((n,i)=>{
+  const c=document.createElement('div');c.className='sc-card';
+  const a1=.16+i*.05,a2=.05;
+  c.innerHTML=`<div class="bgfill" style="background:
+    radial-gradient(circle at ${20+i*16}% 18%,rgba(255,255,255,.65),transparent 55%),
+    linear-gradient(${135+i*18}deg,rgba(${ar},${ag},${ab},${a1}),rgba(${ar},${ag},${ab},${a2}) 65%),var(--sim-glass)"></div>
+   <div class="in"><span class="eb">Chapter 0${i+1}</span><div><div class="idx">0${i+1} / 05</div><h5>${n}</h5></div></div>`;
+  scrollTrack.appendChild(c);
+ });
+ const dots=$('#scrollDots');dots.innerHTML='';
+ names.forEach((_,i)=>{const d=document.createElement('i');if(i===0)d.classList.add('on');dots.appendChild(d)});
+ requestAnimationFrame(layoutScroll);
+}
+function layoutScroll(){
+ const cards=scrollTrack.children;
+ if(!cards.length)return;
+ const cw=cards[0].getBoundingClientRect().width+13;
+ state.scStep=cw;
+ state.scMax=Math.max(0,scrollTrack.scrollWidth-scrollStage.clientWidth+8);
+}
+scrollStage.addEventListener('pointerdown',e=>{
+ e.stopPropagation();
+ scrollStage.setPointerCapture(e.pointerId);
+ state.scDrag=true;state.sv=0;
+ state.scLastX=e.clientX;state.scLastT=performance.now();
+ const move=ev=>{
+  const dx=ev.clientX-state.scLastX;
+  const now=performance.now(),dt=Math.max(now-state.scLastT,1);
+  const sens=lerp(.6,1.5,PD('scroll','sensitivity')/100);
+  let nx=state.sx-dx*sens;
+  // 가장자리 러버밴드
+  if(nx<0)nx=nx*.35;
+  if(nx>state.scMax)nx=state.scMax+(nx-state.scMax)*.35;
+  state.sx=nx;
+  state.sv=(-dx*sens)/dt*1000;
+  state.scLastX=ev.clientX;state.scLastT=now;
+ };
+ const up=()=>{
+  state.scDrag=false;
+  scrollStage.removeEventListener('pointermove',move);
+  scrollStage.removeEventListener('pointerup',up);
+  scrollStage.removeEventListener('pointercancel',up);
+ };
+ scrollStage.addEventListener('pointermove',move);
+ scrollStage.addEventListener('pointerup',up);
+ scrollStage.addEventListener('pointercancel',up);
 });
+window.addEventListener('resize',()=>{if(currentDemo==='scroll')layoutScroll()});
 
 /* =====================================================
    물리 엔진 + 렌더링
 ===================================================== */
 function springStep(pos,vel,target,k,d,m,dt){
- const kk=lerp(16,170,k/100),dd=lerp(4,34,d/100),mm=lerp(.45,2.2,m/100);
+ const kk=lerp(16,180,k/100),dd=lerp(4,36,d/100),mm=lerp(.4,2.4,m/100);
  const a=(kk*(target-pos)-dd*vel)/mm;
  vel+=a*dt;pos+=vel*dt;return[pos,vel];
 }
@@ -977,86 +1153,65 @@ function resizeCanvas(){
  ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 new ResizeObserver(resizeCanvas).observe(canvas);
-window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,300));
+window.addEventListener('orientationchange',()=>setTimeout(()=>{resizeCanvas();layoutScroll()},300));
 
 function seedParticles(){
  state.particles=[];
- const n=10+Math.round(params.light/8);
+ const n=10+Math.round(ambient.light/8);
  for(let i=0;i<n;i++)state.particles.push({
   x:Math.random(),y:Math.random(),r:.6+Math.random()*2.4,
-  sp:.008+Math.random()*.02,ph:Math.random()*6.28,drift:Math.random()*.5+.2
- });
+  sp:.008+Math.random()*.02,ph:Math.random()*6.28,drift:Math.random()*.5+.2});
 }
-
 function drawField(w,h,t){
  ctx.clearRect(0,0,w,h);
- const light=params.light/100,refr=params.refraction/100,visc=params.viscosity/100,
-       wind=params.wind/100,tEff=params.time/100;
+ const light=ambient.light/100,refr=ambient.refraction/100,visc=ambient.viscosity/100,
+       wind=ambient.wind/100,tEff=ambient.time/100;
  const[ar,ag,ab]=themeRGB.accent;
  const whiteA=themeRGB.isDark?.10:.14;
-
- // ① 부유하는 광학 블롭 (테마색 + 화이트, 기울기·시간 반응)
  for(let i=0;i<6;i++){
   const ph=i*1.13;
   const x=w*(.12+.16*i)+Math.sin(t*.00028+ph+state.x*2)*w*.06*(.4+refr)+state.tiltX*(.8+i*.3);
   const y=h*(.2+.12*i)+Math.cos(t*.00021+ph)*h*.05*(.4+visc)+state.tiltY*(.6+i*.2);
   const r=w*(.10+.13*refr)+Math.sin(t*.0004+ph)*10;
   const g=ctx.createRadialGradient(x,y,0,x,y,r);
-  if(i%2===0){
-   g.addColorStop(0,`rgba(255,255,255,${whiteA*(0.4+light)})`);
-   g.addColorStop(.5,`rgba(${ar},${ag},${ab},${.03+.05*refr})`);
-  }else{
-   g.addColorStop(0,`rgba(${ar},${ag},${ab},${.04+.07*refr*light})`);
-   g.addColorStop(.5,`rgba(255,255,255,${whiteA*.4})`);
-  }
+  if(i%2===0){g.addColorStop(0,`rgba(255,255,255,${whiteA*(0.4+light)})`);
+   g.addColorStop(.5,`rgba(${ar},${ag},${ab},${.03+.05*refr})`)}
+  else{g.addColorStop(0,`rgba(${ar},${ag},${ab},${.04+.07*refr*light})`);
+   g.addColorStop(.5,`rgba(255,255,255,${whiteA*.4})`)}
   g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
  }
-
- // ② 공기 흐름 스트랜드
  if(wind>.12){
   ctx.save();ctx.globalAlpha=.06+.13*wind;ctx.lineWidth=.8+wind*1.2;
   ctx.strokeStyle=`rgba(${ar},${ag},${ab},.6)`;
   for(let j=0;j<7;j++){
    ctx.beginPath();
    for(let x=-30;x<w+30;x+=13){
-    const y=h*(.14+j*.11)+Math.sin(x*.014+t*.0012*(.3+wind)+j*1.7)*16*wind
-           +Math.sin(t*.0006+j)*10+state.tiltY*1.2;
+    const y=h*(.14+j*.11)+Math.sin(x*.014+t*.0012*(.3+wind)+j*1.7)*16*wind+Math.sin(t*.0006+j)*10+state.tiltY*1.2;
     if(x<=-30)ctx.moveTo(x,y);else ctx.lineTo(x,y);
    }
    ctx.stroke();
   }
   ctx.restore();
  }
-
- // ③ 부유 입자 (먼지/보케 — 빛·바람·시간 반응)
  state.particles.forEach(pt=>{
   pt.ph+=pt.sp*(0.5+tEff);
   const px=(pt.x+Math.sin(pt.ph)*0.02+wind*0.015*Math.sin(t*.0004+pt.ph))%1;
   const py=(pt.y-pt.sp*pt.drift*(0.3+wind)*0.06+1)%1;
   pt.y=py;
-  const x=px*w+state.tiltX*pt.drift*2, y=py*h+state.tiltY*pt.drift*1.5;
+  const x=px*w+state.tiltX*pt.drift*2,y=py*h+state.tiltY*pt.drift*1.5;
   const a=(.05+.16*light)*(0.5+0.5*Math.sin(pt.ph*2));
   ctx.beginPath();ctx.arc(x,y,pt.r*(1+refr*.5),0,Math.PI*2);
   ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill();
  });
-
- // ④ 터치 리플 (이중 링 + 굴절 시머)
  state.ripple.forEach(rp=>{
   rp.r+=(1.4+5.5*(1-visc))*rp.p;
-  rp.a*=.968-0.018*(params.damping/100);
+  rp.a*=.965;
   const x=rp.x*w,y=rp.y*h;
   ctx.beginPath();ctx.arc(x,y,rp.r,0,Math.PI*2);
   ctx.strokeStyle=`rgba(255,255,255,${rp.a*.55})`;ctx.lineWidth=1.4+2.2*refr;ctx.stroke();
   ctx.beginPath();ctx.arc(x,y,rp.r*.66,0,Math.PI*2);
   ctx.strokeStyle=`rgba(${ar},${ag},${ab},${rp.a*.22})`;ctx.lineWidth=1;ctx.stroke();
-  if(visc>.4){
-   const g=ctx.createRadialGradient(x,y,rp.r*.4,x,y,rp.r);
-   g.addColorStop(0,'rgba(255,255,255,0)');
-   g.addColorStop(.8,`rgba(255,255,255,${rp.a*.06})`);
-   g.addColorStop(1,'rgba(255,255,255,0)');
-   ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,rp.r,0,Math.PI*2);ctx.fill();
-  }
  });
  state.ripple=state.ripple.filter(r=>r.a>.02&&r.r<Math.max(w,h)*1.1);
 }
@@ -1064,71 +1219,121 @@ function drawField(w,h,t){
 function render(now){
  const dt=Math.min((now-state.last)/1000,.033);state.last=now;
  if(!state.simActive){requestAnimationFrame(render);return}
+ const D=currentDemo;
  const tx=(sensorEnabled?state.tiltX:state.manualTiltX),ty=(sensorEnabled?state.tiltY:state.manualTiltY);
- const sens=params.sensitivity/100,wind=params.wind/100;
- const fx=(tx/20)*(.12+.3*sens)+Math.sin(now*.0013)*.055*wind;
- const fy=(ty/20)*(.10+.25*sens)+Math.cos(now*.0011)*.04*wind;
- [state.x,state.vx]=springStep(state.x,state.vx,fx,params.stiffness,params.damping,params.mass,dt);
- [state.y,state.vy]=springStep(state.y,state.vy,fy,params.stiffness,params.damping,params.mass,dt);
- const pr=lerp(9,22,sens);
- state.pressed+=(state.targetPressed-state.pressed)*Math.min(1,dt*pr);
+ const wind=ambient.wind/100;
+ // 전역 미세 흔들림 (현재 데모의 강성·감쇠·질량 사용 → 데모마다 무게감이 다름)
+ const gs=PD(D,'stiffness')??55,gd=PD(D,'damping')??55,gm=PD(D,'mass')??40;
+ const fxv=(tx/20)*.2+Math.sin(now*.0013)*.05*wind;
+ const fyv=(ty/20)*.16+Math.cos(now*.0011)*.035*wind;
+ [state.x,state.vx]=springStep(state.x,state.vx,fxv,gs,gd,gm,dt);
+ [state.y,state.vy]=springStep(state.y,state.vy,fyv,gs,gd,gm,dt);
 
- // 팝업 스프링
- [state.popup,state.popupV]=springStep(state.popup,state.popupV,$('#popup').classList.contains('open')?1:0,params.stiffness,params.damping,params.mass,dt);
- const pop=$('#popup');
- pop.style.transform=`translate(-50%,${(1-state.popup)*36}px) scale(${.84+.16*state.popup}) rotate(${state.x*1.2}deg)`;
- pop.style.opacity=clamp(state.popup,0,1);
-
- // 시트 스프링
- const target=currentFeature==='sheet'?state.sheet:0;
- let s=state.sheet;
- if(!state.pointerDown||currentFeature!=='sheet'){
-  [s,state.sheetV]=springStep(s,state.sheetV,clamp(target,0,1),params.stiffness,params.damping,params.mass,dt);
-  state.sheet=s;
+ /* 1. PRESS */
+ {
+  const p=ixParams.press;
+  const rate=lerp(7,26,p.sensitivity/100);
+  if(state.pointerDown&&(state.downOnBtn||D==='sheet')){
+   state.pressed+=(1-state.pressed)*Math.min(1,dt*rate);
+   state._prV=0;
+  }else{
+   let[np,nv]=springStep(state.pressed,state._prV||0,0,p.stiffness,p.damping,30,dt);
+   state.pressed=np;state._prV=nv;
+   if(Math.abs(np)<.0004&&Math.abs(nv)<.004){state.pressed=0;state._prV=0}
+  }
+  const depth=(.04+.20*(1-p.stiffness/100));
+  const pb=$('#pressBtn');
+  const sq=clamp(state.pressed,-.6,1.2);
+  pb.style.transform=`translate(${state.x*8}px,${state.y*4}px) scale(${1+sq*depth},${1-sq*depth*.75}) rotate(${state.x*3}deg)`;
+  pb.style.borderRadius=`${21+clamp(sq,0,1.2)*14}px`;
+  document.querySelectorAll('.pchip').forEach((c,i)=>{
+   c.style.transform=`translate(${state.x*(5+i*2)}px,${state.y*3}px) scale(${1+sq*depth*.4})`;
+  });
+  if(D==='press')$('#pressVal').textContent=Math.round(clamp(sq,0,1.3)*100*(0.3+0.7*(1-p.stiffness/100)))+'%';
  }
- sheet.style.transform=`translateY(${-clamp(state.sheet,0,1.06)*300}px) rotate(${state.x*1.3}deg)`;
 
- // 버튼 변형 (스쿼시 & 스트레치 + 굴곡)
- const deform=(.03+.15*(1-params.stiffness/100))*(.55+sens);
- action.style.transform=`translate(${state.x*9}px,${state.y*5}px) scale(${1+state.pressed*deform},${1-state.pressed*deform*.72}) rotate(${state.x*4.5+tx*.05}deg)`;
- action.style.borderRadius=`${20+state.pressed*12*(params.tension/100)}px`;
+ /* 2. MENU (스태거 스프링) */
+ {
+  const p=ixParams.menu;
+  const stag=lerp(150,22,p.sensitivity/100);
+  let sum=0;
+  menuItems.forEach((it,i)=>{
+   const active=state.menuOpen&&(now-state.menuT0)>i*stag;
+   const tgt=active?1:0;
+   [it.p,it.v]=springStep(it.p,it.v,tgt,p.stiffness,p.damping,26,dt);
+   sum+=it.p;
+   const el=document.querySelectorAll('.menu-item')[i];
+   if(el){
+    el.style.opacity=clamp(it.p,0,1);
+    el.style.transform=`translateY(${(1-it.p)*16}px) scale(${.92+.08*it.p})`;
+   }
+  });
+  const panel=$('#menuPanel');
+  const pp=clamp(sum/menuItems.length,0,1.15);
+  panel.style.opacity=clamp(pp*1.6,0,1);
+  panel.style.transform=`translateY(${(1-Math.min(pp,1))*22}px) scale(${.9+.1*Math.min(pp*1.2,1.04)}) rotate(${state.x*1.2}deg)`;
+  const mb=$('#menuBtn');
+  mb.style.transform=`translate(${state.x*8}px,${state.y*4}px) scale(${1-Math.min(pp,1)*.03}) rotate(${state.x*3}deg)`;
+ }
 
- // 카드 3D + 광택
- card.style.transform=`translate(${state.x*16}px,${state.y*10}px) perspective(600px) rotateY(${tx*.3+state.x*5}deg) rotateX(${-ty*.22-state.y*4}deg) scale(${1-state.pressed*.016})`;
- card.style.filter=`saturate(${1+params.light/240}) brightness(${.94+params.light/450})`;
- card.style.setProperty('--blur',(params.viscosity/100).toFixed(2));
- card.style.setProperty('--shine',`${-90+((now*.012+params.light*1.6)%280)}%`);
- $('#mcFill').style.width=Math.round(38+state.pressed*30+Math.abs(state.x)*180)+'%';
- $('#mcVal').textContent=Math.round(params.sensitivity*(0.7+state.pressed*0.3))+'%';
+ /* 3. SLIDER (점성 추적 + 정착) */
+ {
+  const p=ixParams.slider;
+  const trackK=lerp(95,10,p.viscosity/100);
+  [state.sliderShow,state.sliderV]=springStep(state.sliderShow,state.sliderV,state.slider,trackK,p.damping,32,dt);
+  const sv=clamp(state.sliderShow,-.03,1.03);
+  $('#sliderFill').style.width=(clamp(sv,0,1)*100)+'%';
+  $('#sliderKnob').style.left=(clamp(sv,0,1)*100)+'%';
+  $('#sliderKnob').style.transform=`translate(-50%,-50%) scale(${1+state.targetPressed*.09})`;
+  $('#sliderOut').textContent=Math.round(clamp(sv,0,1)*100);
+  // 스냅 강도에 따라 눈금 강조
+  const tn=p.tension/100;
+  document.querySelectorAll('#sliderDetents i').forEach(el=>{
+   el.style.opacity=.25+.75*tn;el.style.transform=`scaleY(${.7+.8*tn})`;
+  });
+ }
 
- // 슬라이더 (표시값이 실제값을 스프링으로 추적 → 점성/탄성 체감)
- [state.sliderShow,state.sliderV]=springStep(state.sliderShow,state.sliderV,state.slider,params.stiffness,Math.max(params.damping,30),params.mass,dt);
- const sv=clamp(state.sliderShow,0,1);
- $('#sliderFill').style.width=(sv*100)+'%';
- $('#sliderKnob').style.left=(sv*100)+'%';
- $('#sliderKnob').style.transform=`translate(-50%,-50%) scale(${1+state.pressed*.08})`;
- $('#sliderOut').textContent=Math.round(sv*100);
+ /* 4. SHEET */
+ {
+  const p=ixParams.sheet;
+  if(!(state.pointerDown&&D==='sheet')){
+   [state.sheet,state.sheetV]=springStep(state.sheet,state.sheetV,state.sheetTgt||0,p.stiffness,p.damping,p.mass,dt);
+  }
+  // 러버밴드: 1을 넘긴 만큼 저항
+  let disp=state.sheet;
+  if(disp>1)disp=1+(disp-1)*lerp(.6,.18,p.tension/100);
+  if(disp<0)disp=disp*lerp(.6,.18,p.tension/100);
+  sheetEl.style.transform=`translateY(${-disp*300}px) rotate(${state.x*1.2}deg)`;
+ }
 
- // 데모존 전체가 미세하게 살아있게
+ /* 5. SCROLL (관성 + 마찰 + 스냅 + 러버밴드 복원) */
+ {
+  const p=ixParams.scroll;
+  if(!state.scDrag){
+   const fr=lerp(.6,7.5,p.damping/100)/lerp(1.6,.55,p.mass/100);
+   state.sv*=Math.exp(-fr*dt);
+   state.sx+=state.sv*dt;
+   // 가장자리 스프링 복귀
+   if(state.sx<0){[state.sx,state.sv]=springStep(state.sx,state.sv,0,lerp(30,90,p.tension/100),55,30,dt)}
+   else if(state.sx>state.scMax){[state.sx,state.sv]=springStep(state.sx,state.sv,state.scMax,lerp(30,90,p.tension/100),55,30,dt)}
+   // 카드 스냅
+   else if(Math.abs(state.sv)<60&&p.tension>40&&state.scStep>0){
+    const near=clamp(Math.round(state.sx/state.scStep)*state.scStep,0,state.scMax);
+    [state.sx,state.sv]=springStep(state.sx,state.sv,near,lerp(20,70,(p.tension-40)/60),60,30,dt);
+   }
+  }
+  scrollTrack.style.transform=`translateX(${-state.sx}px)`;
+  if(state.scStep>0){
+   const idx=clamp(Math.round(state.sx/state.scStep),0,4);
+   if(idx!==state.scIdx){state.scIdx=idx;haptic('tick');
+    document.querySelectorAll('#scrollDots i').forEach((d,i)=>d.classList.toggle('on',i===idx));}
+  }
+ }
+
  $('#demoZone').style.transform=`translate(${state.x*3}px,${state.y*2}px)`;
-
  const r=canvas.getBoundingClientRect();
  drawField(r.width,r.height,now);
  requestAnimationFrame(render);
-}
-
-function updateMetrics(){
- const k=lerp(16,170,params.stiffness/100),m=lerp(.45,2.2,params.mass/100),d=lerp(4,34,params.damping/100);
- const response=Math.round(38+(params.mass*.65)+(100-params.sensitivity)*.8+params.viscosity*.18);
- const wn=Math.sqrt(k/m),z=d/(2*Math.sqrt(k*m));
- const settle=clamp(z>0?4/(z*wn):2.5,.12,3.5);
- const deform=Math.round(7+(100-params.stiffness)*.16+params.sensitivity*.06);
- const energy=clamp((params.wind*.35+params.sensitivity*.25+(100-params.damping)*.25+(100-params.mass)*.15)/100,0,1);
- $('#mResponse').textContent=response+' ms';$('#mSettle').textContent=settle.toFixed(2)+' s';
- $('#mDeform').textContent=deform+' %';$('#mEnergy').textContent=energy.toFixed(2);
- $('#shElastic').textContent=params.stiffness+'%';
- $('#shRecovery').textContent=params.recovery+'%';
- $('#shDamping').textContent=params.damping+'%';
 }
 
 function updateClock(){
@@ -1138,9 +1343,13 @@ function updateClock(){
 setInterval(updateClock,20000);
 
 /* 초기화 */
-makePresetChips();makeControls();
-applyTheme(current.theme);seedParticles();syncControls();updateMetrics();renderFeatureTabs();
-applyFeature('button');updateClock();
+seedIxParams();
+makePresetChips();
+applyTheme(current.theme);
+seedParticles();
+renderFeatureTabs();
+setDemo('press');
+updateClock();
 requestAnimationFrame(render);
 })();
 </script>
