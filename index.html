@@ -15,8 +15,9 @@
     --accent:#3b7bff;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
+  html{height:100%}
   body{
+    min-height:100vh;
     background:
       radial-gradient(1100px 700px at 78% -10%, rgba(70,95,165,.15), transparent 60%),
       radial-gradient(900px 620px at 8% 112%, rgba(165,85,120,.10), transparent 60%),
@@ -25,7 +26,7 @@
     font-family:-apple-system,BlinkMacSystemFont,"Samsung Sans","SamsungOne","Roboto","Apple SD Gothic Neo","Pretendard",system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
     display:flex;align-items:center;justify-content:center;align-content:center;
-    padding:26px 24px 32px;gap:26px 54px;flex-wrap:wrap;min-height:100vh;
+    padding:26px 24px 32px;gap:26px 54px;flex-wrap:wrap;
     user-select:none;-webkit-user-select:none;
   }
 
@@ -55,7 +56,7 @@
   body[data-theme=stone] .tbtn.sel .tnum{background:linear-gradient(165deg,#eceef2,#8d939d);color:#22252b}
   body[data-theme=oil] .tbtn.sel{background:linear-gradient(180deg,rgba(224,168,60,.30),rgba(120,170,240,.16));box-shadow:inset 0 0 0 1px rgba(230,180,90,.5)}
   body[data-theme=oil] .tbtn.sel .tnum{background:linear-gradient(165deg,#f3c14e,#7db3ef);color:#2a1c08}
-  .theme-cap{font-size:12px;color:var(--text-2);letter-spacing:.1px}
+  .theme-cap{font-size:12px;color:var(--text-2);letter-spacing:.1px;text-align:center;padding:0 12px}
 
   /* ================= PHONE ================= */
   .phone{
@@ -118,176 +119,232 @@
   }
 
   /* ================================================== */
-  /* ---- 테마 2 : 글라스 & 메탈 ----
-     바탕 = 투명하고 투명도가 높은 크리스탈 유리 /
-     인터랙션 대상 = 정밀 가공 메탈.
-     메탈은 유리에 뚫린 소켓에 안착되어 있고, 누르면 유리면
-     아래로 잠기며(--sink) 절도 있게 복귀한다. */
+  /* ---- 테마 2 : 스톤 & 메탈 ----
+     바탕 = 짙은 회색의 거친 돌 / 대상 = 반구형 리얼 메탈.
+     메탈 노브는 볼록 거울처럼 하늘·수평선·바닥이 비치는
+     크롬 구슬로 렌더링되며, 누르면 돌에 파인 소켓 속으로
+     잠기고(--sink) 절도 있게 복귀한다. */
   /* ================================================== */
+
+  /* 거친 돌 바탕 : 2중 노이즈(미세 그레인 + 얼룩) + 정으로 다듬은 모서리 */
   body[data-theme=stone] .lg{
     background:
-      linear-gradient(158deg, rgba(255,255,255,.11), rgba(255,255,255,.015) 46%),
-      rgba(216,226,242,.09);
-    backdrop-filter:blur(calc(var(--blur,18)*.65px)) saturate(1.55) brightness(1.03);
-    -webkit-backdrop-filter:blur(calc(var(--blur,18)*.65px)) saturate(1.55) brightness(1.03);
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.55 0 0 0 0 0.55 0 0 0 0 0.56 0 0 0 0.75 0'/></filter><rect width='150' height='150' filter='url(%23g)'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='3' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.42 0 0 0 0 0.42 0 0 0 0 0.44 0 0 0 0.9 0'/></filter><rect width='280' height='280' filter='url(%23m)'/></svg>"),
+      linear-gradient(172deg,#4c4c50 0%,#3c3c40 48%,#2e2e32 100%);
+    background-blend-mode:overlay,soft-light,normal;
+    backdrop-filter:blur(3px) saturate(.95);
+    -webkit-backdrop-filter:blur(3px) saturate(.95);
     box-shadow:
-      0 16px 36px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.22),
-      inset 0 0 26px rgba(255,255,255,.035);
+      0 22px 46px rgba(0,0,0,.6), 0 5px 12px rgba(0,0,0,.5),
+      inset 0 1px 0 rgba(255,255,255,.10),
+      inset 0 -8px 16px rgba(0,0,0,.5),
+      inset 4px 0 8px rgba(0,0,0,.25), inset -4px 0 8px rgba(0,0,0,.25);
   }
-  body[data-theme=stone] .lg::before{ /* 크리스탈 컷 에지 */
-    padding:1.3px;
+  body[data-theme=stone] .lg::before{ /* 정으로 다듬은 모서리 */
+    padding:2px;
     background:linear-gradient(150deg,
-      rgba(255,255,255,.95), rgba(255,255,255,.28) 22%,
-      rgba(185,205,235,.10) 46%, rgba(255,255,255,.22) 70%,
-      rgba(255,255,255,.8));
+      rgba(255,255,255,.26), rgba(255,255,255,.05) 26%,
+      rgba(0,0,0,.06) 50%, rgba(0,0,0,.42) 78%, rgba(0,0,0,.18));
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;
-    opacity:var(--shine,.95);
+    opacity:1;
   }
-  body[data-theme=stone] .lg::after{ /* 판유리 사선 반사 */
-    background:
-      linear-gradient(115deg, transparent 28%, rgba(255,255,255,.17) 37%, rgba(255,255,255,.03) 45%, transparent 53%),
-      radial-gradient(130% 70% at 20% -8%, rgba(255,255,255,.20), transparent 50%);
-    mix-blend-mode:screen;opacity:var(--shine,.9);
+  body[data-theme=stone] .lg::after{ /* 석영 알갱이 반짝임 */
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='110'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.85 -0.58'/></filter><rect width='110' height='110' filter='url(%23s)'/></svg>");
+    mix-blend-mode:screen;opacity:.14;
   }
 
-  /* 회전 가공된 메탈 노브 (버튼·칩·썸) : 유리 소켓 + 잠김(--sink) */
+  /* ---- 반구형 리얼 메탈 구슬 (볼록 거울 반사) ---- */
   body[data-theme=stone] .qs-btn,
   body[data-theme=stone] .qs-chip.lg,
   body[data-theme=stone] .thumb.lg,
   body[data-theme=stone] .m-btn{
-    --sink:0;position:relative;
+    --sink:0;position:relative;overflow:hidden;
     background:
-      radial-gradient(120% 120% at 30% 22%, rgba(255,255,255,.85), rgba(255,255,255,0) 40%),
-      repeating-conic-gradient(rgba(255,255,255,.13) 0deg 3deg, rgba(0,0,0,.14) 3deg 6deg),
-      radial-gradient(circle at 50% 45%, #e0e3e9 0%, #a9aeb8 48%, #7b818a 78%, #5f646d 100%);
+      /* 주 스페큘러 하이라이트 */
+      radial-gradient(circle at 33% 21%, rgba(255,255,255,.98) 0%, rgba(255,255,255,.55) 6%, rgba(255,255,255,.12) 15%, transparent 30%),
+      /* 바닥 반사광 */
+      radial-gradient(circle at 62% 88%, rgba(255,255,255,.5) 0%, transparent 34%),
+      /* 측면 환경광 */
+      radial-gradient(120% 100% at 100% 50%, rgba(180,192,208,.55), transparent 48%),
+      /* 하늘 → 수평선 → 바닥 반사 */
+      linear-gradient(178deg,
+        #f2f6fb 0%, #dce3ec 14%, #c2ccd8 30%,
+        #a3aebb 42%, #8b96a4 47.5%,
+        #2c3239 49.6%, #454d57 50.6%,
+        #656e79 55%, #8b939e 63%,
+        #b3bac4 74%, #dde2e9 89%, #f3f5f8 100%);
     box-shadow:
-      inset 0 1.5px 1px rgba(255,255,255,.92),
-      inset 0 -3px 5px rgba(0,0,0,.42),
-      inset 0 0 0 .8px rgba(255,255,255,.22),
-      0 0 0 3px rgba(10,16,26,.30),
-      0 0 0 4px rgba(255,255,255,.22),
-      0 calc(6px - var(--sink)*6px) calc(14px - var(--sink)*11px) rgba(0,0,0,.5),
-      inset 0 calc(var(--sink)*4px) calc(2px + var(--sink)*7px) rgba(0,0,0,calc(var(--sink)*.5));
-    filter:brightness(calc(1 - var(--sink)*.15));
+      inset 0 0 0 1px rgba(255,255,255,.4),
+      inset 0 9px 12px -9px rgba(255,255,255,.85),
+      inset 0 -9px 12px -9px rgba(0,0,0,.55),
+      inset 7px 0 12px -10px rgba(0,0,0,.5),
+      inset -7px 0 12px -10px rgba(0,0,0,.5),
+      inset 0 0 12px 3px rgba(0,0,0,.18),
+      0 0 0 2.5px rgba(14,14,16,.62),
+      0 0 0 3.6px rgba(255,255,255,.14),
+      0 calc(7px - var(--sink)*7px) calc(15px - var(--sink)*12px) rgba(0,0,0,.62),
+      inset 0 calc(var(--sink)*4px) calc(2px + var(--sink)*8px) rgba(0,0,0,calc(var(--sink)*.55));
+    filter:brightness(calc(1 - var(--sink)*.16));
     backdrop-filter:none;-webkit-backdrop-filter:none;
   }
+  /* 구체 가장자리 감쇠(림 다크닝) */
+  body[data-theme=stone] .qs-btn::before,
+  body[data-theme=stone] .m-btn::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
+    background:radial-gradient(circle at 50% 50%, transparent 52%, rgba(0,0,0,.30) 84%, rgba(0,0,0,.5) 100%);
+  }
   body[data-theme=stone] .qs-chip.lg::before,
+  body[data-theme=stone] .thumb.lg::before{
+    background:radial-gradient(circle at 50% 50%, transparent 52%, rgba(0,0,0,.30) 84%, rgba(0,0,0,.5) 100%);
+    -webkit-mask:none;mask:none;padding:0;opacity:1;
+  }
   body[data-theme=stone] .qs-chip.lg::after,
-  body[data-theme=stone] .thumb.lg::before,
   body[data-theme=stone] .thumb.lg::after{display:none}
+
+  /* 골드 크롬 구슬 (켜짐) */
   body[data-theme=stone] .qs-btn.on{
     background:
-      radial-gradient(120% 120% at 30% 22%, rgba(255,255,255,.8), rgba(255,255,255,0) 40%),
-      repeating-conic-gradient(rgba(255,255,255,.16) 0deg 3deg, rgba(92,62,10,.20) 3deg 6deg),
-      radial-gradient(circle at 50% 45%, #f5e0a5 0%, #d9af55 46%, #aa7f27 78%, #7c5a16 100%);
+      radial-gradient(circle at 33% 21%, rgba(255,255,255,.98) 0%, rgba(255,248,225,.55) 6%, rgba(255,240,200,.12) 15%, transparent 30%),
+      radial-gradient(circle at 62% 88%, rgba(255,238,190,.5) 0%, transparent 34%),
+      radial-gradient(120% 100% at 100% 50%, rgba(210,175,105,.5), transparent 48%),
+      linear-gradient(178deg,
+        #fdf3d6 0%, #f2dda6 14%, #e0c47e 30%,
+        #c9a755 42%, #b08f3e 47.5%,
+        #3a2c0c 49.6%, #5c4715 50.6%,
+        #86682a 55%, #ab8a41 63%,
+        #d3b269 74%, #f0dda8 89%, #fbf2d8 100%);
   }
   body[data-theme=stone] .qs-btn svg,
-  body[data-theme=stone] .m-btn svg{filter:brightness(.22) drop-shadow(0 1px 0 rgba(255,255,255,.4))}
+  body[data-theme=stone] .m-btn svg,
+  body[data-theme=stone] .qs-chip svg{
+    position:relative;z-index:3;
+    filter:brightness(.16) drop-shadow(0 1px 0 rgba(255,255,255,.55));
+  }
   body[data-theme=stone] .m-btn{width:36px;height:36px}
-  body[data-theme=stone] .qs-chip svg{filter:brightness(.24)}
 
-  /* 브러시드 메탈 필 (막대형) */
+  /* 폴리시드 메탈 필 (막대형 : 같은 수평선 반사) */
   body[data-theme=stone] .qs-pill{
     --sink:0;position:relative;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 45%),
-      repeating-linear-gradient(92deg, rgba(255,255,255,.10) 0 1px, rgba(0,0,0,.10) 1px 2.5px),
-      linear-gradient(180deg,#cbcfd6 0%,#9ba1ab 55%,#7c828c 100%);
+      linear-gradient(178deg,
+        #f2f6fb 0%, #d7dfe9 16%, #b6c0cd 36%,
+        #96a1af 45%,
+        #343b44 49.5%, #525b66 51%,
+        #7d8792 60%, #adb5c0 76%, #e2e7ee 96%);
     box-shadow:
-      inset 0 1.5px 1px rgba(255,255,255,.88),
-      inset 0 -2.5px 4px rgba(0,0,0,.38),
-      0 0 0 2.5px rgba(10,16,26,.28), 0 0 0 3.5px rgba(255,255,255,.2),
-      0 calc(5px - var(--sink)*5px) calc(12px - var(--sink)*9px) rgba(0,0,0,.45),
-      inset 0 calc(var(--sink)*3px) calc(var(--sink)*6px) rgba(0,0,0,calc(var(--sink)*.45));
-    filter:brightness(calc(1 - var(--sink)*.13));
-    color:#22262c;text-shadow:0 1px 0 rgba(255,255,255,.45);
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -2px 4px rgba(0,0,0,.4),
+      0 0 0 2.2px rgba(14,14,16,.55), 0 0 0 3.2px rgba(255,255,255,.12),
+      0 calc(5px - var(--sink)*5px) calc(13px - var(--sink)*10px) rgba(0,0,0,.55),
+      inset 0 calc(var(--sink)*3px) calc(var(--sink)*7px) rgba(0,0,0,calc(var(--sink)*.5));
+    filter:brightness(calc(1 - var(--sink)*.14));
+    color:#1d2126;text-shadow:0 1px 0 rgba(255,255,255,.5);
+    backdrop-filter:none;-webkit-backdrop-filter:none;
   }
-  body[data-theme=stone] .qs-pill svg{filter:brightness(.2)}
+  body[data-theme=stone] .qs-pill svg{filter:brightness(.14) drop-shadow(0 1px 0 rgba(255,255,255,.5))}
 
-  /* 유리에 파인 슬라이더 홈 */
+  /* 돌에 파낸 슬라이더 홈 */
   body[data-theme=stone] .track.lg{
-    background:linear-gradient(180deg, rgba(16,22,34,.32), rgba(26,32,46,.22));
-    backdrop-filter:blur(9px) saturate(1.4);
-    -webkit-backdrop-filter:blur(9px) saturate(1.4);
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='130'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.45 0 0 0 0 0.46 0 0 0 0.65 0'/></filter><rect width='130' height='130' filter='url(%23n)'/></svg>"),
+      linear-gradient(180deg,#1d1d20,#2c2c30 60%,#232326);
+    background-blend-mode:overlay,normal;
     box-shadow:
-      inset 0 3px 7px rgba(0,0,0,.42),
-      inset 0 -1px 0 rgba(255,255,255,.28),
-      inset 0 0 0 1px rgba(255,255,255,.10);
+      inset 0 5px 10px rgba(0,0,0,.8),
+      inset 0 -1px 0 rgba(255,255,255,.10),
+      inset 0 0 0 1px rgba(0,0,0,.6),
+      0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter:none;-webkit-backdrop-filter:none;
   }
   body[data-theme=stone] .track.lg::before,
   body[data-theme=stone] .track.lg::after{display:none}
   body[data-theme=stone] .fill{
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,0) 42%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 2px, rgba(0,0,0,.06) 2px 4px),
-      linear-gradient(180deg,#d7dbe1,#aaafb9 60%,#c3c7ce);
-    box-shadow:inset 0 -1px 2px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.7), 0 1px 3px rgba(0,0,0,.4);
+    background:linear-gradient(178deg,
+      #eff4f9 0%, #d2dae4 20%, #aeb8c5 42%,
+      #3a424c 49.5%, #5e6772 52%,
+      #929ba6 66%, #ccd3db 90%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 2px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.5);
+    backdrop-filter:none;-webkit-backdrop-filter:none;
   }
-  body[data-theme=stone] .thumb .dot::after{background:#3a3d43;box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.5)}
+  body[data-theme=stone] .thumb .dot::after{
+    background:#23262b;box-shadow:inset 0 1px 2px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.55);
+    position:relative;z-index:3;
+  }
 
-  /* 메탈 서랍 메뉴 */
+  /* 폴리시드 메탈 서랍 메뉴 */
   body[data-theme=stone] .menu-morph{
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 30%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.07) 0 1px, rgba(0,0,0,.08) 1px 2.5px),
-      linear-gradient(165deg,#d5d9df 0%,#a4aab3 45%,#787e88 100%);
+    background:linear-gradient(178deg,
+      #eef3f9 0%, #d3dbe5 12%, #b2bcca 28%,
+      #939eac 40%,
+      #333a43 46%, #4e5762 48%,
+      #6f7883 56%, #99a2ad 70%, #c8cfd8 92%);
     box-shadow:
-      0 0 0 2.5px rgba(10,16,26,.3), 0 0 0 3.5px rgba(255,255,255,.2),
-      0 16px 32px rgba(0,0,0,.55),
-      inset 0 1px 0 rgba(255,255,255,.85), inset 0 -4px 8px rgba(0,0,0,.35);
+      0 0 0 2.2px rgba(14,14,16,.6), 0 0 0 3.2px rgba(255,255,255,.12),
+      0 18px 34px rgba(0,0,0,.62),
+      inset 0 1px 0 rgba(255,255,255,.9), inset 0 -4px 8px rgba(0,0,0,.4);
     backdrop-filter:none;-webkit-backdrop-filter:none;
   }
   body[data-theme=stone] .menu-morph::before{
     padding:1.4px;
-    background:linear-gradient(150deg,#f7f8fa,#9aa0aa 30%,#e9ecf0 52%,#71767f 74%,#c9cdd4);
+    background:linear-gradient(150deg,#ffffff,#9aa3af 30%,#eef2f7 52%,#6b737e 74%,#cfd5dd);
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;
   }
   body[data-theme=stone] .menu-morph::after{display:none}
-  body[data-theme=stone] .menu-plus svg{filter:brightness(.22)}
-  body[data-theme=stone] .menu-morph .menu-item{color:#22252b;text-shadow:0 1px 0 rgba(255,255,255,.4)}
-  body[data-theme=stone] .menu-morph .menu-item svg{filter:brightness(.2)}
-  body[data-theme=stone] .menu-morph .menu-sep{background:rgba(0,0,0,.28)}
-  body[data-theme=stone] .menu-morph .menu-item:active{background:rgba(0,0,0,.12)}
+  body[data-theme=stone] .menu-plus svg{filter:brightness(.14)}
+  body[data-theme=stone] .menu-morph .menu-item{color:#1c2025;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+  body[data-theme=stone] .menu-morph .menu-item svg{filter:brightness(.14)}
+  body[data-theme=stone] .menu-morph .menu-sep{background:rgba(0,0,0,.32)}
+  body[data-theme=stone] .menu-morph .menu-item:active{background:rgba(0,0,0,.14)}
 
-  /* 메탈 레일 탭바 */
+  /* 폴리시드 메탈 레일 탭바 */
   body[data-theme=stone] .tabbar.lg{
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0) 36%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, rgba(0,0,0,.07) 2px 4px),
-      linear-gradient(180deg,#bcc1c9,#8f959f 55%,#71767f);
+    background:linear-gradient(178deg,
+      #eef3f9 0%, #d0d8e3 14%, #adb7c4 34%,
+      #8d98a6 44%,
+      #313841 49.5%, #4c555f 51.5%,
+      #757e89 60%, #a2aab5 76%, #d6dce4 96%);
     box-shadow:
-      0 16px 32px rgba(0,0,0,.5),
-      0 0 0 2.5px rgba(10,16,26,.28), 0 0 0 3.5px rgba(255,255,255,.18),
-      inset 0 1px 0 rgba(255,255,255,.85), inset 0 -3px 6px rgba(0,0,0,.4);
+      0 18px 34px rgba(0,0,0,.6),
+      0 0 0 2.2px rgba(14,14,16,.55), 0 0 0 3.2px rgba(255,255,255,.1),
+      inset 0 1px 0 rgba(255,255,255,.9), inset 0 -3px 6px rgba(0,0,0,.45);
     backdrop-filter:none;-webkit-backdrop-filter:none;
   }
   body[data-theme=stone] .tabbar.lg::before,
   body[data-theme=stone] .tabbar.lg::after{display:none}
-  body[data-theme=stone] .tab{color:#454b54}
-  body[data-theme=stone] .tab.active{color:#14171c}
-  body[data-theme=stone] .tab .lbl{text-shadow:0 1px 0 rgba(255,255,255,.4)}
+  body[data-theme=stone] .tab{color:#3e454e}
+  body[data-theme=stone] .tab.active{color:#0f1216}
+  body[data-theme=stone] .tab .lbl{text-shadow:0 1px 0 rgba(255,255,255,.45)}
 
-  body[data-theme=stone] .grabber{background:linear-gradient(180deg,#eef0f3,#9ba0a9);box-shadow:0 1px 3px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.9)}
-  body[data-theme=stone] .sheet-card{
-    background:rgba(255,255,255,.12);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.38), inset 0 0 0 .6px rgba(255,255,255,.12);
+  body[data-theme=stone] .grabber{
+    background:linear-gradient(180deg,#f4f7fa,#8d949e);
+    box-shadow:0 1px 3px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.95);
   }
-  body[data-theme=stone] .sheet-close{background:linear-gradient(165deg,#d5d9df,#8b919b);color:#22262c}
+  body[data-theme=stone] .sheet-card{
+    background:rgba(0,0,0,.3);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.07);
+  }
+  body[data-theme=stone] .sheet-close{
+    background:linear-gradient(178deg,#eef3f9 0%,#b6c0cd 44%,#3a424c 50%,#7d8792 62%,#d9dfe7 96%);
+    color:#1d2126;
+    box-shadow:0 0 0 2px rgba(14,14,16,.5), inset 0 1px 0 rgba(255,255,255,.8);
+  }
   body[data-theme=stone] .card{
-    background:rgba(255,255,255,.10);
-    backdrop-filter:blur(13px) saturate(1.5);-webkit-backdrop-filter:blur(13px) saturate(1.5);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 .6px rgba(255,255,255,.12), 0 10px 24px rgba(0,0,0,.28);
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.55 0 0 0 0 0.55 0 0 0 0 0.56 0 0 0 0.62 0'/></filter><rect width='150' height='150' filter='url(%23g)'/></svg>"),
+      linear-gradient(180deg,rgba(72,72,76,.92),rgba(44,44,48,.92));
+    background-blend-mode:overlay,normal;
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 -3px 7px rgba(0,0,0,.4), 0 12px 24px rgba(0,0,0,.5);
   }
 
   /* ================================================== */
   /* ---- 테마 3 : 워터 & 오일 ----
      바탕 = 점성 있는 호박색 오일 / 대상 = 맑은 물.
-     모든 인터랙션 = "물방울이 오일에 자극을 주는" 사건.
-     누르면 중앙에 물방울이 떨어지고(임팩트), 그 지점에서
-     파문이 바깥으로 번진다. 손잡이가 지나간 오일 표면에도
-     연속적으로 파문이 퍼진다. */
+     모든 조작 = 대상 중앙에서 흰 그라데이션 광이 한 번
+     바깥까지 퍼졌다가 사라지는 "자극과 확산". */
   /* ================================================== */
   @keyframes irid{to{filter:hue-rotate(360deg)}}
   body[data-theme=oil] .lg{
@@ -384,35 +441,23 @@
   body[data-theme=oil] .sheet-card{background:rgba(255,240,215,.13);box-shadow:inset 0 1px 0 rgba(255,235,190,.22)}
   body[data-theme=oil] .grabber{background:rgba(210,232,255,.75)}
 
-  /* --- 물방울 임팩트 : 낙하하는 방울 --- */
-  .dropin{
-    position:absolute;pointer-events:none;z-index:7;border-radius:50%;
-    background:radial-gradient(circle at 34% 30%, #eef6ff 0%, #a8ccf6 55%, #6d9de0 100%);
-    box-shadow:0 2px 6px rgba(30,60,120,.35), inset 0 -2px 4px rgba(70,120,200,.5);
-    animation:dropin .34s cubic-bezier(.35,.6,.4,1) forwards;
-  }
-  @keyframes dropin{
-    0%{transform:translate(-50%,-190%) scale(.85);opacity:0}
-    28%{opacity:1}
-    72%{transform:translate(-50%,-50%) scale(1);opacity:1}
-    100%{transform:translate(-50%,-50%) scale(.18);opacity:0}
-  }
-  /* --- 오일 파문 : 임팩트 지점에서 바깥으로 --- */
-  .oripple{
+  /* --- 흰 그라데이션 확산 : 중앙에서 바깥까지 한 번 퍼졌다 사라짐 --- */
+  .wsplash{
     position:absolute;pointer-events:none;z-index:6;border-radius:50%;
-    border:2px solid rgba(195,228,255,.9);
-    box-shadow:
-      0 0 0 4px rgba(224,158,52,.30),
-      0 0 10px 2px rgba(255,205,110,.25),
-      inset 0 0 8px rgba(195,228,255,.45);
-    animation:orip .72s cubic-bezier(.17,.65,.3,1) forwards;
+    transform:translate(-50%,-50%) scale(.2);
+    background:radial-gradient(circle,
+      rgba(255,255,255,.95) 0%,
+      rgba(255,255,255,.55) 34%,
+      rgba(225,240,255,.26) 56%,
+      rgba(255,255,255,0) 74%);
+    mix-blend-mode:screen;
+    animation:wsplash .62s cubic-bezier(.2,.65,.3,1) forwards;
   }
-  @keyframes orip{
-    0%{transform:translate(-50%,-50%) scale(.12);opacity:0}
-    12%{opacity:1}
+  @keyframes wsplash{
+    0%{transform:translate(-50%,-50%) scale(.18);opacity:0}
+    16%{opacity:1}
     100%{transform:translate(-50%,-50%) scale(1);opacity:0}
   }
-  .oripple.late{animation-duration:.95s;animation-delay:.10s;opacity:0}
 
   /* ============ SCENES ============ */
   .scene{position:absolute;inset:0;display:none;z-index:20}
@@ -563,12 +608,6 @@
   .tab.active{color:#fff}
   .tab .lbl{font-size:10px;font-weight:650;letter-spacing:.2px;will-change:opacity;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 
-  /* ---------- 물·기름 방울 ---------- */
-  .drops{position:absolute;inset:0;z-index:56;pointer-events:none;filter:url(#goo)}
-  .drop{position:absolute;left:0;top:0;border-radius:50%;will-change:transform,opacity}
-  .drop.water{background:radial-gradient(circle at 34% 30%, #e2f1ff 0%, #a4c9f5 55%, #6d9de0 100%)}
-  .drop.oil{background:radial-gradient(circle at 34% 30%, #ffe08a 0%, #e0a83c 55%, #a97316 100%)}
-
   /* ================= PANEL ================= */
   .panel{
     width:344px;border-radius:26px;background:linear-gradient(180deg,var(--panel-2),var(--panel));
@@ -598,7 +637,24 @@
   .reset:hover{opacity:.8}
   .hint{font-size:12px;color:var(--text-2);line-height:1.55;border-top:1px solid var(--line);padding-top:15px}
 
-  @media (max-width:820px){ body{gap:24px 34px;padding:20px 14px} }
+  /* ================= 모바일 : 세로 스택 레이아웃 ================= */
+  @media (max-width:860px){
+    body{
+      flex-direction:column;flex-wrap:nowrap;
+      align-items:center;justify-content:flex-start;align-content:flex-start;
+      gap:20px;padding:16px 10px 56px;
+    }
+    .topbar{flex-basis:auto;width:100%}
+    .theme-switch{flex-wrap:wrap;justify-content:center;max-width:100%}
+    .tbtn{padding:9px 13px;font-size:12.5px;gap:6px}
+    .phone{
+      transform-origin:top center;
+    }
+    .panel{width:100%;max-width:372px}
+  }
+  @media (max-width:372px){
+    .phone{transform:scale(calc((100vw - 16px)/352));margin-bottom:calc(-724px*(1 - (100vw - 16px)/352))}
+  }
   @media (prefers-reduced-motion:reduce){ *{animation:none!important} }
 </style>
 </head>
@@ -608,22 +664,11 @@
 <header class="topbar">
   <div class="theme-switch" id="themeSwitch">
     <button class="tbtn sel" data-t="glass"><span class="tnum">1</span>리퀴드 글라스</button>
-    <button class="tbtn" data-t="stone"><span class="tnum">2</span>글라스 &amp; 메탈</button>
+    <button class="tbtn" data-t="stone"><span class="tnum">2</span>스톤 &amp; 메탈</button>
     <button class="tbtn" data-t="oil"><span class="tnum">3</span>워터 &amp; 오일</button>
   </div>
   <div class="theme-cap" id="themeCap">빛을 머금은 유리가 젤처럼 눌리고 출렁이며 복원됩니다</div>
 </header>
-
-<!-- goo 필터 정의 -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <filter id="goo">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="5.5" result="b"/>
-      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="g"/>
-      <feComposite in="SourceGraphic" in2="g" operator="atop"/>
-    </filter>
-  </defs>
-</svg>
 
 <!-- ================= PHONE ================= -->
 <div class="phone">
@@ -741,7 +786,7 @@
     <!-- ========== SCENE 2 : 메뉴 ========== -->
     <section class="scene" id="sc-menu">
       <div class="scene-title">오른쪽 아래 버튼을 눌러 메뉴로 변형해 보세요</div>
-      <div class="menu-anchor">
+      <div class="menu-anchor" id="menuAnchor">
         <div class="menu-morph lg" id="menuMorph">
           <div class="menu-items" id="menuItems">
             <div class="menu-item"><svg width="18" height="18" viewBox="0 0 18 18" fill="white"><path d="M9 1l2.3 4.9 5.2.7-3.8 3.7.9 5.2L9 13l-4.6 2.5.9-5.2L1.5 6.6l5.2-.7z"/></svg>즐겨찾기에 추가</div>
@@ -824,7 +869,6 @@
       </div>
     </section>
 
-    <div class="drops" id="drops"></div>
     <div class="gesturebar"></div>
   </div>
 </div>
@@ -868,10 +912,10 @@ const dampFromK = (k,z)=>2*z*Math.sqrt(k);
 /* ============ 소재 테마 : 물성 해석 ============ */
 /*
   glass : 젤 같은 유리 — 균일 스케일, 액체 스트레치
-  stone : 투명 유리 소켓에 안착된 정밀 메탈 — 누르면 유리면 아래로
-          잠기고(--sink), 임계 감쇠에 가까운 절도 있는 복귀.
-  oil   : 오일 위의 물 — 모든 조작은 "물방울이 오일을 두드리는" 사건.
-          중앙에 방울이 떨어지고 그 지점에서 파문이 바깥으로 번진다.
+  stone : 거친 회색 돌 소켓 위의 반구형 메탈 구슬 — 누르면 돌면
+          아래로 잠기고(--sink), 임계 감쇠에 가까운 절도 있는 복귀.
+  oil   : 오일 위의 물 — 모든 조작은 중앙에서 흰 그라데이션 광이
+          대상 바깥까지 한 번 퍼졌다가 사라지는 자극으로 표현.
 */
 const THEMES = {
   glass:{
@@ -881,28 +925,25 @@ const THEMES = {
     menu:{kMul:1, z:b=>zeta(b)},
     slider:{stretchMul:1, max:1.9, zMod:z=>z},
     sheet:{kMul:1, z:b=>zeta(b), rubberMul:1},
-    tab:{z:.95},
-    droplets:false
+    tab:{z:.95}
   },
   stone:{
-    cap:'투명한 유리판 위에서 정밀 가공된 메탈이 절도 있게 반응합니다',
-    sliderTitle:'메탈 노브가 유리 홈 위를 정밀하게 미끄러져 단단히 멈춥니다',
+    cap:'거친 회색 돌 위에서 반구형 메탈 구슬이 절도 있게 반응합니다',
+    sliderTitle:'메탈 구슬 노브가 돌 홈 위를 무게감 있게 미끄러집니다',
     press:{k:640, z:b=>Math.max(.8, zeta(b)*.9+.18)},
     menu:{kMul:1.9, z:b=>Math.max(.88, zeta(b))},
     slider:{stretchMul:0, max:1.02, zMod:z=>Math.max(.95,z)},
     sheet:{kMul:1.3, z:b=>Math.max(.9, zeta(b)), rubberMul:.32},
-    tab:{z:1.02},
-    droplets:false
+    tab:{z:1.02}
   },
   oil:{
-    cap:'물방울이 오일 표면을 두드리면 파문이 바깥으로 번집니다',
-    sliderTitle:'물방울이 지나간 오일 표면마다 파문이 퍼져 나갑니다',
+    cap:'조작할 때마다 흰 빛이 물결처럼 바깥으로 퍼져 나갑니다',
+    sliderTitle:'손잡이가 지나가는 자리마다 빛의 파동이 퍼져 나갑니다',
     press:{k:200, z:b=>clamp(zeta(b)*.55,.2,.7)},
     menu:{kMul:.85, z:b=>clamp(zeta(b)*.5,.2,.62)},
     slider:{stretchMul:1.25, max:1.9, zMod:z=>z*.6},
     sheet:{kMul:.9, z:b=>clamp(zeta(b)*.55,.22,.7), rubberMul:1.55},
-    tab:{z:.55},
-    droplets:true
+    tab:{z:.55}
   }
 };
 let themeName='glass';
@@ -912,7 +953,7 @@ const T = ()=>THEMES[themeName];
 const DEFS = {
   press:{
     name:'버튼 누르기', desc:'빠른 설정 패널의 탭 반응',
-    hint:'모든 토글과 버튼을 눌러 보세요. 유리는 젤처럼 출렁이고, 메탈 노브는 유리 소켓 속으로 잠기며 그림자가 조여들었다가 기계식 클릭으로 복귀하고, 워터·오일은 누르는 순간 버튼 가운데로 물방울이 떨어지며 파문이 바깥으로 번집니다.',
+    hint:'모든 토글과 버튼을 눌러 보세요. 유리는 젤처럼 출렁이고, 메탈 구슬 노브는 돌 소켓 속으로 잠기며 그림자가 조여들었다가 기계식 클릭으로 복귀하고, 워터·오일은 누르는 순간 버튼 가운데에서 흰 빛이 바깥까지 한 번 퍼졌다가 사라집니다.',
     controls:[
       {id:'depth', label:'눌림 깊이', min:2, max:20, step:1, def:9, unit:'%'},
       {id:'bounce',label:'탄성',      min:0, max:100,step:1, def:55,unit:''},
@@ -922,7 +963,7 @@ const DEFS = {
   },
   menu:{
     name:'버튼에서 메뉴 열기', desc:'버튼이 카드로 변형',
-    hint:'버튼이 메뉴 카드로 부풀어 오르는 모핑입니다. 유리는 출렁이며 펼쳐지고, 메탈 서랍은 유리판 위에서 정확하게 열리며, 물 블롭은 방울 임팩트와 함께 파문을 일으키며 펼쳐집니다. 항목 시차를 조절하면 메뉴 항목이 순차적으로 떠오릅니다.',
+    hint:'버튼이 메뉴 카드로 부풀어 오르는 모핑입니다. 유리는 출렁이며 펼쳐지고, 메탈 서랍은 돌 위에서 정확하게 열리며, 물 블롭은 흰 빛의 확산과 함께 펼쳐집니다. 항목 시차를 조절하면 메뉴 항목이 순차적으로 떠오릅니다.',
     controls:[
       {id:'speed',  label:'펼침 속도', min:20, max:100,step:1, def:60,unit:''},
       {id:'bounce', label:'탄성',      min:0,  max:100,step:1, def:45,unit:''},
@@ -932,7 +973,7 @@ const DEFS = {
   },
   slider:{
     name:'슬라이더 드래그', desc:'소재에 따라 달라지는 손잡이',
-    hint:'유리 손잡이는 속도에 따라 액체처럼 늘어납니다. 메탈 노브는 늘어나지 않는 대신 잡는 순간 유리 홈 속으로 살짝 잠기며 정밀하게 미끄러집니다. 물 방울 손잡이는 오일 트랙 위를 지나가며 그 자리마다 파문을 남기고, 빠른 구간에서 방울을 떨어뜨립니다.',
+    hint:'유리 손잡이는 속도에 따라 액체처럼 늘어납니다. 메탈 구슬 노브는 늘어나지 않는 대신 잡는 순간 홈 속으로 살짝 잠기며 정밀하게 미끄러집니다. 물 손잡이는 지나가는 자리마다 흰 빛의 파동이 트랙 바깥까지 퍼져 나갑니다.',
     controls:[
       {id:'stretch',label:'늘어남 정도', min:0, max:100,step:1, def:60,unit:''},
       {id:'damp',   label:'복원 감쇠',   min:5, max:100,step:1, def:35,unit:''},
@@ -942,7 +983,7 @@ const DEFS = {
   },
   sheet:{
     name:'바텀 시트 끌어올리기', desc:'세 단계 스냅과 경계 반응',
-    hint:'시트는 낮음 · 중간 · 전체 세 지점에 스냅됩니다. 유리는 부드럽게, 메탈 슬래브는 경계를 거의 허용하지 않고 단호하게 안착하며, 오일 위의 물 시트는 크게 넘실대다 안착하는 순간 그래버 지점에서 파문이 번지고 방울이 떨어집니다.',
+    hint:'시트는 낮음 · 중간 · 전체 세 지점에 스냅됩니다. 유리는 부드럽게, 메탈 슬래브는 경계를 거의 허용하지 않고 단호하게 안착하며, 오일 위의 물 시트는 잡거나 안착하는 순간 그 지점에서 흰 빛이 퍼져 나갑니다.',
     controls:[
       {id:'stiff', label:'스냅 강성', min:10,max:100,step:1, def:55,unit:''},
       {id:'bounce',label:'탄성',      min:0, max:100,step:1, def:40,unit:''},
@@ -976,66 +1017,23 @@ requestAnimationFrame(function loop(now){
   requestAnimationFrame(loop);
 });
 
-/* ============ 물방울 임팩트 · 파문 · 낙하 방울 ============ */
-const dropLayer = $('#drops');
-const screenEl = $('#screenEl');
-const drops = [];
-function spawnDrops(clientX, clientY, n=1){
-  if(!T().droplets) return;
-  const sr = screenEl.getBoundingClientRect();
-  for(let i=0;i<n;i++){
-    const el=document.createElement('span');
-    el.className='drop '+(Math.random()<.5?'water':'oil');
-    const size=6+Math.random()*9;
-    el.style.width=el.style.height=size+'px';
-    dropLayer.appendChild(el);
-    drops.push({
-      el, size,
-      x: clientX - sr.left + (Math.random()*16-8),
-      y: clientY - sr.top,
-      vx: Math.random()*34-17,
-      vy: 10+Math.random()*50,
-      life:0
-    });
-  }
-}
-/* 특정 지점(컨테이너 좌표)에서 파문이 바깥으로 번짐 */
-function rippleAt(container, x, y, dia, late=false){
+/* ============ 흰 그라데이션 확산 (워터&오일) ============ */
+/* 컨테이너 내부 (x,y)에서 지름 dia의 흰 빛이 한 번 퍼졌다 사라짐 */
+function splashAt(container, x, y, dia){
   if(themeName!=='oil') return;
-  const r=document.createElement('span');
-  r.className='oripple'+(late?' late':'');
-  r.style.width=r.style.height=dia+'px';
-  r.style.left=x+'px'; r.style.top=y+'px';
-  container.appendChild(r);
-  setTimeout(()=>r.remove(), late?1150:800);
+  const s=document.createElement('span');
+  s.className='wsplash';
+  s.style.width=s.style.height=dia+'px';
+  s.style.left=x+'px'; s.style.top=y+'px';
+  container.appendChild(s);
+  setTimeout(()=>s.remove(), 680);
 }
-/* 물방울이 중앙에 떨어진 뒤 파문을 일으키는 임팩트 */
-function dropImpact(el, d=16){
+/* 요소 정중앙에서 요소 바깥까지 퍼지는 확산 */
+function splashCenter(el, scale=2.2){
   if(themeName!=='oil') return;
-  const cx=el.clientWidth/2, cy=el.clientHeight/2;
-  const dr=document.createElement('span');
-  dr.className='dropin';
-  dr.style.width=dr.style.height=d+'px';
-  dr.style.left=cx+'px'; dr.style.top=cy+'px';
-  el.appendChild(dr);
-  const dia=Math.max(el.clientWidth, el.clientHeight)*1.7;
-  setTimeout(()=>{ rippleAt(el, cx, cy, dia); rippleAt(el, cx, cy, dia*1.25, true); }, 200);
-  setTimeout(()=>dr.remove(), 400);
+  splashAt(el, el.clientWidth/2, el.clientHeight/2,
+    Math.max(el.clientWidth, el.clientHeight)*scale);
 }
-tickers.add(dt=>{
-  if(!drops.length) return;
-  const G=1150, H=724;
-  for(let i=drops.length-1;i>=0;i--){
-    const d=drops[i];
-    d.life+=dt;
-    d.vy+=G*dt;
-    d.x+=d.vx*dt; d.y+=d.vy*dt;
-    const sc=Math.max(.25, 1-d.life*.55);
-    d.el.style.transform=`translate(${d.x.toFixed(1)}px,${d.y.toFixed(1)}px) scale(${sc.toFixed(2)})`;
-    d.el.style.opacity=Math.max(0, 1-d.life*.8);
-    if(d.y>H+20 || d.life>1.5){ d.el.remove(); drops.splice(i,1); }
-  }
-});
 
 /* ============ 패널 ============ */
 const modesEl=$('#modes'), controlsEl=$('#controls'), hintEl=$('#hint');
@@ -1111,18 +1109,11 @@ const pressScene = (()=>{
     const down=e=>{
       if(e.target.closest('.track')) return;
       it.sp.target = 1 - (state.press.depth/100)*it.mult;
-      /* 워터&오일 : 누르는 순간 중앙에 물방울 낙하 → 파문 */
-      dropImpact(it.el, Math.min(18, it.el.clientHeight*.3));
+      /* 워터&오일 : 중앙에서 흰 빛이 바깥까지 확산 */
+      splashCenter(it.el, 2.3);
       e.stopPropagation();
     };
-    const up=e=>{
-      if(it.sp.target===1) return;
-      it.sp.target=1;
-      if(e && e.clientX!==undefined){
-        const r=it.el.getBoundingClientRect();
-        spawnDrops(r.left+r.width/2, r.bottom-4, 1);
-      }
-    };
+    const up=()=>{ if(it.sp.target!==1) it.sp.target=1; };
     it.el.addEventListener('pointerdown',down);
     it.el.addEventListener('pointerup',up);
     it.el.addEventListener('pointerleave',up);
@@ -1151,11 +1142,10 @@ const pressScene = (()=>{
       const depth=Math.max(.02,(state.press.depth/100)*it.mult);
       const prog=clamp((1-v)/depth, 0, 1.25);
       if(themeName==='stone'){
-        /* 메탈이 유리 소켓 속으로 잠김 : 하강 + 그림자 조임 + 명도 하강 */
+        /* 메탈 구슬이 돌 소켓 속으로 잠김 : 하강 + 그림자 조임 + 명도 하강 */
         it.el.style.setProperty('--sink', clamp(prog,0,1).toFixed(3));
         it.el.style.transform=`translateY(${(prog*2.8).toFixed(2)}px) scale(${(1-prog*.02).toFixed(4)})`;
       }else{
-        /* 유리·물 공통 : 균일 스케일 (물은 방울 임팩트·파문이 표현을 담당) */
         it.el.style.transform=`scale(${v.toFixed(4)})`;
       }
     });
@@ -1170,7 +1160,7 @@ const sliders = $$('[data-slider]').map(track=>{
   const outEl = track.dataset.out ? $('#'+track.dataset.out) : null;
   let pos = parseFloat(track.dataset.val)||.5;
   const st = new Spring(1); st.k=320;
-  let dragging=false, lastX=0, lastT=0, vel=0, dir=1, lastDrip=0, lastRip=0;
+  let dragging=false, lastX=0, lastT=0, vel=0, dir=1, lastRip=0;
 
   function dims(){ return {W:track.clientWidth, TH:thumb.offsetWidth}; }
   function render(){
@@ -1186,17 +1176,17 @@ const sliders = $$('[data-slider]').map(track=>{
     const r=track.getBoundingClientRect(), {W,TH}=dims();
     pos=clamp((e.clientX-r.left-TH/2)/(W-TH),0,1);
   }
+  function thumbSplash(scale){
+    const {W,TH}=dims();
+    splashAt(track, pos*(W-TH)+TH/2, track.clientHeight/2, TH*scale);
+  }
 
   track.addEventListener('pointerdown',e=>{
     dragging=true; track.setPointerCapture(e.pointerId);
     lastX=e.clientX; lastT=performance.now(); vel=0;
     if(themeName==='stone') thumb.style.setProperty('--sink','.5');   /* 잡는 순간 홈 속으로 */
     moveTo(e); render();
-    /* 물방울이 오일 트랙에 착수 → 파문 */
-    if(themeName==='oil'){
-      const {W,TH}=dims();
-      rippleAt(track, pos*(W-TH)+TH/2, track.clientHeight/2, TH*2.1);
-    }
+    thumbSplash(2.3);   /* 접촉 지점에서 흰 빛 확산 */
     e.stopPropagation();
   });
   track.addEventListener('pointermove',e=>{
@@ -1214,30 +1204,16 @@ const sliders = $$('[data-slider]').map(track=>{
     st.vel=0;
     thumb.style.transformOrigin=dir>0?'left center':'right center';
     render();
-    /* 물방울이 지나간 오일 표면마다 파문이 번짐 */
-    if(themeName==='oil' && now-lastRip>95 && Math.abs(vel)>.12){
+    /* 손잡이가 지나가는 자리마다 흰 빛의 파동 */
+    if(themeName==='oil' && now-lastRip>110 && Math.abs(vel)>.15){
       lastRip=now;
-      const {W,TH}=dims();
-      rippleAt(track, pos*(W-TH)+TH/2, track.clientHeight/2, TH*(1.6+Math.min(1.4,Math.abs(vel))));
-    }
-    if(T().droplets && Math.abs(vel)>.9 && now-lastDrip>130){
-      lastDrip=now;
-      const tr=thumb.getBoundingClientRect();
-      spawnDrops(tr.left+tr.width/2, tr.bottom-4, 1);
+      thumbSplash(1.8+Math.min(1.2,Math.abs(vel)*.8));
     }
   });
   const end=()=>{
     if(!dragging)return; dragging=false;
     if(themeName==='stone') thumb.style.setProperty('--sink','0');
-    if(themeName==='oil'){
-      const {W,TH}=dims();
-      rippleAt(track, pos*(W-TH)+TH/2, track.clientHeight/2, TH*2.6);
-      rippleAt(track, pos*(W-TH)+TH/2, track.clientHeight/2, TH*3.3, true);
-      if(Math.abs(vel)>.4){
-        const tr=thumb.getBoundingClientRect();
-        spawnDrops(tr.left+tr.width/2, tr.bottom-4, 2);
-      }
-    }
+    if(themeName==='oil') thumbSplash(2.8);
     vel=0; st.target=1; render();
   };
   track.addEventListener('pointerup',end);
@@ -1271,7 +1247,7 @@ const sliderScene = {
 
 /* ============ SCENE 2 : 메뉴 ============ */
 const menuScene = (()=>{
-  const morph=$('#menuMorph'), plus=$('#menuPlus');
+  const morph=$('#menuMorph'), plus=$('#menuPlus'), anchor=$('#menuAnchor');
   const items=$$('#menuItems .menu-item, #menuItems .menu-sep');
   const sp=new Spring(0);
   let open=false;
@@ -1284,11 +1260,13 @@ const menuScene = (()=>{
   function reset(){ open=false; sp.v=0; sp.vel=0; sp.target=0; }
   morph.addEventListener('pointerdown',()=>{
     open=!open; sp.target=open?1:0;
-    /* 물방울이 블롭을 두드려 변형을 촉발 */
-    dropImpact(morph, 15);
-    if(open){
-      const r=morph.getBoundingClientRect();
-      spawnDrops(r.left+14, r.bottom-6, 2);
+    /* 흰 빛이 블롭 중앙에서 앵커 영역 바깥까지 확산 (morph는 overflow hidden) */
+    if(themeName==='oil'){
+      const ar=anchor.getBoundingClientRect(), mr=morph.getBoundingClientRect();
+      splashAt(anchor,
+        mr.left-ar.left+mr.width/2,
+        mr.top-ar.top+mr.height/2,
+        Math.max(mr.width,mr.height)*2.1);
     }
   });
   tickers.add(dt=>{
@@ -1332,10 +1310,10 @@ const sheetScene = (()=>{
   sheet.addEventListener('pointerdown',e=>{
     dragging=true; sheet.setPointerCapture(e.pointerId);
     startY=e.clientY; startH=sp.v; lastY=e.clientY; lastT=performance.now(); vel=0;
-    /* 물방울이 시트에 착수 → 잡은 지점 상단에서 파문 */
+    /* 잡은 지점에서 흰 빛 확산 */
     if(themeName==='oil'){
       const r=sheet.getBoundingClientRect();
-      rippleAt(sheet, e.clientX-r.left, e.clientY-r.top, 110);
+      splashAt(sheet, e.clientX-r.left, e.clientY-r.top, 130);
     }
   });
   sheet.addEventListener('pointermove',e=>{
@@ -1352,14 +1330,8 @@ const sheetScene = (()=>{
     let best=DET[0],bd=1e9;
     DET.forEach(d=>{const dd=Math.abs(d-proj); if(dd<bd){bd=dd;best=d;}});
     sp.target=best; sp.vel=vel*60;
-    if(themeName==='oil'){
-      rippleAt(sheet, sheet.clientWidth/2, 14, 130);
-      rippleAt(sheet, sheet.clientWidth/2, 14, 170, true);
-    }
-    if(Math.abs(vel)>.4){
-      const r=sheet.getBoundingClientRect();
-      spawnDrops(r.left+r.width/2, r.top+16, 2);
-    }
+    /* 놓는 순간 그래버 지점에서 흰 빛 확산 */
+    if(themeName==='oil') splashAt(sheet, sheet.clientWidth/2, 14, 150);
   };
   sheet.addEventListener('pointerup',end);
   sheet.addEventListener('pointercancel',end);
@@ -1429,6 +1401,8 @@ const tabScene = (()=>{
   tabs.forEach((t,i)=>t.addEventListener('click',()=>{
     active=i;
     tabs.forEach((x,j)=>x.classList.toggle('active',j===i));
+    /* 탭 선택도 자극 : 흰 빛 확산 */
+    splashCenter(t, 2.4);
     if(sp.target===1) sp.target=0;
   }));
 
