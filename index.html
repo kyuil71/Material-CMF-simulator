@@ -553,7 +553,7 @@
     <section class="status-strip">
       <div class="stage-status" id="stageStatus">감성 키워드 입력</div>
       <div class="model-locks">
-        <span class="model-badge">텍스트 · gemini-1.5-flash · 고정</span>
+        <span class="model-badge">텍스트 · gemini-2.5-flash · 고정</span>
         <span class="model-badge">이미지 · imagen-3.0-generate-001 · 고정</span>
       </div>
     </section>
@@ -587,7 +587,7 @@
     /*
       MODEL LOCK CONTRACT (Updated for Google AI Studio Official Endpoints)
     */
-    const LOCKED_TEXT_MODEL = "gemini-1.5-flash";
+    const LOCKED_TEXT_MODEL = "gemini-2.5-flash";
     const LOCKED_IMAGE_MODEL = "imagen-3.0-generate-001";
     const MODEL_LOCK = {};
     Object.defineProperties(MODEL_LOCK, {
@@ -635,7 +635,7 @@
     const toastEl = document.getElementById("toast");
 
     function assertModelLock() {
-      if (MODEL_LOCK.text !== "gemini-1.5-flash" || MODEL_LOCK.image !== "imagen-3.0-generate-001") {
+      if (MODEL_LOCK.text !== "gemini-2.5-flash" || MODEL_LOCK.image !== "imagen-3.0-generate-001") {
         throw new Error("보호된 Gemini 모델 식별자가 변경되었습니다. 원래 고정값을 복원해 주세요.");
       }
     }
