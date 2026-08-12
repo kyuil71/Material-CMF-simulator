@@ -596,7 +596,7 @@
     });
     Object.freeze(MODEL_LOCK);
 
-    const API_BASE = "[https://generativelanguage.googleapis.com/v1beta](https://generativelanguage.googleapis.com/v1beta)";
+    const API_BASE = "https://generativelanguage.googleapis.com/v1beta";
     const SESSION_KEY = "cmf-gemini-api-key";
     const DB_NAME = "cmf-emotion-material-lab";
     const DB_STORE = "projects";
@@ -666,7 +666,7 @@
       clearTimeout(toastTimer);
       toastEl.textContent = message;
       toastEl.className = "toast " + (type || "");
-      toastTimer = setTimeout(function () { toastEl.classList.add("hidden"); }, 3600);
+      toastTimer = setTimeout(function () { toastEl.classList.add("hidden"); }, 4500);
     }
 
     function openApiModal() {
@@ -697,38 +697,56 @@
     }
 
     function friendlyApiError(error) {
-      const raw = error && error.message ? error.message : String(error || "알 수 없는 오류");
-      if (/API_KEY_INVALID|invalid api key|401|403/i.test(raw)) return "API 키가 유효하지 않거나 이 모델에 접근 권한이 없습니다.";
-      if (/429|RESOURCE_EXHAUSTED|quota/i.test(raw)) return "API 사용량 한도에 도달했습니다. 잠시 후 같은 단계에서 다시 시도해 주세요.";
-      if (/fetch|network|cors/i.test(raw)) return "네트워크 연결에 실패했습니다. 인터넷 연결과 API 허용 설정을 확인해 주세요.";
-      if (/SAFETY|blocked/i.test(raw)) return "안전 정책으로 생성이 중단되었습니다. 감성 키워드를 조금 더 중립적으로 바꿔 주세요.";
-      return raw;
+      const raw = error && error.message ? String(error.message) : String(error || "알 수 없는 오류");
+      if (/API_KEY_INVALID|invalid api key|401|403|key/i.test(raw)) return "API 키가 유효하지 않거나 접근 권한이 없습니다.";
+      if (/429|RESOURCE_EXHAUSTED|quota/i.test(raw)) return "API 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
+      if (/fetch|network|cors/i.test(raw)) return "네트워크 연결 실패 (인터넷 또는 방화벽 문제): " + raw;
+      if (/SAFETY|blocked/i.test(raw)) return "안전 정책으로 생성이 중단되었습니다.";
+      if (/식별자가 변경되었습니다/i.test(raw)) return raw;
+      return "통신 오류: " + raw;
     }
 
-    async function fetchWithRetry(url, options, retries) {
+    // Fail-fast 구조로 완전히 재작성된 통신 로직
+    async function fetchWithRetry(url, options, retries = 2) {
       let lastError;
       for (let attempt = 0; attempt <= retries; attempt += 1) {
         try {
           const response = await fetch(url, options);
-          const payload = await response.json().catch(function () { return {}; });
+          let payload;
+          const text = await response.text();
+          
+          try {
+            payload = text ? JSON.parse(text) : {};
+          } catch (e) {
+            payload = { error: { message: "JSON 파싱 실패 (응답 본문이 올바르지 않음)" } };
+          }
+
           if (!response.ok) {
-            const message = payload && payload.error && payload.error.message
+            const message = (payload && payload.error && payload.error.message)
               ? payload.error.message
-              : "HTTP " + response.status;
+              : "HTTP 오류 " + response.status;
             const error = new Error(message);
             error.status = response.status;
-            if (response.status < 500 && response.status !== 429) throw error;
+            
+            // 400대 에러(인증 실패, 잘못된 요청 등)는 재시도 없이 즉시 중단 (429 제외)
+            if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+              throw error; 
+            }
             lastError = error;
           } else {
-            return payload;
+            return payload; // 성공 시 즉시 반환
           }
         } catch (error) {
           lastError = error;
-          if (error && error.status && error.status < 500 && error.status !== 429) throw error;
+          // 즉각적으로 던져진 클라이언트 에러(4xx)나 명시적 네트워크 단절 에러는 즉시 중단
+          if (error.status && error.status >= 400 && error.status < 500 && error.status !== 429) {
+            throw error; 
+          }
         }
-        if (attempt < retries) await sleep(900 * Math.pow(2, attempt));
+        // 재시도 대기
+        if (attempt < retries) await sleep(1000 * Math.pow(2, attempt));
       }
-      throw lastError || new Error("API 요청에 실패했습니다.");
+      throw lastError || new Error("API 서버에 연결할 수 없습니다.");
     }
 
     function outputText(payload) {
@@ -739,7 +757,6 @@
     }
 
     function outputImage(payload) {
-      // 구글 AI Studio Imagen 3 표준 응답 구조 처리
       if (payload.predictions && payload.predictions[0] && payload.predictions[0].bytesBase64Encoded) {
         return "data:image/jpeg;base64," + payload.predictions[0].bytesBase64Encoded;
       }
@@ -750,11 +767,12 @@
       assertModelLock();
       const apiKey = requireApiKey();
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent?key=" + apiKey,
+        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
           },
           body: JSON.stringify({
             systemInstruction: {
@@ -769,13 +787,12 @@
             }
           })
         },
-        3
+        2
       );
       
       let text = outputText(payload);
       if (!text) throw new Error("텍스트 모델이 빈 응답을 반환했습니다.");
       
-      // JSON Markdown 백틱 찌꺼기를 정리하여 SyntaxError 방지
       text = text.replace(/^```(json)?|```$/gm, '').trim();
       return JSON.parse(text);
     }
@@ -784,11 +801,12 @@
       assertModelLock();
       const apiKey = requireApiKey();
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.image + ":predict?key=" + apiKey,
+        API_BASE + "/models/" + MODEL_LOCK.image + ":predict",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
           },
           body: JSON.stringify({
             instances: [
@@ -806,7 +824,6 @@
     }
 
     function arraySchema(itemProperties, required) {
-      // JSON Schema를 Gemini API 호환 스키마로 대문자 변환
       const geminiProperties = {};
       for (const key in itemProperties) {
         geminiProperties[key] = { ...itemProperties[key], type: itemProperties[key].type.toUpperCase() };
@@ -1398,16 +1415,22 @@
 
     async function validateApiKey(key) {
       assertModelLock();
+      
+      // API 검증 단계에서는 재시도(retries)를 0으로 주어 지연시간 없이 
+      // 즉각적으로 오류를 반환하게 만듭니다.
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent?key=" + key,
+        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "x-goog-api-key": key
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: "Reply with OK only." }] }]
           })
         },
-        1
+        0 
       );
       if (!outputText(payload)) throw new Error("모델 응답이 없습니다.");
     }
@@ -1422,8 +1445,8 @@
         clone.style.width = board.scrollWidth + "px";
         clone.style.minWidth = board.scrollWidth + "px";
         const css = document.querySelector("style").textContent;
-        const svg = '<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="' + board.scrollWidth + '" height="' + board.scrollHeight + '">' +
-          '<foreignObject width="100%" height="100%"><div xmlns="[http://www.w3.org/1999/xhtml](http://www.w3.org/1999/xhtml)"><style>' + css + '</style>' +
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + board.scrollWidth + '" height="' + board.scrollHeight + '">' +
+          '<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>' + css + '</style>' +
           clone.outerHTML + '</div></foreignObject></svg>';
         const image = new Image();
         const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
@@ -1460,6 +1483,7 @@
       apiKeyInput.value = "";
       showToast("세션의 API 키를 삭제했습니다.", "success");
     });
+    
     document.getElementById("connectApiBtn").addEventListener("click", async function () {
       const key = apiKeyInput.value.trim();
       if (!key) {
@@ -1481,6 +1505,7 @@
         button.textContent = "연결 확인";
       }
     });
+    
     apiModal.addEventListener("click", function (event) {
       if (event.target === apiModal) closeApiModal();
     });
