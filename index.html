@@ -554,7 +554,7 @@
       <div class="stage-status" id="stageStatus">감성 키워드 입력</div>
       <div class="model-locks">
         <span class="model-badge">텍스트 · gemini-2.5-flash · 고정</span>
-        <span class="model-badge">이미지 · imagen-3.0-generate-001 · 고정</span>
+        <span class="model-badge">이미지 · gemini-3.1-flash-image · 고정</span>
       </div>
     </section>
 
@@ -588,7 +588,7 @@
       MODEL LOCK CONTRACT (Updated for Google AI Studio Official Endpoints)
     */
     const LOCKED_TEXT_MODEL = "gemini-2.5-flash";
-    const LOCKED_IMAGE_MODEL = "imagen-3.0-generate-001";
+    const LOCKED_IMAGE_MODEL = "gemini-3.1-flash-image";
     const MODEL_LOCK = {};
     Object.defineProperties(MODEL_LOCK, {
       text: { value: LOCKED_TEXT_MODEL, writable: false, configurable: false, enumerable: true },
@@ -596,7 +596,9 @@
     });
     Object.freeze(MODEL_LOCK);
 
+    // 단일 v1beta API 베이스 사용
     const API_BASE = "https://generativelanguage.googleapis.com/v1beta";
+    
     const SESSION_KEY = "cmf-gemini-api-key";
     const DB_NAME = "cmf-emotion-material-lab";
     const DB_STORE = "projects";
@@ -635,7 +637,7 @@
     const toastEl = document.getElementById("toast");
 
     function assertModelLock() {
-      if (MODEL_LOCK.text !== "gemini-2.5-flash" || MODEL_LOCK.image !== "imagen-3.0-generate-001") {
+      if (MODEL_LOCK.text !== "gemini-2.5-flash" || MODEL_LOCK.image !== "gemini-3.1-flash-image") {
         throw new Error("보호된 Gemini 모델 식별자가 변경되었습니다. 원래 고정값을 복원해 주세요.");
       }
     }
@@ -706,7 +708,6 @@
       return "통신 오류: " + raw;
     }
 
-    // Fail-fast 구조로 완전히 재작성된 통신 로직
     async function fetchWithRetry(url, options, retries = 2) {
       let lastError;
       for (let attempt = 0; attempt <= retries; attempt += 1) {
@@ -728,22 +729,19 @@
             const error = new Error(message);
             error.status = response.status;
             
-            // 400대 에러(인증 실패, 잘못된 요청 등)는 재시도 없이 즉시 중단 (429 제외)
             if (response.status >= 400 && response.status < 500 && response.status !== 429) {
               throw error; 
             }
             lastError = error;
           } else {
-            return payload; // 성공 시 즉시 반환
+            return payload; 
           }
         } catch (error) {
           lastError = error;
-          // 즉각적으로 던져진 클라이언트 에러(4xx)나 명시적 네트워크 단절 에러는 즉시 중단
           if (error.status && error.status >= 400 && error.status < 500 && error.status !== 429) {
             throw error; 
           }
         }
-        // 재시도 대기
         if (attempt < retries) await sleep(1000 * Math.pow(2, attempt));
       }
       throw lastError || new Error("API 서버에 연결할 수 없습니다.");
@@ -757,6 +755,18 @@
     }
 
     function outputImage(payload) {
+      // generateContent 방식의 이미지 응답 처리 (inlineData 파싱)
+      if (payload.candidates && payload.candidates[0] && payload.candidates[0].content) {
+        const parts = payload.candidates[0].content.parts;
+        for (const part of parts) {
+          if (part.inlineData) {
+             const mime = part.inlineData.mimeType || "image/jpeg";
+             return "data:" + mime + ";base64," + part.inlineData.data;
+          }
+        }
+      }
+      
+      // 구형(Predict) 방식 데이터도 혹시 모를 대비책으로 남겨둡니다
       if (payload.predictions && payload.predictions[0] && payload.predictions[0].bytesBase64Encoded) {
         return "data:image/jpeg;base64," + payload.predictions[0].bytesBase64Encoded;
       }
@@ -766,13 +776,13 @@
     async function callTextModel(prompt, schema) {
       assertModelLock();
       const apiKey = requireApiKey();
+      
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent",
+        `${API_BASE}/models/${MODEL_LOCK.text}:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
             systemInstruction: {
@@ -800,22 +810,21 @@
     async function callImageModel(prompt) {
       assertModelLock();
       const apiKey = requireApiKey();
+      
+      // 요청하신 gemini-3.1-flash-image의 generateContent 방식을 적용했습니다
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.image + ":predict",
+        `${API_BASE}/models/${MODEL_LOCK.image}:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            instances: [
-              { prompt: prompt }
-            ],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: "16:9"
-            }
+            contents: [
+              {
+                parts: [{ text: prompt }]
+              }
+            ]
           })
         },
         2
@@ -1416,15 +1425,12 @@
     async function validateApiKey(key) {
       assertModelLock();
       
-      // API 검증 단계에서는 재시도(retries)를 0으로 주어 지연시간 없이 
-      // 즉각적으로 오류를 반환하게 만듭니다.
       const payload = await fetchWithRetry(
-        API_BASE + "/models/" + MODEL_LOCK.text + ":generateContent",
+        `${API_BASE}/models/${MODEL_LOCK.text}:generateContent?key=${key}`,
         {
           method: "POST",
           headers: { 
-            "Content-Type": "application/json",
-            "x-goog-api-key": key
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
             contents: [{ parts: [{ text: "Reply with OK only." }] }]
