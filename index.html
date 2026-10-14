@@ -1,1531 +1,820 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <title>CMF 감성–물성 디자인 랩</title>
-  <style>
-    :root {
-      --ink: #15243a;
-      --muted: #5d6a7e;
-      --line: #d9e0e9;
-      --panel: #ffffff;
-      --canvas: #eef2f6;
-      --navy: #17365d;
-      --blue: #2866b1;
-      --blue-soft: #e9f1fb;
-      --gold: #9a6c20;
-      --gold-soft: #f7f0df;
-      --danger: #a93b3b;
-      --success: #267352;
-      --shadow: 0 16px 44px rgba(20, 37, 60, .11);
-      --radius: 24px;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>불릿 라이트 CMF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  --ink:#1c1d20; --sub:#5d6066; --line:rgba(0,0,0,.12);
+  --panel:rgba(236,236,233,.88); --chip:rgba(255,255,255,.6); --chipOn:#1c1d20; --chipOnInk:#f1f1ee;
+  --cold:#3e5a8a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e4e3df; --sub:#9a9ca1; --line:rgba(255,255,255,.12);
+    --panel:rgba(22,23,26,.84); --chip:rgba(255,255,255,.05); --chipOn:#e6eeff; --chipOnInk:#15161a;
+    --cold:#bcd0f5;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e4e3df; --sub:#9a9ca1; --line:rgba(255,255,255,.12);
+  --panel:rgba(22,23,26,.84); --chip:rgba(255,255,255,.05); --chipOn:#e6eeff; --chipOnInk:#15161a;
+  --cold:#bcd0f5;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%}
+body{margin:0;height:100%;overflow:hidden;background:#050506;color:var(--ink);
+  font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cold);outline-offset:2px}
 
-    * { box-sizing: border-box; }
-    html { font-size: 16px; }
-    body {
-      margin: 0;
-      min-width: 320px;
-      min-height: 100vh;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 8% 0%, rgba(99, 148, 205, .13), transparent 28rem),
-        linear-gradient(180deg, #f8fafc 0, var(--canvas) 48rem);
-      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.55;
-      word-break: keep-all;
-    }
+.top{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:3}
+.title{pointer-events:auto;min-width:0;flex:1;margin-right:12px;color:#e4e3df;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.light-bg .title{color:#1c1d20;text-shadow:none}
+.light-bg .title span{color:#5d6066}
+.title b{display:block;font-weight:600;font-size:18px;letter-spacing:-.01em}
+.title span{font-size:16px;color:#a8aab0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reset{pointer-events:auto;flex:none;border:1px solid rgba(255,255,255,.18);background:rgba(20,21,24,.7);color:#e4e3df;border-radius:999px;padding:6px 16px;min-height:38px;font-size:16px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.seg{pointer-events:auto;flex:none;display:flex;background:rgba(20,21,24,.7);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:3px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.seg button{white-space:nowrap;border:0;background:none;color:#cfd0d3;padding:6px 12px;border-radius:999px;font-size:16px;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:#e6eeff;color:#15161a}
 
-    button, input, textarea, select, small, label, p, li, a, span, div {
-      font-size: 16px;
-    }
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;justify-content:center;pointer-events:none}
+.sheet{pointer-events:auto;width:100%;max-width:430px;background:var(--panel);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);
+  border-top:1px solid var(--line);border-radius:20px 20px 0 0;padding:12px 0 calc(env(safe-area-inset-bottom,0px) + 12px);max-height:58vh;display:flex;flex-direction:column}
+@media (min-width:900px){.dock{justify-content:flex-end;bottom:16px;right:16px;left:auto}.sheet{border-radius:20px;border:1px solid var(--line);width:400px;max-height:calc(100vh - 120px)}}
+.handle{display:flex;align-items:center;gap:6px;padding:0 10px 10px;touch-action:none;user-select:none}
+.grip{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;cursor:pointer;padding:2px 0;min-height:44px;justify-content:center}
+.grip::before{content:"";width:40px;height:5px;border-radius:3px;background:var(--sub);opacity:.6}
+.grip span{font-size:20px;font-weight:600;letter-spacing:-.01em;line-height:1.2;transition:opacity .3s}
+.grip span.swap{opacity:0}
+.grip small{font-size:14px;color:var(--sub);line-height:1.3;text-align:center}
+.nav{border:1px solid var(--line);background:var(--chip);border-radius:12px;width:44px;height:44px;font-size:18px;cursor:pointer;flex:none}
+.sheet .body{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.sheet.collapsed .body{display:none}
+.sheet.collapsed{padding-top:8px}
+.sheet.collapsed .grip small{display:none}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 16px 10px;justify-content:space-between;scrollbar-width:none}
+.chips[hidden]{display:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);background:var(--chip);border-radius:50%;padding:0;cursor:pointer;font-size:14px;font-variant-numeric:tabular-nums}
+.chip.cust{box-shadow:inset 0 -3px 0 var(--cold)}
+.chip i{width:28px;height:28px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.chip b{font-size:13px;font-weight:500;color:var(--sub);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"] b{color:inherit;opacity:.6}
+.chip span{display:block;font-size:16px;white-space:nowrap;line-height:1.25}
+.chip small{display:block;font-size:13px;color:var(--sub);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--chipOn);color:var(--chipOnInk);border-color:transparent}
+.chip[aria-pressed="true"] small{color:inherit;opacity:.7}
 
-    button, input, textarea, select { font: inherit; }
-    button { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: .5; }
-    img { max-width: 100%; }
-    .hidden { display: none !important; }
+.tabs{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;border:0;background:none;padding:8px 4px;font-size:16px;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.pane{overflow-y:auto;padding:12px 16px 4px;-webkit-overflow-scrolling:touch}
+.pane[hidden]{display:none}
 
-    .app-shell {
-      width: min(1500px, calc(100% - 32px));
-      margin: 18px auto 48px;
-    }
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.pill{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:6px 14px;font-size:16px;cursor:pointer;min-height:38px;display:inline-flex;align-items:center;gap:8px}
+.pill[aria-pressed="true"]{background:var(--chipOn);color:var(--chipOnInk);border-color:transparent}
+.pill .dot{width:14px;height:14px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.pill:disabled{opacity:.4;cursor:default}
+.grp{font-size:14px;color:var(--sub);margin:6px 0 6px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hd .pill{min-height:34px;padding:4px 12px;font-size:14px}
+.sl{display:grid;grid-template-columns:96px 1fr 52px;align-items:center;gap:10px;margin:6px 0}
+.sl label{font-size:16px}
+.sl output{font-size:14px;color:var(--sub);text-align:right;font-variant-numeric:tabular-nums}
+.sl.dis{opacity:.4}
+.col{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:10px;margin:6px 0 10px}
+.col input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;background:none;padding:2px;cursor:pointer}
+input[type=range]{width:100%;accent-color:var(--cold);height:28px}
+.box{transition:opacity .2s}
+.box.off{opacity:.4;pointer-events:none}
+.note{margin:8px 0 6px;font-size:14px;color:var(--sub);border-left:2px solid var(--cold);padding-left:10px}
 
-    .topbar {
-      position: sticky;
-      z-index: 30;
-      top: 12px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 20px;
-      align-items: center;
-      padding: 18px 22px;
-      border: 1px solid rgba(210, 219, 231, .9);
-      border-radius: 22px;
-      background: rgba(255, 255, 255, .94);
-      box-shadow: 0 10px 34px rgba(29, 51, 78, .09);
-      backdrop-filter: blur(18px);
-    }
-
-    .brand { display: flex; gap: 14px; align-items: center; min-width: 0; }
-    .brand-mark {
-      display: grid;
-      flex: 0 0 46px;
-      width: 46px;
-      height: 46px;
-      place-items: center;
-      border-radius: 15px;
-      color: white;
-      background: linear-gradient(145deg, #102d52, #3074bb);
-      font-weight: 800;
-      letter-spacing: .04em;
-    }
-    .brand h1 { margin: 0; font-size: 23px; line-height: 1.2; letter-spacing: -.02em; }
-    .brand p { margin: 3px 0 0; color: var(--muted); }
-    .header-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
-
-    .btn {
-      min-height: 46px;
-      padding: 10px 17px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      color: var(--ink);
-      background: #fff;
-      font-weight: 700;
-      transition: transform .16s ease, border-color .16s ease, background .16s ease;
-    }
-    .btn:hover:not(:disabled) { transform: translateY(-1px); border-color: #9cb3ce; }
-    .btn-primary { color: #fff; border-color: var(--navy); background: var(--navy); }
-    .btn-primary:hover:not(:disabled) { background: #214a7d; }
-    .btn-soft { color: var(--navy); border-color: #c6d6e9; background: var(--blue-soft); }
-    .btn-danger { color: var(--danger); border-color: #e9caca; background: #fff8f8; }
-    .btn-ghost { border-color: transparent; background: transparent; }
-
-    .status-strip {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      margin: 14px 0;
-      padding: 14px 18px;
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: rgba(255, 255, 255, .82);
-    }
-    .stage-status { font-weight: 800; }
-    .stage-status b { color: var(--blue); }
-    .model-locks { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
-    .model-badge {
-      padding: 7px 11px;
-      border: 1px solid #d4dce7;
-      border-radius: 999px;
-      color: #48576b;
-      background: #f8fafc;
-      white-space: nowrap;
-    }
-
-    .progress-wrap {
-      overflow-x: auto;
-      margin-bottom: 18px;
-      padding: 4px 0 8px;
-      scrollbar-width: thin;
-    }
-    .progress {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(150px, 1fr));
-      min-width: 1080px;
-      gap: 8px;
-    }
-    .step-tab {
-      display: flex;
-      gap: 10px;
-      min-height: 62px;
-      align-items: center;
-      padding: 10px 13px;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      color: #667386;
-      background: rgba(255,255,255,.82);
-      text-align: left;
-    }
-    .step-tab .num {
-      display: grid;
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      place-items: center;
-      border: 1px solid #cbd5e1;
-      border-radius: 50%;
-      background: #fff;
-      font-weight: 800;
-    }
-    .step-tab strong { display: block; color: inherit; }
-    .step-tab.active { color: #fff; border-color: var(--navy); background: var(--navy); }
-    .step-tab.active .num { color: var(--navy); border-color: #fff; }
-    .step-tab.done { color: var(--navy); border-color: #aac0d9; background: #eef5fd; }
-
-    .surface {
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.94);
-      box-shadow: var(--shadow);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 28px;
-      align-items: stretch;
-      min-height: 520px;
-    }
-    .hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 24px; }
-    .eyebrow { margin: 0 0 12px; color: var(--blue); font-weight: 800; letter-spacing: .08em; }
-    .hero h2 { margin: 0; font-size: clamp(34px, 5vw, 62px); line-height: 1.08; letter-spacing: -.045em; }
-    .hero .lead { max-width: 690px; margin: 22px 0 28px; color: var(--muted); font-size: 19px; line-height: 1.75; }
-    .keyword-form { display: grid; gap: 13px; }
-    .keyword-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
-    .input {
-      width: 100%;
-      min-height: 54px;
-      padding: 13px 16px;
-      border: 1px solid #c8d2df;
-      border-radius: 14px;
-      outline: none;
-      background: #fff;
-    }
-    .input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(40,102,177,.12); }
-    .examples { display: flex; flex-wrap: wrap; gap: 8px; }
-    .example-chip {
-      padding: 8px 12px;
-      border: 1px solid #d7dfE9;
-      border-radius: 999px;
-      color: #526177;
-      background: #f7f9fc;
-    }
-    .hero-visual {
-      position: relative;
-      overflow: hidden;
-      min-height: 430px;
-      border-radius: 21px;
-      background:
-        linear-gradient(142deg, transparent 0 45%, rgba(255,255,255,.18) 46% 49%, transparent 50%),
-        radial-gradient(circle at 25% 24%, rgba(210,229,248,.95), transparent 22%),
-        linear-gradient(150deg, #17395e, #6f95b7 52%, #d9e4ed);
-    }
-    .hero-visual:before, .hero-visual:after {
-      content: "";
-      position: absolute;
-      border: 1px solid rgba(255,255,255,.55);
-      box-shadow: inset 0 0 46px rgba(255,255,255,.28), 0 28px 50px rgba(6,27,51,.25);
-      backdrop-filter: blur(5px);
-    }
-    .hero-visual:before { inset: 12% 32% 28% 13%; border-radius: 50% 18% 45% 25%; transform: rotate(-13deg); }
-    .hero-visual:after { inset: 37% 11% 10% 35%; border-radius: 18% 55% 22% 50%; transform: rotate(9deg); }
-    .visual-caption {
-      position: absolute;
-      z-index: 2;
-      right: 24px;
-      bottom: 22px;
-      left: 24px;
-      padding: 18px;
-      border: 1px solid rgba(255,255,255,.45);
-      border-radius: 16px;
-      color: #fff;
-      background: rgba(10,31,56,.43);
-      backdrop-filter: blur(12px);
-    }
-    .visual-caption strong { display: block; margin-bottom: 5px; font-size: 20px; }
-
-    .projects { margin-top: 20px; }
-    .section-heading { display: flex; gap: 14px; align-items: end; justify-content: space-between; margin-bottom: 15px; }
-    .section-heading h3 { margin: 0; font-size: 24px; }
-    .section-heading p { margin: 0; color: var(--muted); }
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
-    .project-card {
-      display: grid;
-      gap: 10px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fff;
-    }
-    .project-card h4 { margin: 0; font-size: 19px; }
-    .project-card p { margin: 0; color: var(--muted); }
-    .project-actions { display: flex; gap: 8px; margin-top: 4px; }
-
-    .board-scroll { overflow-x: auto; padding: 2px 2px 16px; }
-    .image-board {
-      width: 100%;
-      min-width: 1120px;
-      padding: 26px;
-      border: 1px solid #cfd7e2;
-      border-radius: 20px;
-      background: #fbfbfa;
-      box-shadow: 0 18px 52px rgba(16,34,56,.12);
-    }
-    .board-head {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 22px;
-      align-items: end;
-      padding-bottom: 18px;
-      border-bottom: 1px solid #cfd5dd;
-    }
-    .board-head h2 { margin: 0 0 6px; font-size: 30px; letter-spacing: -.03em; }
-    .board-head p { max-width: 840px; margin: 0; color: var(--muted); }
-    .stage-pill {
-      padding: 8px 13px;
-      border: 1px solid #b8c8db;
-      border-radius: 999px;
-      color: var(--navy);
-      background: #eef4fb;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .board-flow {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 13px 0;
-      color: #6c7888;
-      border-bottom: 1px solid #e1e5ea;
-    }
-    .board-flow b { color: var(--blue); }
-    .board-flow .arrow { color: #9fa9b5; }
-
-    .board-grid { display: grid; gap: 14px; margin-top: 18px; }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid-6 { grid-template-columns: repeat(3, 1fr); }
-    .grid-10 { grid-template-columns: repeat(2, 1fr); }
-    .grid-8 { grid-template-columns: repeat(4, 1fr); }
-
-    .choice-card {
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      min-height: 270px;
-      flex-direction: column;
-      padding: 0;
-      border: 2px solid #d8dee7;
-      border-radius: 16px;
-      color: var(--ink);
-      background: #fff;
-      text-align: left;
-      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
-    }
-    .choice-card:hover { transform: translateY(-2px); border-color: #94abc5; box-shadow: 0 12px 28px rgba(27,51,79,.1); }
-    .choice-card.selected { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(40,102,177,.14), 0 12px 28px rgba(27,51,79,.12); }
-    .card-media {
-      position: relative;
-      flex: 0 0 150px;
-      min-height: 150px;
-      background-color: #dbe5ef;
-      background-image:
-        radial-gradient(circle at 24% 20%, rgba(255,255,255,.8), transparent 18%),
-        linear-gradient(145deg, #c5d6e7, #405f82 72%, #1d344f);
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    .grid-10 .card-media { flex-basis: 125px; }
-    .grid-8 .card-media { flex-basis: 135px; }
-    .card-num {
-      position: absolute;
-      z-index: 2;
-      top: 10px;
-      left: 10px;
-      display: grid;
-      width: 40px;
-      height: 40px;
-      place-items: center;
-      border-radius: 11px;
-      color: #fff;
-      background: rgba(18,50,88,.93);
-      font-weight: 800;
-    }
-    .select-mark {
-      position: absolute;
-      z-index: 2;
-      top: 10px;
-      right: 10px;
-      display: none;
-      padding: 7px 10px;
-      border-radius: 999px;
-      color: #fff;
-      background: var(--blue);
-      font-weight: 800;
-    }
-    .selected .select-mark { display: block; }
-    .card-body { display: grid; gap: 8px; padding: 15px; }
-    .card-body h3 { margin: 0; color: var(--navy); font-size: 20px; line-height: 1.35; }
-    .card-body p { margin: 0; color: #435167; }
-    .meta-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
-    .meta-list li { color: #4a586d; }
-    .meta-list b { color: var(--ink); }
-    .cue-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
-    .cue { padding: 5px 9px; border: 1px solid #d7dfe9; border-radius: 999px; color: #536278; background: #f4f7fa; }
-    .scale { display: grid; grid-template-columns: auto 1fr auto; gap: 9px; align-items: center; }
-    .scale-line { position: relative; height: 2px; background: #bcc7d4; }
-    .scale-line:after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: var(--value, 60%);
-      width: 13px;
-      height: 13px;
-      border: 3px solid white;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 0 1px var(--gold);
-      transform: translate(-50%, -50%);
-    }
-
-    .board-foot {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 16px;
-      align-items: center;
-      margin-top: 18px;
-      padding-top: 17px;
-      border-top: 1px solid #d8dde4;
-    }
-    .selection-note { color: var(--muted); }
-    .selection-note b { color: var(--blue); }
-    .board-actions { display: flex; gap: 9px; justify-content: flex-end; }
-
-    .final-board { padding: 20px; }
-    .strategy-grid {
-      display: grid;
-      grid-template-columns: 1.05fr 1fr 1.1fr 1.1fr 1.35fr 1.5fr;
-      gap: 0;
-      margin-top: 16px;
-      border: 1px solid #d7dde5;
-      background: #fff;
-    }
-    .strategy-column { min-width: 0; padding: 16px; border-right: 1px solid #d7dde5; }
-    .strategy-column:last-child { border-right: 0; }
-    .strategy-column h3 { margin: 0 0 14px; color: var(--navy); font-size: 18px; }
-    .strategy-column h3 span { display: block; color: #647186; font-weight: 500; }
-    .strategy-column p { margin: 0 0 10px; }
-    .strategy-column ul { margin: 0; padding-left: 20px; }
-    .strategy-column li { margin-bottom: 8px; }
-    .final-hero-image {
-      width: 100%;
-      height: 220px;
-      margin-bottom: 14px;
-      border-radius: 12px;
-      object-fit: cover;
-      background: linear-gradient(145deg, #dbe5ee, #183958);
-    }
-    .sample-mini-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .sample-mini { min-height: 92px; padding: 9px; border: 1px solid #d7dde5; border-radius: 10px; background: #f7f8fa; }
-    .sample-mini b { display: block; color: var(--navy); }
-    .method-bar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-      margin-top: 14px;
-      padding: 14px;
-      border: 1px solid #d7dde5;
-      color: #4e5c70;
-      background: #f6f7f8;
-    }
-    .method-bar b { color: var(--navy); }
-
-    .loading {
-      display: grid;
-      min-height: 500px;
-      place-items: center;
-      padding: 40px;
-      text-align: center;
-    }
-    .spinner {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto 20px;
-      border: 5px solid #dbe6f2;
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading h2 { margin: 0 0 8px; font-size: 26px; }
-    .loading p { max-width: 630px; margin: 0 auto; color: var(--muted); }
-    .loading-steps { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
-    .loading-chip { padding: 8px 11px; border-radius: 999px; color: #5c697c; background: #edf2f7; }
-    .loading-chip.active { color: #fff; background: var(--blue); }
-
-    .error-box {
-      display: grid;
-      gap: 14px;
-      max-width: 760px;
-      margin: 60px auto;
-      padding: 26px;
-      border: 1px solid #e2bcbc;
-      border-radius: 18px;
-      background: #fff8f8;
-    }
-    .error-box h2 { margin: 0; color: var(--danger); font-size: 25px; }
-    .error-box p { margin: 0; }
-    .error-detail { padding: 13px; border-radius: 10px; color: #6f3434; background: #f9e8e8; white-space: pre-wrap; }
-
-    .modal-backdrop {
-      position: fixed;
-      z-index: 80;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 22px;
-      background: rgba(10,23,40,.62);
-      backdrop-filter: blur(9px);
-    }
-    .modal {
-      width: min(620px, 100%);
-      padding: 26px;
-      border-radius: 22px;
-      background: #fff;
-      box-shadow: 0 28px 80px rgba(0,0,0,.28);
-    }
-    .modal h2 { margin: 0 0 8px; font-size: 27px; }
-    .modal p { margin: 0 0 18px; color: var(--muted); }
-    .modal-actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 16px; }
-    .security-note { margin-top: 12px !important; padding: 12px; border-radius: 10px; color: #566377 !important; background: #f2f5f8; }
-
-    .toast {
-      position: fixed;
-      z-index: 100;
-      right: 24px;
-      bottom: 24px;
-      max-width: min(470px, calc(100% - 48px));
-      padding: 14px 17px;
-      border-radius: 13px;
-      color: #fff;
-      background: #17365d;
-      box-shadow: 0 14px 40px rgba(12,31,54,.25);
-    }
-    .toast.error { background: #8e3838; }
-    .toast.success { background: #267352; }
-
-    @media (max-width: 900px) {
-      .app-shell { width: min(100% - 20px, 1500px); margin-top: 10px; }
-      .topbar { position: static; grid-template-columns: 1fr; padding: 15px; }
-      .header-actions { justify-content: flex-start; }
-      .status-strip { grid-template-columns: 1fr; }
-      .model-locks { justify-content: flex-start; }
-      .hero { grid-template-columns: 1fr; }
-      .hero-copy { padding: 8px; }
-      .hero-visual { min-height: 310px; }
-      .surface { padding: 18px; }
-      .keyword-row { grid-template-columns: 1fr; }
-    }
-
-    @media print {
-      body { background: #fff; }
-      .topbar, .status-strip, .progress-wrap, .board-foot { display: none !important; }
-      .app-shell { width: 100%; margin: 0; }
-      .surface { padding: 0; border: 0; box-shadow: none; }
-      .board-scroll { overflow: visible; }
-      .image-board { min-width: 0; border: 0; box-shadow: none; }
-    }
-  </style>
+#load{position:fixed;inset:0;display:grid;place-items:center;color:#9a9ca1;font-size:16px;z-index:9;background:#050506;transition:opacity .6s}
+#load.done{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion: reduce){#load{transition:none}}
+</style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">CMF</div>
-        <div>
-          <h1>CMF 감성–물성 디자인 랩</h1>
-          <p>Emotion to Material Strategy Studio</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button class="btn btn-ghost" id="homeBtn" type="button">프로젝트 홈</button>
-        <button class="btn btn-soft" id="apiBtn" type="button">API 설정</button>
-        <button class="btn" id="saveBtn" type="button">현재 프로젝트 저장</button>
-      </div>
-    </header>
+<canvas id="c" aria-label="총알형 조명 3D 뷰어"></canvas>
+<div id="load">셰이더를 준비하는 중…</div>
 
-    <section class="status-strip">
-      <div class="stage-status" id="stageStatus">감성 키워드 입력</div>
-      <div class="model-locks">
-        <span class="model-badge">텍스트 · gemini-2.5-flash · 고정</span>
-        <span class="model-badge">이미지 · gemini-3.1-flash-image · 고정</span>
-      </div>
-    </section>
+<header class="top">
+  <div class="title"><b>불릿 라이트 CMF</b><span id="hdrSub"></span></div>
+  <button class="reset" id="reset">초기화</button>
+</header>
 
-    <nav class="progress-wrap" aria-label="CMF 디자인 단계">
-      <div class="progress" id="progress"></div>
-    </nav>
-
-    <main id="app"></main>
+<div class="dock"><section class="sheet" id="sheet">
+  <div class="handle" id="handle">
+    <button class="nav" id="prev" aria-label="이전 프리셋">‹</button>
+    <button class="grip" id="grip" aria-expanded="true" aria-controls="sheetBody">
+      <span id="gripName"></span><small id="gripHint"></small>
+    </button>
+    <button class="nav" id="next" aria-label="다음 프리셋">›</button>
   </div>
-
-  <div class="modal-backdrop hidden" id="apiModal" role="dialog" aria-modal="true" aria-labelledby="apiTitle">
-    <section class="modal">
-      <h2 id="apiTitle">Gemini API 연결</h2>
-      <p>Google AI Studio에서 발급한 Gemini API 키를 입력하세요. 키는 이 브라우저 탭의 세션에만 저장됩니다.</p>
-      <label for="apiKey"><b>Gemini API Key</b></label>
-      <input class="input" id="apiKey" type="password" autocomplete="off" placeholder="AIza…">
-      <p class="security-note">단일 HTML에서 Google API를 직접 호출하므로 배포용 공개 웹사이트에서는 서버 프록시 사용을 권장합니다. 이 파일은 로컬 프로토타입용입니다.</p>
-      <div class="modal-actions">
-        <button class="btn btn-danger" id="clearApiBtn" type="button">저장 키 삭제</button>
-        <button class="btn" id="closeApiBtn" type="button">닫기</button>
-        <button class="btn btn-primary" id="connectApiBtn" type="button">연결 확인</button>
+  <div class="body" id="sheetBody">
+    <div class="chips" id="chips" role="group" aria-label="단계" hidden></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-p="pLight">빛</button>
+      <button role="tab" aria-selected="false" data-p="pIn">안쪽 레이어</button>
+      <button role="tab" aria-selected="false" data-p="pOut">바깥 레이어</button>
+      <button role="tab" aria-selected="false" data-p="pEnv">환경</button>
+    </div>
+    <div class="pane" id="pLight">
+      <p class="grp">내부 빛 색</p>
+      <div class="row" id="lightRow"></div>
+      <div class="sl"><label for="sLI">빛 세기</label><input id="sLI" type="range" min="0" max="100" step="1"><output id="oLI"></output></div>
+      <div class="sl"><label for="sBloom">빛 번짐</label><input id="sBloom" type="range" min="0" max="2" step="0.05"><output id="oBloom"></output></div>
+      <p class="note">빛은 중심축의 LED 바에서 나옵니다. 안쪽 레이어를 통과한 빛(천공·투광)만 바깥 레이어에 닿고, 바깥 천공으로 새어 나온 빛은 바닥에 점 무늬로 맺힙니다.</p>
+    </div>
+    <div class="pane" id="pIn" hidden></div>
+    <div class="pane" id="pOut" hidden></div>
+    <div class="pane" id="pEnv" hidden>
+      <p class="grp">배경</p>
+      <div class="row" id="bgRow"></div>
+      <div class="sl"><label for="sGap">레이어 간격</label><input id="sGap" type="range" min="2" max="20" step="0.5"><output id="oGap"></output></div>
+      <div class="sl"><label for="sEnvL">주변광</label><input id="sEnvL" type="range" min="0" max="1.5" step="0.05"><output id="oEnvL"></output></div>
+      <div class="sl"><label for="sExp">노출</label><input id="sExp" type="range" min="0.3" max="2.5" step="0.05"><output id="oExp"></output></div>
+      <p class="grp">시점·움직임</p>
+      <div class="row">
+        <button class="pill" id="vFront">정면</button>
+        <button class="pill" id="vHigh">위에서</button>
+        <button class="pill" id="vLow">낮게</button>
+        <button class="pill" id="tRot" aria-pressed="false">자동 회전</button>
       </div>
-    </section>
+      <p class="note">지름 100 mm · 높이 약 195 mm 기준. 드래그로 360° 회전, 두 손가락으로 확대·축소합니다.</p>
+    </div>
   </div>
-  <div class="toast hidden" id="toast"></div>
+</section></div>
 
-  <script>
-    "use strict";
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-    /*
-      MODEL LOCK CONTRACT (Updated for Google AI Studio Official Endpoints)
-    */
-    const LOCKED_TEXT_MODEL = "gemini-2.5-flash";
-    const LOCKED_IMAGE_MODEL = "gemini-3.1-flash-image";
-    const MODEL_LOCK = {};
-    Object.defineProperties(MODEL_LOCK, {
-      text: { value: LOCKED_TEXT_MODEL, writable: false, configurable: false, enumerable: true },
-      image: { value: LOCKED_IMAGE_MODEL, writable: false, configurable: false, enumerable: true }
-    });
-    Object.freeze(MODEL_LOCK);
+/* ───────── 치수 (1 unit = 100 mm) ───────── */
+const SC = 0.01;            // mm → unit
+const H  = 1.45;            // 원통부 높이 145 mm
+const RO = 0.5;             // 바깥 반지름 50 mm
+const EY0 = 0.10, EY1 = H + 0.08;   // LED 바 범위
 
-    // 단일 v1beta API 베이스 사용
-    const API_BASE = "https://generativelanguage.googleapis.com/v1beta";
-    
-    const SESSION_KEY = "cmf-gemini-api-key";
-    const DB_NAME = "cmf-emotion-material-lab";
-    const DB_STORE = "projects";
-    const DB_VERSION = 1;
+/* ───────── 데이터 ───────── */
+const LIGHTS = {
+  white:  {name:'화이트', css:'#f4f2ee', rgb:[1.00,0.96,0.90]},
+  yellow: {name:'옐로',   css:'#ffc24a', rgb:[1.00,0.70,0.26]},
+  blue:   {name:'블루',   css:'#4f86ff', rgb:[0.22,0.48,1.00]},
+  green:  {name:'그린',   css:'#4cf27a', rgb:[0.28,1.00,0.42]},
+};
+const MATS = {
+  glass:  {name:'유리',     idx:0, color:'#ffffff', t:.85, g:.95, tl:'투명도'},
+  plastic:{name:'플라스틱', idx:1, color:'#f4f1ea', t:.30, g:.60, tl:'투명도'},
+  metal:  {name:'메탈',     idx:2, color:'#c9ccd1', t:0,   g:.55, tl:'투광도'},
+  wood:   {name:'나무',     idx:3, color:'#b98552', t:.20, g:.35, tl:'투광도'},
+  marble: {name:'대리석',   idx:4, color:'#efebe4', t:.35, g:.85, tl:'투광도'},
+  fabric: {name:'패브릭',   idx:5, color:'#d8d0c2', t:.35, g:.10, tl:'성김'},
+};
+const DISTS = [['균일',0],['위로 커짐',1],['아래로 커짐',2],['랜덤',3],['가운데 큼',4],['위아래 큼',5],['군집',6]];
+const BGS = {
+  black:{name:'블랙', bg:'#050506', floor:'#0c0d0f', light:false},
+  gray: {name:'다크 그레이', bg:'#202226', floor:'#2a2c31', light:false},
+  white:{name:'스튜디오 화이트', bg:'#e6e6e2', floor:'#d9d9d4', light:true},
+};
 
-    const STAGES = [
-      { id: 1, ko: "감성 해석", en: "Emotion", count: 3, min: 1, max: 1 },
-      { id: 2, ko: "지각", en: "Perception", count: 6, min: 3, max: 6 },
-      { id: 3, ko: "물성", en: "Material Properties", count: 10, min: 5, max: 10 },
-      { id: 4, ko: "영감의 문장", en: "Inspiration", count: 3, min: 1, max: 1 },
-      { id: 5, ko: "소재와 가공기법", en: "Material & Process", count: 10, min: 5, max: 5 },
-      { id: 6, ko: "CMF 샘플", en: "CMF Samples", count: 8, min: 8, max: 8 },
-      { id: 7, ko: "최종 보드", en: "Strategy Board", count: 1, min: 0, max: 0 }
-    ];
+const layerDef = (mat, o={}) => Object.assign({mat, color:MATS[mat].color, t:MATS[mat].t, g:MATS[mat].g,
+  perf:false, size:4, pitch:8, dist:0, vari:.6, stag:true, seed:1, vis:true}, o);
 
-    const STAGE_SUBTITLES = {
-      1: "감성을 서로 다른 세 가지 물질적 방향으로 해석합니다.",
-      2: "선택한 감성이 눈과 손에 어떻게 인식되어야 하는지 정의합니다.",
-      3: "선택한 지각을 검증 가능한 물리·광학·촉각 물성으로 전환합니다.",
-      4: "확정된 감성·지각·물성을 구현 기준이 되는 문장으로 통합합니다.",
-      5: "영감 방향을 실제 제작 가능한 소재·공정·마감 조합으로 연결합니다.",
-      6: "서로 다른 물성 가설을 검증할 여덟 개의 CMF 샘플을 구성합니다.",
-      7: "모든 확정 선택을 하나의 CMF Material Strategy Board로 종합합니다."
-    };
+/* 밋밋한 단계 → 감성이 풍부해지는 순서 */
+const PRESETS = [
+  {kw:'무난하고 밋밋한', desc:'무광 회색 플라스틱 한 겹 · 빛 없음',
+   light:'white', li:0, inner:layerDef('plastic',{color:'#8d8f93',t:0,g:0}), outer:layerDef('plastic',{color:'#8d8f93',t:0,g:0})},
+  {kw:'무난하고 깨끗한', desc:'회색 플라스틱 위에 투명 유리 · 빛 없음',
+   light:'white', li:0, inner:layerDef('plastic',{color:'#8d8f93',t:0,g:.15}), outer:layerDef('glass',{t:.85})},
+  {kw:'단단하고 모던한', desc:'광택 알루미늄 코어 + 투명 유리 · 빛 없음',
+   light:'white', li:0, inner:layerDef('metal',{color:'#dcdfe3',g:.6}), outer:layerDef('glass',{t:.85})},
+  {kw:'모던하고 흥미로운', desc:'알루미늄 천공 + 투명 유리 · 빛 없음',
+   light:'yellow', li:0, inner:layerDef('metal',{perf:true,size:4,pitch:8}), outer:layerDef('glass',{t:.82})},
+  {kw:'은은하고 생기 있는', desc:'알루미늄 천공 사이로 옐로 빛이 새어 나옴',
+   light:'yellow', li:75, inner:layerDef('metal',{perf:true,size:4,pitch:8}), outer:layerDef('glass',{t:.85})},
+  {kw:'가볍고 안정적인', desc:'위로 커지는 천공 + 무광 유리 · 화이트',
+   light:'white', li:55, inner:layerDef('metal',{perf:true,size:8,pitch:10,dist:1,vari:.95}), outer:layerDef('glass',{t:.7,g:.3})},
+  {kw:'귀엽고 포근한', desc:'큰 랜덤 천공 메탈 + 패브릭 · 옐로',
+   light:'yellow', li:55, inner:layerDef('metal',{perf:true,size:25,pitch:40,dist:3,vari:.8}), outer:layerDef('fabric',{t:.45})},
+  {kw:'온화하고 따스함', desc:'오팔 아크릴 + 군집 천공 나무 · 옐로',
+   light:'yellow', li:60, inner:layerDef('plastic',{t:.2}), outer:layerDef('wood',{t:.25,perf:true,size:6,pitch:9,dist:6,vari:.9})},
+  {kw:'밝고 신비로운', desc:'오팔 아크릴 + 결이 비치는 대리석 · 옐로',
+   light:'yellow', li:60, inner:layerDef('plastic',{t:.25}), outer:layerDef('marble',{t:.45,g:.9})},
+  {kw:'젊고 활발한', desc:'촘촘한 천공 + 다크 블루 랜덤 천공 메탈 · 그린',
+   light:'green', li:80, inner:layerDef('metal',{color:'#eef0ec',perf:true,size:3,pitch:6}), outer:layerDef('metal',{color:'#071d80',g:.6,perf:true,size:11,pitch:15,dist:3,vari:.6})},
+];
 
-    let state = newProject();
-    let currentView = "home";
-    let busy = false;
-    let toastTimer = null;
+const state = {
+  preset:0, custom:false, light:'white', li:0, bloom:.5, gap:8, envL:.25, exp:1, bg:'black', rot:false, view:'all',
+  layers:{inner:null, outer:null}
+};
+/* 사용자가 바꾼 값은 테마별로 유지 (브라우저에 저장) */
+const STORE = 'bullet-light-cmf-v3';
+const DEF_GLOBAL = {bloom:.5, gap:8, envL:.25, exp:1, bg:'black', rot:false};
+let themeStates = {};
+try { const d = JSON.parse(localStorage.getItem(STORE) || 'null');
+  if (d){ themeStates = d.themes || {}; Object.assign(state, DEF_GLOBAL, d.global || {}); } } catch(e) {}
+function saveStore(){
+  try { const g = {}; for (const k in DEF_GLOBAL) g[k] = state[k];
+    localStorage.setItem(STORE, JSON.stringify({themes:themeStates, global:g})); } catch(e) {}
+}
+function loadPreset(i){
+  const saved = themeStates[i], src = saved || PRESETS[i];
+  state.preset=i; state.custom=!!saved; state.light=src.light; state.li=src.li;
+  state.layers.inner = structuredClone(src.inner);
+  state.layers.outer = structuredClone(src.outer);
+}
+loadPreset(0);
 
-    const app = document.getElementById("app");
-    const progressEl = document.getElementById("progress");
-    const stageStatus = document.getElementById("stageStatus");
-    const apiModal = document.getElementById("apiModal");
-    const apiKeyInput = document.getElementById("apiKey");
-    const toastEl = document.getElementById("toast");
+/* ───────── 렌더러 / 씬 ───────── */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.localClippingEnabled = true;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30,1,.05,100);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping=true; controls.dampingFactor=.08; controls.enablePan=false;
+controls.minDistance=1.6; controls.maxDistance=12; controls.maxPolarAngle=Math.PI*.5; controls.minPolarAngle=.05;
+controls.autoRotateSpeed=.8;
+controls.target.set(0,.98,0);
 
-    function assertModelLock() {
-      if (MODEL_LOCK.text !== "gemini-2.5-flash" || MODEL_LOCK.image !== "gemini-3.1-flash-image") {
-        throw new Error("보호된 Gemini 모델 식별자가 변경되었습니다. 원래 고정값을 복원해 주세요.");
-      }
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), .04).texture;
+
+const rt = new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
+const composer = new EffectComposer(renderer, rt);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(256,256), .5, .4, 1.1);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ───────── GLSL ───────── */
+const GL_COMMON = /* glsl */`
+varying vec3 vObj;
+uniform float hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag;
+const float KPI=3.14159265, KTAU=6.2831853;
+float kH13(vec3 p){p=fract(p*.1031);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
+float kVN(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(mix(kH13(i),kH13(i+vec3(1,0,0)),f.x),mix(kH13(i+vec3(0,1,0)),kH13(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(kH13(i+vec3(0,0,1)),kH13(i+vec3(1,0,1)),f.x),mix(kH13(i+vec3(0,1,1)),kH13(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float kFbm(vec3 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*kVN(p);p=p*2.03+vec3(17.1,3.7,9.2);a*=.5;}return s;}
+/* 표면 좌표: (둘레각, 바닥부터의 호 길이, 그 높이의 반지름) */
+vec3 kSurf(vec3 p,float R,float H){
+  float r=length(p.xz); float th=atan(p.z,p.x);
+  if(p.y<=H) return vec3(th,p.y,R);
+  float ph=atan(p.y-H,max(r,1e-6));
+  return vec3(th,H+R*ph,R*cos(ph));
+}
+float kSizeF(float t,float rn,float mode,float v,vec3 q){
+  if(mode<.5) return 1.;
+  if(mode<1.5) return mix(1.-v,1.,t);
+  if(mode<2.5) return mix(1.,1.-v,t);
+  if(mode<3.5) return 1.-v*rn;
+  float e=smoothstep(0.,1.,abs(t-.5)*2.);
+  if(mode<4.5) return mix(1.,1.-v,e);
+  if(mode<5.5) return mix(1.-v,1.,e);
+  return 1.-v*smoothstep(.35,.68,kVN(q));
+}
+/* 원형 천공: 표면 위에서 고른 간격(돔 포함)으로 배치. 반환 (구멍 마스크, 가장자리까지 거리, 구멍 반지름) */
+vec3 kHoles(vec3 p,float R,float H,float on,float pitch,float size,float v,float mode,float seed,float stag,float soft){
+  vec3 res=vec3(0.,1e3,0.);
+  if(on<.5) return res;
+  vec3 sp=kSurf(p,R,H); float th=sp.x, s=sp.y, rf=sp.z;
+  float smax=H+R*KPI*.5;
+  float lastRow=floor((smax-pitch*.5)/pitch)-1.;
+  float row=floor(s/pitch);
+  float cap=pitch*.48;
+  for(int k=-1;k<=1;k++){
+    float ri=row+float(k);
+    if(ri<0.||ri>lastRow) continue;
+    float sc=(ri+.5)*pitch;
+    float rr= sc<=H ? R : R*cos((sc-H)/R);
+    float n=max(1.,floor(KTAU*rr/pitch));
+    float off= stag>.5 ? mod(ri,2.)*.5 : 0.;
+    float ci=floor((th/KTAU)*n-off+.5);
+    for(int j=-1;j<=1;j++){
+      float c=ci+float(j);
+      float thc=(c+off)/n*KTAU;
+      float dth=mod(th-thc+KPI,KTAU)-KPI;
+      vec2 d=vec2(dth*rf,s-sc);
+      float rn=kH13(vec3(ri,mod(c,n),seed));
+      vec3 q=vec3(cos(thc)*rr,sc,sin(thc)*rr)*3.2+seed;
+      float hr=min(size*.5*kSizeF(sc/smax,rn,mode,v,q),cap);
+      if(hr<.0004 || sc-hr<.035) continue;
+      float e=length(d)-hr;
+      if(e<res.y){res.y=e;res.z=hr;}
     }
+  }
+  float hrP=min(size*.5*kSizeF(1.,kH13(vec3(99.,1.,seed)),mode,v,vec3(0.,smax*3.2,0.)+seed),cap);
+  if(hrP>=.0004){ float e=(smax-s)-hrP; if(e<res.y){res.y=e;res.z=hrP;} }
+  res.x=1.-smoothstep(-soft,soft,res.y);
+  return res;
+}
+vec3 kProj(vec3 p,float H,float Ri){
+  float r=length(p.xz); vec2 dir=r>1e-6?p.xz/r:vec2(1.,0.);
+  if(p.y<=H) return vec3(dir.x*Ri,p.y,dir.y*Ri);
+  float ph=atan(p.y-H,max(r,1e-6));
+  return vec3(dir.x*Ri*cos(ph),H+Ri*sin(ph),dir.y*Ri*cos(ph));
+}
+`;
+const GL_MAIN_UNI = /* glsl */`
+uniform float oR,oOn,oPitch,oSize,oVar,oMode,oSeed,oStag,oT,oVis;
+uniform float uIsOuter,uMat,uAlpha,uScatter,uFres,uPremul,uTrans,uRimK,uGapBlur,uLI,uEY0,uEY1,uGlowK;
+uniform float uDiff,uEnvOcc;
+uniform vec3 uLC;
+`;
+const GL_COLOR = /* glsl */`
+#include <color_fragment>
+vec3 kSP=kSurf(vObj,hR,hH);
+vec3 kQ=vObj;
+float kHgt=0., kRg=0., kAw=1.;
+vec3 kAlb=vec3(1.);
+float kAA=length(fwidth(vObj));
+if(uMat>1.5&&uMat<2.5){            /* 메탈: 선반 가공 결 */
+  float f=kSP.y*1400.;
+  float fade=clamp(1.-fwidth(f)*.6,0.,1.);
+  float n=mix(.5,kVN(vec3(f,cos(kSP.x)*4.,sin(kSP.x)*4.)),fade);
+  kHgt+=(n-.5)*.00003; kRg+=(n-.5)*.18; kAlb*=1.-.05*n;
+} else if(uMat>2.5&&uMat<3.5){     /* 나무: 세로 결 + 물관 */
+  vec3 w=vec3(kQ.x*7.,kQ.z*7.,kQ.y*.55);
+  float g=kFbm(w)*9.+kFbm(w*3.1+4.)*.6;
+  float r=fract(g);
+  float band=smoothstep(0.,.18,r)*smoothstep(1.,.55,r);
+  float fade=clamp(1.-kAA*120.,0.,1.);
+  float pores=smoothstep(.65,.9,kVN(vec3(kQ.x*160.,kQ.z*160.,kQ.y*6.)))*fade;
+  kAlb*=mix(.6,1.08,band)*(.92+.16*kFbm(w*5.))*(1.-.18*pores);
+  kHgt+=-.00012*(1.-band)-.00008*pores;
+  kRg+=(1.-band)*.12;
+} else if(uMat>3.5&&uMat<4.5){     /* 대리석: 베인 */
+  float t1=kFbm(kQ*2.6+1.3);
+  float v1=abs(sin(kQ.x*4.+kQ.z*2.5+kQ.y*3.+t1*7.));
+  float v2=abs(sin(kQ.z*9.-kQ.y*5.+kFbm(kQ*6.)*9.));
+  float m=max(1.-smoothstep(0.,.16,v1),(1.-smoothstep(0.,.08,v2))*.7);
+  kAlb*=mix(vec3(1.),vec3(.34,.33,.32),m)*(.94+.1*kFbm(kQ*14.));
+  kRg+=m*.06;
+} else if(uMat>4.5){               /* 패브릭: 평직 */
+  float wv=.011; float N=floor(KTAU*hR/wv);
+  float uu=(kSP.x/KTAU+.5)*N, vv=kSP.y/wv;
+  vec2 f=fract(vec2(uu,vv))-.5;
+  float odd=mod(floor(uu)+floor(vv),2.);
+  float tW=1.-smoothstep(.30,.46,abs(f.y));
+  float tF=1.-smoothstep(.30,.46,abs(f.x));
+  float over=odd>.5?tW:tF;
+  float cv=max(tW,tF);
+  float aa=clamp(max(fwidth(uu),fwidth(vv))*1.4-.2,0.,1.);
+  float fib=kVN(vec3(uu*6.,vv*6.,1.));
+  over=mix(over,.5,aa); cv=mix(cv,.86,aa);
+  kAlb*=mix(.78,1.,over)*(.93+.1*fib);
+  kHgt+=over*.00018*(1.-aa);
+  kAw=mix(1.-uTrans,1.,cv);
+}
+diffuseColor.rgb*=kAlb;
+`;
+const GL_ALPHA = /* glsl */`
+#include <alphamap_fragment>
+vec3 kHS=kHoles(vObj,hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag,kAA*.75+1e-5);
+float kCov=1.-kHS.x;
+diffuseColor.a=uAlpha*kAw*kCov;
+if(kCov<.01) discard;
+float kBw=min(kHS.z*.35,.0035);
+if(kHS.z>0.) kHgt-=kBw*.7*(1.-smoothstep(0.,kBw,kHS.y));
+float kRim=kHS.z>0.?(1.-smoothstep(0.,kBw*1.8+kAA,kHS.y)):0.;
+`;
+const GL_ROUGH = /* glsl */`
+#include <roughnessmap_fragment>
+roughnessFactor=clamp(roughnessFactor+kRg,.03,1.);
+`;
+const GL_NORMAL = /* glsl */`
+#include <normal_fragment_maps>
+{ vec3 dpx=dFdx(-vViewPosition), dpy=dFdy(-vViewPosition);
+  vec3 r1=cross(dpy,normal), r2=cross(normal,dpx); float det=dot(dpx,r1);
+  vec3 grad=sign(det)*(dFdx(kHgt)*r1+dFdy(kHgt)*r2);
+  normal=normalize(abs(det)*normal-grad); }
+`;
+const GL_EMIS = /* glsl */`
+#include <emissivemap_fragment>
+{
+  float yc=clamp(vObj.y,uEY0,uEY1);
+  float dd=length(vec3(vObj.x,vObj.y-yc,vObj.z));
+  float fall=(1.+pow(.5/.3,2.))/(1.+pow(dd/.3,2.));
+  float tin=1.;
+  if(uIsOuter>.5&&oVis>.5){
+    vec3 pin=kProj(vObj,hH,oR);
+    vec3 HI=kHoles(pin,oR,hH,oOn,oPitch,oSize,oVar,oMode,oSeed,oStag,kAA*.75+uGapBlur+1e-5);
+    tin=mix(oT,1.,HI.x);
+  }
+  vec3 Lc=uLC*uLI*fall*uGlowK;
+  totalEmissiveRadiance=Lc*tin*(uScatter*diffuseColor.rgb+kRim*uRimK*mix(vec3(1.),diffuseColor.rgb,.5));
+}
+`;
+const GL_AO = /* glsl */`
+#include <aomap_fragment>
+{ float occ = gl_FrontFacing ? uEnvOcc : .03;
+  reflectedLight.indirectDiffuse*=occ; reflectedLight.indirectSpecular*=occ; }
+`;
+const GL_OUT = /* glsl */`
+vec3 kSpec=reflectedLight.directSpecular+reflectedLight.indirectSpecular;
+float kA=diffuseColor.a;
+float kFr=pow(1.-clamp(abs(dot(normalize(vViewPosition),normal)),0.,1.),5.);
+float kAo=clamp(kA+(kCov-kA)*kFr*uFres,0.,1.);
+if(uPremul>.5){
+  vec3 rest=max(outgoingLight-kSpec-totalEmissiveRadiance,0.)*uDiff;
+  gl_FragColor=vec4(rest*kAo+(kSpec+totalEmissiveRadiance)*kCov,kAo);
+} else gl_FragColor=vec4(outgoingLight,kAo);
+`;
 
-    function newProject(keyword) {
-      return {
-        id: "cmf-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
-        title: keyword || "새 CMF 프로젝트",
-        keyword: keyword || "",
-        currentStage: 0,
-        maxStage: 0,
-        steps: {},
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+/* ───────── 공유 유니폼 ───────── */
+const G = {uLC:{value:new THREE.Color()}, uLI:{value:.3}, uEY0:{value:EY0}, uEY1:{value:EY1}, uGlowK:{value:2.6}, uGapBlur:{value:.01}};
+const holeU = R => ({hR:{value:R},hH:{value:H},hOn:{value:0},hPitch:{value:.08},hSize:{value:.04},hVar:{value:.5},hMode:{value:0},hSeed:{value:1},hStag:{value:1}});
+const extU = isOuter => ({uIsOuter:{value:isOuter?1:0},uMat:{value:0},uAlpha:{value:1},uScatter:{value:0},uFres:{value:0},uPremul:{value:0},uTrans:{value:0},uRimK:{value:.26},oT:{value:0},oVis:{value:1},uDiff:{value:1},uEnvOcc:{value:1}});
+
+function makeMat(self, other, ext, side){
+  const m = new THREE.MeshPhysicalMaterial({side});
+  const otherMap = {oR:other.hR,oOn:other.hOn,oPitch:other.hPitch,oSize:other.hSize,oVar:other.hVar,oMode:other.hMode,oSeed:other.hSeed,oStag:other.hStag};
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, self, G, ext, otherMap);
+    sh.vertexShader = 'varying vec3 vObj;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position;');
+    sh.fragmentShader = GL_COMMON + GL_MAIN_UNI + sh.fragmentShader
+      .replace('#include <color_fragment>', GL_COLOR)
+      .replace('#include <alphamap_fragment>', GL_ALPHA)
+      .replace('#include <roughnessmap_fragment>', GL_ROUGH)
+      .replace('#include <normal_fragment_maps>', GL_NORMAL)
+      .replace('#include <emissivemap_fragment>', GL_EMIS)
+      .replace('#include <aomap_fragment>', GL_AO)
+      .replace('#include <opaque_fragment>', GL_OUT)
+      .replace('#include <premultiplied_alpha_fragment>', '');
+  };
+  return m;
+}
+function shadowMat(Base, self, opts){
+  const m = new Base(opts);
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, self);
+    sh.vertexShader = 'varying vec3 vObj;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position;');
+    sh.fragmentShader = GL_COMMON + sh.fragmentShader.replace(/void\s+main\s*\(\s*\)\s*\{/,
+      'void main() {\n if(kHoles(vObj,hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag,.0005).x>.5) discard;');
+  };
+  return m;
+}
+
+/* ───────── 형상 ───────── */
+function bulletGeo(R){
+  const pts=[]; const nc=56, nd=72;
+  for(let i=0;i<=nc;i++) pts.push(new THREE.Vector2(R, H*i/nc));
+  for(let i=1;i<=nd;i++){const a=i/nd*Math.PI/2; pts.push(new THREE.Vector2(Math.max(R*Math.cos(a),1e-4), H+R*Math.sin(a)));}
+  return new THREE.LatheGeometry(pts, 200);
+}
+
+const LY = {};
+const U_in = holeU(RO-.08), U_out = holeU(RO);
+function buildLayer(key, isOuter, U, other, order){
+  const E = extU(isOuter);
+  const front = new THREE.Mesh(bulletGeo(U.hR.value), makeMat(U, other, E, THREE.FrontSide));
+  const back  = new THREE.Mesh(front.geometry, makeMat(U, other, E, THREE.BackSide));
+  front.material.shadowSide = THREE.DoubleSide;
+  front.customDepthMaterial = shadowMat(THREE.MeshDepthMaterial, U, {depthPacking:THREE.RGBADepthPacking});
+  front.customDistanceMaterial = shadowMat(THREE.MeshDistanceMaterial, U);
+  front.receiveShadow = back.receiveShadow = true;
+  back.renderOrder = order; front.renderOrder = order + 2;
+  scene.add(front, back);
+  LY[key] = {U, E, front, back, mats:[front.material, back.material]};
+}
+buildLayer('inner', false, U_in, U_out, 2);
+buildLayer('outer', true,  U_out, U_in, 1);
+
+// 받침 링
+const baseMat = new THREE.MeshPhysicalMaterial({color:'#1d1e21', metalness:.9, roughness:.38});
+const base = new THREE.Mesh(new THREE.CylinderGeometry(RO+.006, RO+.012, .034, 160), baseMat);
+base.position.y = .017; base.castShadow = base.receiveShadow = true; scene.add(base);
+const baseIn = new THREE.Mesh(new THREE.CircleGeometry(RO, 96), baseMat);
+baseIn.rotation.x = -Math.PI/2; baseIn.position.y = .035; baseIn.receiveShadow = true; scene.add(baseIn);
+
+// LED 바 (발광체)
+const rodMat = new THREE.MeshBasicMaterial({color:'#fff'});
+const rod = new THREE.Mesh(new THREE.CapsuleGeometry(.016, EY1-EY0, 6, 24), rodMat);
+rod.position.y = (EY0+EY1)/2; scene.add(rod);
+const stem = new THREE.Mesh(new THREE.CylinderGeometry(.03,.04,EY0,32), baseMat);
+stem.position.y = EY0/2; scene.add(stem);
+
+// 바닥
+const floorMat = new THREE.MeshStandardMaterial({color:'#0c0d0f', roughness:.82, metalness:0});
+const floor = new THREE.Mesh(new THREE.CircleGeometry(14, 96), floorMat);
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+// 조명
+const pLight = new THREE.PointLight(0xffffff, 1, 0, 2);
+pLight.position.set(0, H*.55, 0);
+pLight.castShadow = true;
+pLight.shadow.mapSize.set(1024,1024);
+pLight.shadow.camera.near = .02; pLight.shadow.camera.far = 4;
+pLight.shadow.bias = -.0008;
+scene.add(pLight);
+
+const key = new THREE.DirectionalLight(0xffffff, 1);
+key.position.set(2.4, 4.2, 2.0);
+key.castShadow = true; key.shadow.mapSize.set(2048,2048);
+Object.assign(key.shadow.camera, {left:-1.6,right:1.6,top:1.6,bottom:-1.6,near:.5,far:10});
+key.shadow.bias = -.0004; key.shadow.normalBias = .01;
+scene.add(key);
+
+/* ───────── 상태 → 씬 반영 ───────── */
+const clipPlane = new THREE.Plane(new THREE.Vector3(1,0,0), 0);
+function layerPhys(L){
+  const t=L.t, g=L.g; const r = {rough:.5, metal:0, alpha:1, scatter:0, fres:0, transp:false, clear:0, sheen:0, cast:true, env:1};
+  switch(L.mat){
+    case 'glass':   Object.assign(r,{rough:.02+(1-g)*.6, alpha:Math.min(1,.04+(1-t)*.9+(1-g)*.25), scatter:.04+(1-g)*.55+(1-t)*.15, fres:1, transp:true, cast:false, env:1.4}); break;
+    case 'plastic': { const a=Math.min(1,.15+(1-t)*.85); Object.assign(r,{rough:.05+(1-g)*.55, alpha:a, scatter:.35+(1-t)*.35, fres:.7, transp:a<.995, clear:g*.6, cast:t<.15}); break; }
+    case 'metal':   Object.assign(r,{rough:.08+(1-g)*.6, metal:1, env:1.6}); break;
+    case 'wood':    Object.assign(r,{rough:.3+(1-g)*.5, scatter:t*1.2, clear:g>.6?(g-.6)*1.5:0}); break;
+    case 'marble':  Object.assign(r,{rough:.06+(1-g)*.5, scatter:t*1.4, clear:g*.5}); break;
+    case 'fabric':  Object.assign(r,{rough:.88, scatter:.3+t*.9, sheen:1, transp:true}); break;
+  }
+  r.T = L.mat==='metal' ? 0 : L.mat==='fabric' ? Math.min(1,.12+t*.8) : Math.min(1,(1-r.alpha)+r.alpha*r.scatter*.75);
+  return r;
+}
+function applyScene(){
+  const lc = LIGHTS[state.light].rgb, I = state.li/100;
+  G.uLC.value.setRGB(lc[0],lc[1],lc[2]); G.uLI.value = I;
+  pLight.color.setRGB(lc[0],lc[1],lc[2]); pLight.intensity = I*1.5;
+  const k = .15 + I*6;
+  rodMat.color.setRGB(lc[0]*k+.02, lc[1]*k+.02, lc[2]*k+.02);
+  bloom.strength = state.bloom;
+  renderer.toneMappingExposure = state.exp;
+  key.intensity = state.envL*2.2;
+
+  const B = BGS[state.bg];
+  scene.background = new THREE.Color(B.bg); floorMat.color.set(B.floor);
+  document.body.classList.toggle('light-bg', B.light);
+  document.body.style.background = B.bg;
+
+  // 레이어 반지름
+  const Ri = RO - state.gap*SC;
+  if (Math.abs(U_in.hR.value - Ri) > 1e-6){
+    U_in.hR.value = Ri;
+    const old = LY.inner.front.geometry; const geo = bulletGeo(Ri);
+    LY.inner.front.geometry = LY.inner.back.geometry = geo; old.dispose();
+  }
+  const cut = state.view==='cut';
+  const phys = {};
+  for (const key of ['inner','outer']){
+    const L = state.layers[key], ly = LY[key], U = ly.U, E = ly.E, P = layerPhys(L);
+    phys[key] = P;
+    U.hOn.value = L.perf?1:0; U.hPitch.value = L.pitch*SC; U.hSize.value = L.size*SC;
+    U.hVar.value = L.vari; U.hMode.value = L.dist; U.hSeed.value = L.seed; U.hStag.value = L.stag?1:0;
+    E.uMat.value = MATS[L.mat].idx; E.uAlpha.value = L.mat==='fabric'?1:P.alpha; E.uScatter.value = P.scatter;
+    E.uFres.value = P.fres; E.uPremul.value = P.transp?1:0; E.uTrans.value = L.t;
+    E.uDiff.value = L.mat==='glass' ? .08 + (1-L.g)*.9 : 1;
+    for (const m of ly.mats){
+      m.color.set(L.color);
+      m.roughness = P.rough; m.metalness = P.metal;
+      m.clearcoat = P.clear; m.clearcoatRoughness = .06;
+      m.sheen = P.sheen; m.sheenRoughness = .55; m.sheenColor.set('#ffffff');
+      m.ior = 1.5; m.specularIntensity = 1;
+      m.envMapIntensity = state.envL*P.env*1.8 + .05;
+      const needs = m.transparent!==P.transp || m.alphaToCoverage===P.transp || ((m.clippingPlanes&&m.clippingPlanes.length)?1:0)!==(cut?1:0);
+      m.transparent = P.transp; m.premultipliedAlpha = P.transp; m.depthWrite = !P.transp; m.alphaToCoverage = !P.transp;
+      m.clippingPlanes = cut ? [clipPlane] : null;
+      if (needs) m.needsUpdate = true;
     }
+    const vis = L.vis && !(key==='outer' && state.view==='inner');
+    ly.front.visible = ly.back.visible = vis;
+    ly.front.castShadow = vis && P.cast;
+  }
+  LY.outer.E.oT.value = phys.inner.T;
+  LY.inner.E.uEnvOcc.value = LY.outer.front.visible ? .08 + .92*phys.outer.T : 1;
+  LY.outer.E.oVis.value = LY.inner.front.visible ? 1 : 0;
+  G.uGapBlur.value = state.gap*SC*(.15 + phys.outer.rough*1.2);
+  baseMat.clippingPlanes = cut ? [clipPlane] : null; baseMat.needsUpdate = true;
+  baseMat.envMapIntensity = state.envL*2 + .1; floorMat.envMapIntensity = state.envL;
+  controls.autoRotate = state.rot;
+  updateTexts();
+}
 
-    function escapeHtml(value) {
-      return String(value == null ? "" : value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+/* ───────── UI ───────── */
+const $ = id => document.getElementById(id);
+const press = (el, on) => el.setAttribute('aria-pressed', on ? 'true':'false');
+function changed(){
+  state.custom = true;
+  themeStates[state.preset] = {light:state.light, li:state.li, inner:structuredClone(state.layers.inner), outer:structuredClone(state.layers.outer)};
+  applyScene(); syncUI(); saveStore();
+}
+function globalChanged(){ applyScene(); syncUI(); saveStore(); }
 
-    function showToast(message, type) {
-      clearTimeout(toastTimer);
-      toastEl.textContent = message;
-      toastEl.className = "toast " + (type || "");
-      toastTimer = setTimeout(function () { toastEl.classList.add("hidden"); }, 4500);
-    }
+function layerPane(k, label){
+  return `
+  <div class="hd"><p class="grp">${label} 소재</p><button class="pill" id="${k}Vis">보이기</button></div>
+  <div class="row" id="${k}Mat"></div>
+  <div class="col"><label for="${k}Col">색상</label><input type="color" id="${k}Col"><button class="pill" id="${k}ColR">기본색</button></div>
+  <div class="sl" id="${k}TRow"><label id="${k}TLab" for="${k}T">투명도</label><input id="${k}T" type="range" min="0" max="1" step="0.01"><output id="${k}TO"></output></div>
+  <div class="sl"><label for="${k}G">광택</label><input id="${k}G" type="range" min="0" max="1" step="0.01"><output id="${k}GO"></output></div>
+  <div class="hd" style="margin-top:8px"><p class="grp">천공</p><button class="pill" id="${k}Perf">천공 사용</button></div>
+  <div class="box" id="${k}Box">
+    <div class="sl"><label for="${k}Sz">구멍 지름</label><input id="${k}Sz" type="range" min="1" max="25" step="0.5"><output id="${k}SzO"></output></div>
+    <div class="sl"><label for="${k}Pt">간격</label><input id="${k}Pt" type="range" min="3" max="40" step="0.5"><output id="${k}PtO"></output></div>
+    <p class="grp">크기 분포</p>
+    <div class="row" id="${k}Dist"></div>
+    <div class="sl"><label for="${k}Vr">변화폭</label><input id="${k}Vr" type="range" min="0" max="1" step="0.01"><output id="${k}VrO"></output></div>
+    <div class="row"><button class="pill" id="${k}Stag">엇갈림 배열</button><button class="pill" id="${k}Seed">랜덤 재배치</button></div>
+  </div>`;
+}
+$('pIn').innerHTML = layerPane('in','안쪽 레이어');
+$('pOut').innerHTML = layerPane('out','바깥 레이어');
 
-    function openApiModal() {
-      apiKeyInput.value = sessionStorage.getItem(SESSION_KEY) || "";
-      apiModal.classList.remove("hidden");
-      setTimeout(function () { apiKeyInput.focus(); }, 50);
-    }
+function bindLayer(k, key){
+  const L = () => state.layers[key];
+  const mr = $(k+'Mat');
+  for (const [id,M] of Object.entries(MATS)){
+    const b = document.createElement('button'); b.className='pill'; b.textContent=M.name; b.dataset.m=id;
+    b.onclick = () => { const l=L(); if(l.mat===id) return; l.mat=id; l.color=M.color; l.t=M.t; l.g=M.g; changed(); };
+    mr.appendChild(b);
+  }
+  const dr = $(k+'Dist');
+  for (const [n,v] of DISTS){
+    const b=document.createElement('button'); b.className='pill'; b.textContent=n; b.dataset.d=v;
+    b.onclick=()=>{L().dist=v; changed();}; dr.appendChild(b);
+  }
+  $(k+'Col').oninput = e => { L().color = e.target.value; changed(); };
+  $(k+'ColR').onclick = () => { L().color = MATS[L().mat].color; changed(); };
+  const sl = (id, prop) => $(k+id).oninput = e => { L()[prop] = +e.target.value; changed(); };
+  sl('T','t'); sl('G','g'); sl('Sz','size'); sl('Pt','pitch'); sl('Vr','vari');
+  $(k+'Perf').onclick = () => { L().perf = !L().perf; changed(); };
+  $(k+'Stag').onclick = () => { L().stag = !L().stag; changed(); };
+  $(k+'Seed').onclick = () => { L().seed = 1 + Math.floor(Math.random()*997); changed(); };
+  $(k+'Vis').onclick = () => { L().vis = !L().vis; changed(); };
+}
+bindLayer('in','inner'); bindLayer('out','outer');
 
-    function closeApiModal() {
-      apiModal.classList.add("hidden");
-    }
+for (const [id,Lt] of Object.entries(LIGHTS)){
+  const b=document.createElement('button'); b.className='pill'; b.dataset.l=id;
+  b.innerHTML=`<span class="dot" style="background:${Lt.css};color:${Lt.css}"></span>${Lt.name}`;
+  b.onclick=()=>{state.light=id; changed();}; $('lightRow').appendChild(b);
+}
+for (const [id,B] of Object.entries(BGS)){
+  const b=document.createElement('button'); b.className='pill'; b.dataset.b=id; b.textContent=B.name;
+  b.onclick=()=>{state.bg=id; globalChanged();}; $('bgRow').appendChild(b);
+}
+const gsl = (id, prop, custom=true) => $(id).oninput = e => { state[prop] = +e.target.value; custom ? changed() : globalChanged(); };
+gsl('sLI','li'); gsl('sBloom','bloom',false); gsl('sGap','gap',false); gsl('sEnvL','envL',false); gsl('sExp','exp',false);
+$('tRot').onclick = () => { state.rot = !state.rot; globalChanged(); };
 
-    function getApiKey() {
-      return sessionStorage.getItem(SESSION_KEY) || "";
-    }
+PRESETS.forEach((p,i)=>{
+  const b=document.createElement('button'); b.className='chip'; b.dataset.i=i;
+  b.textContent = i+1; b.setAttribute('aria-label', `${i+1}단계 · ${p.kw}`);
+  b.onclick=()=>{loadPreset(i); applyScene(); syncUI(); scrollChip();};
+  $('chips').appendChild(b);
+});
+$('prev').onclick=()=>{loadPreset((state.preset+PRESETS.length-1)%PRESETS.length); applyScene(); syncUI(); scrollChip();};
+$('next').onclick=()=>{loadPreset((state.preset+1)%PRESETS.length); applyScene(); syncUI(); scrollChip();};
+$('reset').onclick = () => {
+  if (!confirm('모든 테마의 조정값을 처음 상태로 되돌릴까요?')) return;
+  themeStates = {}; Object.assign(state, DEF_GLOBAL);
+  try { localStorage.removeItem(STORE); } catch(e) {}
+  loadPreset(state.preset); applyScene(); syncUI();
+};
+function scrollChip(){ const c=$('chips').children[state.preset]; c && c.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }
 
-    function requireApiKey() {
-      const key = getApiKey();
-      if (!key) {
-        openApiModal();
-        throw new Error("Gemini API 키를 먼저 연결해 주세요.");
-      }
-      return key;
-    }
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>{x.setAttribute('aria-selected', x===b?'true':'false'); $(x.dataset.p).hidden = x!==b;});
+});
 
-    function sleep(ms) {
-      return new Promise(function (resolve) { setTimeout(resolve, ms); });
-    }
+const fmt = {pct:v=>Math.round(v*100)+'%', mm:v=>(+v).toFixed(1)+' mm', f2:v=>(+v).toFixed(2)};
+function setSl(id, v, out){ const el=$(id); el.value=v; if(out) $(out[0]).textContent=out[1](v); }
+function syncUI(){
+  document.querySelectorAll('#lightRow .pill').forEach(b=>press(b,b.dataset.l===state.light));
+  document.querySelectorAll('#bgRow .pill').forEach(b=>press(b,b.dataset.b===state.bg));
+  document.querySelectorAll('#chips .chip').forEach(b=>{ press(b,+b.dataset.i===state.preset); b.classList.toggle('cust', !!themeStates[b.dataset.i]); });
+  setSl('sLI',state.li,['oLI',v=>v+'%']);
+  setSl('sBloom',state.bloom,['oBloom',fmt.f2]);
+  setSl('sGap',state.gap,['oGap',fmt.mm]);
+  setSl('sEnvL',state.envL,['oEnvL',fmt.f2]);
+  setSl('sExp',state.exp,['oExp',fmt.f2]);
+  press($('tRot'),state.rot);
+  for (const [k,key] of [['in','inner'],['out','outer']]){
+    const L = state.layers[key], M = MATS[L.mat];
+    document.querySelectorAll('#'+k+'Mat .pill').forEach(b=>press(b,b.dataset.m===L.mat));
+    document.querySelectorAll('#'+k+'Dist .pill').forEach(b=>press(b,+b.dataset.d===L.dist));
+    $(k+'Col').value = L.color;
+    $(k+'TLab').textContent = M.tl;
+    const isMetal = L.mat==='metal';
+    $(k+'T').disabled = isMetal; $(k+'TRow').classList.toggle('dis', isMetal);
+    setSl(k+'T', L.t, [k+'TO', v=>isMetal?'불투명':fmt.pct(v)]);
+    setSl(k+'G', L.g, [k+'GO', fmt.pct]);
+    setSl(k+'Sz', L.size, [k+'SzO', fmt.mm]);
+    setSl(k+'Pt', L.pitch, [k+'PtO', fmt.mm]);
+    setSl(k+'Vr', L.vari, [k+'VrO', fmt.pct]);
+    press($(k+'Perf'), L.perf); $(k+'Box').classList.toggle('off', !L.perf);
+    $(k+'Stag').textContent = L.stag ? '엇갈림 배열' : '격자 배열'; press($(k+'Stag'), L.stag);
+    press($(k+'Vis'), L.vis); $(k+'Vis').textContent = L.vis ? '보이기' : '숨김';
+    $(k+'Vr').closest('.sl').classList.toggle('dis', L.dist===0);
+  }
+  updateTexts();
+}
+let lastKw = '';
+function updateTexts(){
+  const li = state.layers.inner, lo = state.layers.outer, P = PRESETS[state.preset];
+  const desc = L => MATS[L.mat].name + (L.perf ? ' 천공' : '');
+  const lightTxt = state.li === 0 ? '빛 없음' : `${LIGHTS[state.light].name} ${state.li}%`;
+  $('hdrSub').textContent = `${lightTxt} · 안 ${desc(li)} · 밖 ${desc(lo)}`;
+  const kw = state.custom ? P.kw + ' · 조정됨' : P.kw;
+  $('gripHint').textContent = state.custom ? '옵션을 직접 바꾼 조합입니다' : P.desc;
+  const el = $('gripName');
+  if (kw !== lastKw){
+    const first = lastKw === ''; lastKw = kw;
+    if (first) el.textContent = kw;
+    else { el.classList.add('swap'); setTimeout(()=>{ el.textContent = kw; el.classList.remove('swap'); }, 160); }
+  }
+}
 
-    function friendlyApiError(error) {
-      const raw = error && error.message ? String(error.message) : String(error || "알 수 없는 오류");
-      if (/API_KEY_INVALID|invalid api key|401|403|key/i.test(raw)) return "API 키가 유효하지 않거나 접근 권한이 없습니다.";
-      if (/429|RESOURCE_EXHAUSTED|quota/i.test(raw)) return "API 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
-      if (/fetch|network|cors/i.test(raw)) return "네트워크 연결 실패 (인터넷 또는 방화벽 문제): " + raw;
-      if (/SAFETY|blocked/i.test(raw)) return "안전 정책으로 생성이 중단되었습니다.";
-      if (/식별자가 변경되었습니다/i.test(raw)) return raw;
-      return "통신 오류: " + raw;
-    }
+/* 시트 접기 */
+const sheet = $('sheet'), grip = $('grip');
+function setCollapsed(c){ sheet.classList.toggle('collapsed', c); grip.setAttribute('aria-expanded', c?'false':'true'); }
+let dragY = null, dragged = false;
+$('handle').addEventListener('pointerdown', e => { if(e.target.closest('.nav')) return; dragY = e.clientY; dragged = false; });
+addEventListener('pointerup', e => { if(dragY===null) return; const dy = e.clientY-dragY; dragY=null;
+  if (dy > 30){ setCollapsed(true); dragged = true; } else if (dy < -30){ setCollapsed(false); dragged = true; } });
+grip.onclick = () => { if(dragged){ dragged=false; return; } setCollapsed(!sheet.classList.contains('collapsed')); };
 
-    async function fetchWithRetry(url, options, retries = 2) {
-      let lastError;
-      for (let attempt = 0; attempt <= retries; attempt += 1) {
-        try {
-          const response = await fetch(url, options);
-          let payload;
-          const text = await response.text();
-          
-          try {
-            payload = text ? JSON.parse(text) : {};
-          } catch (e) {
-            payload = { error: { message: "JSON 파싱 실패 (응답 본문이 올바르지 않음)" } };
-          }
+/* 시점 */
+let camTween = null;
+function goView(pos){ camTween = {from:camera.position.clone(), to:pos, t:0}; }
+const baseDist = () => camera.position.distanceTo(controls.target);
+$('vFront').onclick = () => { const d=baseDist(); goView(new THREE.Vector3(0, .98+d*.12, d)); };
+$('vHigh').onclick  = () => { const d=baseDist(); goView(new THREE.Vector3(d*.45, .98+d*.75, d*.5)); };
+$('vLow').onclick   = () => { const d=baseDist(); goView(new THREE.Vector3(d*.6, .98-d*.1+.2, d*.78)); };
 
-          if (!response.ok) {
-            const message = (payload && payload.error && payload.error.message)
-              ? payload.error.message
-              : "HTTP 오류 " + response.status;
-            const error = new Error(message);
-            error.status = response.status;
-            
-            if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-              throw error; 
-            }
-            lastError = error;
-          } else {
-            return payload; 
-          }
-        } catch (error) {
-          lastError = error;
-          if (error.status && error.status >= 400 && error.status < 500 && error.status !== 429) {
-            throw error; 
-          }
-        }
-        if (attempt < retries) await sleep(1000 * Math.pow(2, attempt));
-      }
-      throw lastError || new Error("API 서버에 연결할 수 없습니다.");
-    }
+/* 레이아웃: 시트에 가려지지 않게 화면 중심 이동 */
+let lastKey = '';
+function layoutView(force){
+  const w = innerWidth, h = innerHeight, wide = w >= 900;
+  const top = sheet.getBoundingClientRect().top;
+  const cover = wide ? 0 : Math.max(0, h - top);
+  const head = document.querySelector('.top').getBoundingClientRect().bottom;
+  const k = `${w}x${h}x${Math.round(cover)}x${Math.round(head)}`;
+  if (k === lastKey && !force) return; lastKey = k;
+  renderer.setSize(w, h, false); composer.setSize(w, h);
+  camera.aspect = w/h;
+  if (wide) camera.setViewOffset(w, h, 210, 0, w, h);
+  else camera.setViewOffset(w, h, 0, (cover - head)*.5, w, h);
+  camera.updateProjectionMatrix();
+}
+function initCamera(){
+  const h = innerHeight, wide = innerWidth >= 900;
+  const cover = wide ? 0 : Math.max(0, h - sheet.getBoundingClientRect().top);
+  const head = document.querySelector('.top').getBoundingClientRect().bottom + 8;
+  const frac = Math.max(.3, (h - cover - head)/h);
+  const aspect = (wide ? innerWidth - 420 : innerWidth) / Math.max(1, h - cover - head);
+  const need = Math.max(2.35, 1.3 / Math.max(.2, aspect));
+  const dist = need / (2*Math.tan(THREE.MathUtils.degToRad(15))) / frac * (wide?1:1);
+  const dir = new THREE.Vector3(.55, .32, 1).normalize();
+  const fitW = 1.3 / (2*Math.tan(THREE.MathUtils.degToRad(15)) * innerWidth/h);   // 가로로 넘치지 않게
+  camera.position.copy(controls.target).addScaledVector(dir, Math.max(fitW, Math.min(11, dist) / 1.3));  // 기존보다 30% 크게
+}
 
-    function outputText(payload) {
-      if (payload.candidates && payload.candidates[0] && payload.candidates[0].content) {
-        return payload.candidates[0].content.parts.map(p => p.text).join("");
-      }
-      return "";
-    }
-
-    function outputImage(payload) {
-      // generateContent 방식의 이미지 응답 처리 (inlineData 파싱)
-      if (payload.candidates && payload.candidates[0] && payload.candidates[0].content) {
-        const parts = payload.candidates[0].content.parts;
-        for (const part of parts) {
-          if (part.inlineData) {
-             const mime = part.inlineData.mimeType || "image/jpeg";
-             return "data:" + mime + ";base64," + part.inlineData.data;
-          }
-        }
-      }
-      
-      // 구형(Predict) 방식 데이터도 혹시 모를 대비책으로 남겨둡니다
-      if (payload.predictions && payload.predictions[0] && payload.predictions[0].bytesBase64Encoded) {
-        return "data:image/jpeg;base64," + payload.predictions[0].bytesBase64Encoded;
-      }
-      throw new Error("이미지 데이터가 응답에 포함되지 않았습니다.");
-    }
-
-    async function callTextModel(prompt, schema) {
-      assertModelLock();
-      const apiKey = requireApiKey();
-      
-      const payload = await fetchWithRetry(
-        `${API_BASE}/models/${MODEL_LOCK.text}:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: "당신은 전문 CMF 디자이너이자 Material Experience Researcher다. 한국어를 주 언어로 사용하고, 감성→지각→물성→구현→검증의 인과관계를 유지한다. 감정어·지각어·물성어를 엄격히 구분하며 현실적으로 제작 가능한 내용만 제안한다. 응답은 지정된 JSON 스키마만 따른다." }]
-            },
-            contents: [{
-              parts: [{ text: prompt }]
-            }],
-            generationConfig: {
-              responseMimeType: "application/json",
-              responseSchema: schema
-            }
-          })
-        },
-        2
-      );
-      
-      let text = outputText(payload);
-      if (!text) throw new Error("텍스트 모델이 빈 응답을 반환했습니다.");
-      
-      text = text.replace(/^```(json)?|```$/gm, '').trim();
-      return JSON.parse(text);
-    }
-
-    async function callImageModel(prompt) {
-      assertModelLock();
-      const apiKey = requireApiKey();
-      
-      // 요청하신 gemini-3.1-flash-image의 generateContent 방식을 적용했습니다
-      const payload = await fetchWithRetry(
-        `${API_BASE}/models/${MODEL_LOCK.image}:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ text: prompt }]
-              }
-            ]
-          })
-        },
-        2
-      );
-      return outputImage(payload);
-    }
-
-    function arraySchema(itemProperties, required) {
-      const geminiProperties = {};
-      for (const key in itemProperties) {
-        geminiProperties[key] = { ...itemProperties[key], type: itemProperties[key].type.toUpperCase() };
-        if (geminiProperties[key].items) {
-          geminiProperties[key].items = { type: geminiProperties[key].items.type.toUpperCase() };
-        }
-      }
-
-      return {
-        type: "OBJECT",
-        properties: {
-          boardTitle: { type: "STRING" },
-          boardSummary: { type: "STRING" },
-          items: {
-            type: "ARRAY",
-            items: {
-              type: "OBJECT",
-              properties: geminiProperties,
-              required: required
-            }
-          }
-        },
-        required: ["boardTitle", "boardSummary", "items"]
-      };
-    }
-
-    function schemaForStage(stage) {
-      if (stage === 1) return arraySchema({
-        title: { type: "string" },
-        description: { type: "string" },
-        cues: { type: "array", items: { type: "string" } },
-        imagePrompt: { type: "string" }
-      }, ["title", "description", "cues", "imagePrompt"]);
-      if (stage === 2) return arraySchema({
-        title: { type: "string" },
-        description: { type: "string" },
-        sourceEmotion: { type: "string" },
-        imagePrompt: { type: "string" }
-      }, ["title", "description", "sourceEmotion", "imagePrompt"]);
-      if (stage === 3) return arraySchema({
-        title: { type: "string" },
-        range: { type: "string" },
-        value: { type: "integer" },
-        description: { type: "string" },
-        sourcePerception: { type: "string" },
-        imagePrompt: { type: "string" }
-      }, ["title", "range", "value", "description", "sourcePerception", "imagePrompt"]);
-      if (stage === 4) return arraySchema({
-        title: { type: "string" },
-        sentence: { type: "string" },
-        cues: { type: "array", items: { type: "string" } },
-        imagePrompt: { type: "string" }
-      }, ["title", "sentence", "cues", "imagePrompt"]);
-      if (stage === 5) return arraySchema({
-        title: { type: "string" },
-        material: { type: "string" },
-        process: { type: "string" },
-        finish: { type: "string" },
-        effect: { type: "string" },
-        linkedProperty: { type: "string" },
-        imagePrompt: { type: "string" }
-      }, ["title", "material", "process", "finish", "effect", "linkedProperty", "imagePrompt"]);
-      return arraySchema({
-        koName: { type: "string" },
-        enName: { type: "string" },
-        material: { type: "string" },
-        process: { type: "string" },
-        finish: { type: "string" },
-        surface: { type: "string" },
-        effect: { type: "string" },
-        hypothesis: { type: "string" },
-        imagePrompt: { type: "string" }
-      }, ["koName", "enName", "material", "process", "finish", "surface", "effect", "hypothesis", "imagePrompt"]);
-    }
-
-    function selectedItems(stage) {
-      const step = state.steps[stage];
-      if (!step || !step.data || !Array.isArray(step.data.items)) return [];
-      if (stage === 6) return step.data.items;
-      return step.data.items.filter(function (_, index) { return (step.selected || []).indexOf(index) >= 0; });
-    }
-
-    function compactItem(item, stage) {
-      if (stage === 1) return item.title + ": " + item.description + " / 단서 " + (item.cues || []).join(", ");
-      if (stage === 2) return item.title + ": " + item.description;
-      if (stage === 3) return item.title + " " + item.range + ": " + item.description;
-      if (stage === 4) return item.title + ": " + item.sentence;
-      if (stage === 5) return item.material + " → " + item.process + " → " + item.finish + " → " + item.effect;
-      return item.koName + "(" + item.enName + "): " + item.material + ", " + item.process + ", " + item.finish;
-    }
-
-    function contextForStage(stage) {
-      const lines = ["입력 감성: " + state.keyword];
-      for (let i = 1; i < stage; i += 1) {
-        const items = selectedItems(i);
-        if (items.length) {
-          lines.push(STAGES[i - 1].ko + " 확정: " + items.map(function (item) { return compactItem(item, i); }).join(" | "));
-        }
-      }
-      return lines.join("\\n");
-    }
-
-    function promptForStage(stage) {
-      const context = contextForStage(stage);
-      if (stage === 1) {
-        return context + "\\n\\n감성을 정확히 3가지 방향으로 해석하라. 각 방향은 2~3문장의 감성 해석과 핵심 물질 단서 3개를 포함한다. 세 방향은 각각 빛·투명도, 표면·촉감, 구조·밀도·리듬의 우선순위가 분명히 달라야 한다. 에너지, 긴장·이완, 안정, 활동성, 시간, 공간, 사회·문화 이미지를 고려한다. imagePrompt는 텍스트가 없는 photorealistic CMF mood reference용 영어 프롬프트다.";
-      }
-      if (stage === 2) {
-        return context + "\\n\\n선택 감성 해석을 제품·공간에서 눈과 손으로 인식되는 정확히 6개의 지각 특성으로 변환하라. 감정어를 쓰지 말고 보인다·느껴진다·인식된다·만져진다의 언어를 사용한다. 시각과 촉각을 함께 포함하고 의미를 반복하지 않는다. sourceEmotion에는 파생 근거를 짧게 쓴다. imagePrompt는 텍스트 없는 실제 소재 현상 이미지용 영어 프롬프트다.";
-      }
-      if (stage === 3) {
-        return context + "\\n\\n선택 지각을 정확히 10개의 검증 가능한 물리·광학·촉각 물성으로 변환하라. Gloss, Roughness, Reflectivity, Transparency, Translucency, Depth, Density, Hardness, Softness, Elasticity, Texture Scale, Uniformity, Layering, Light Diffusion, Color Saturation, Brightness, Metallicity, Warm/Cool Touch 중 적합한 축을 사용한다. range는 Low–High 목표 범위, value는 0~100 정수다. 선택한 모든 지각이 최소 하나의 물성과 연결되어야 한다.";
-      }
-      if (stage === 4) {
-        return context + "\\n\\n확정 감성·지각·물성을 통합한 정확히 3개의 영감 방향을 제안하라. 각 문장은 1~2문장이고 빛, 표면, 깊이, 움직임, 온도, 반사, 투명도, 질감, 밀도, 리듬, 색 변화 중 최소 3개를 포함한다. 광고 문구가 아니라 소재·공정 선택 기준이어야 하며 세 방향의 물성 우선순위를 다르게 한다.";
-      }
-      if (stage === 5) {
-        return context + "\\n\\n선택 영감 방향을 구현할 정확히 10개의 현실적인 Material → Process → Finish → Perceptual Effect 조합을 제안하라. 금속, 유리·투명 소재, 수지, 코팅·필름·직물·엘라스토머를 균형 있게 포함한다. 양산 또는 프로토타입 제작 가능한 공정만 사용하고 linkedProperty에 연결 물성을 쓴다.";
-      }
-      return context + "\\n\\n모든 확정 선택을 바탕으로 서로 다른 물성 가설을 검증하는 정확히 8개의 CMF Sample Chip을 제안하라. 동일 감성 패밀리를 유지하되 광택, 거칠기, 투명도, 반사, 색, 깊이, 촉감 중 하나 이상이 분명히 달라야 한다. 금속 2, 유리·투명 2, 수지 2, 코팅·특수 표면 2개로 구성하며 색만 다른 반복은 금지한다.";
-    }
-
-    function normalizeData(stage, data) {
-      const expected = STAGES[stage - 1].count;
-      data = data && typeof data === "object" ? data : {};
-      data.boardTitle = data.boardTitle || STAGES[stage - 1].ko + " " + STAGES[stage - 1].en;
-      data.boardSummary = data.boardSummary || STAGE_SUBTITLES[stage];
-      data.items = Array.isArray(data.items) ? data.items.slice(0, expected) : [];
-      if (data.items.length !== expected) {
-        throw new Error("모델 응답 항목 수가 " + data.items.length + "개입니다. 필요한 수는 " + expected + "개입니다.");
-      }
-      if (stage === 3) {
-        data.items.forEach(function (item) {
-          item.value = Math.max(0, Math.min(100, Number(item.value) || 50));
-        });
-      }
-      return data;
-    }
-
-    function imagePromptForStage(stage, data) {
-      const count = data.items.length;
-      const layout = stage === 1 || stage === 4 ? "three equal vertical panels in one row"
-        : stage === 2 ? "three columns by two rows"
-        : stage === 3 || stage === 5 ? "two columns by five rows"
-        : "four columns by two rows";
-      const prompts = data.items.map(function (item, index) {
-        return String(index + 1).padStart(2, "0") + " visual: " + (item.imagePrompt || compactItem(item, stage));
-      }).join("\\n");
-      return "Create ONE single 16:9 high-resolution CMF visual contact sheet for a professional industrial design material library. Exactly " + count + " panels arranged as " + layout + ". Each panel must correspond to the following list in order. Photorealistic macro material photography, controlled studio lighting, accurate reflection, refraction, transparency, texture, edge thickness and manufacturing detail. Clean neutral-white background, thin dividers, generous whitespace, restrained premium accent color. ABSOLUTELY NO text, letters, numbers, logos, icons, people, brands or watermarks. The application will overlay accurate Korean text separately.\\n\\n" + prompts;
-    }
-
-    function finalImagePrompt() {
-      return "Create ONE premium 16:9 photorealistic CMF Material Strategy Board background image without any text. Theme: " + state.keyword + ". Use the confirmed direction below. Show a restrained mood reference plus exactly eight distinct macro material sample chips in a clean industrial design research composition. Neutral white/light gray background, precise grid, thin dividers, controlled studio lighting, realistic metal, glass, resin and coating finishes. No letters, numbers, icons, people, logos, brands or watermark.\\n\\n" + contextForStage(7);
-    }
-
-    function renderLoading(stage, phase) {
-      currentView = "stage";
-      stageStatus.innerHTML = "현재 단계: <b>" + stage + "/7</b> | " + escapeHtml(STAGES[stage - 1].ko);
-      renderProgress();
-      const label = phase === "image" ? "이미지 보드를 생성하고 있습니다" : "CMF 논리를 분석하고 있습니다";
-      app.innerHTML =
-        '<section class="surface loading">' +
-          '<div><div class="spinner"></div><h2>' + label + '</h2>' +
-          '<p>현재 단계의 텍스트 구조와 단일 보드 이미지를 순서대로 생성합니다. 선택 상태는 자동 저장됩니다.</p>' +
-          '<div class="loading-steps"><span class="loading-chip ' + (phase === "text" ? "active" : "") + '">1. CMF 분석</span>' +
-          '<span class="loading-chip ' + (phase === "image" ? "active" : "") + '">2. 단일 이미지 보드</span>' +
-          '<span class="loading-chip">3. 선택 인터페이스 합성</span></div></div>' +
-        '</section>';
-    }
-
-    async function generateStage(stage, imageOnly) {
-      if (busy) return;
-      busy = true;
-      try {
-        requireApiKey();
-        let step = state.steps[stage] || { data: null, image: "", selected: [], imageError: "" };
-        if (!imageOnly && stage < 7) {
-          renderLoading(stage, "text");
-          step.data = normalizeData(stage, await callTextModel(promptForStage(stage), schemaForStage(stage)));
-          step.selected = stage === 6 ? step.data.items.map(function (_, index) { return index; }) : [];
-          step.image = "";
-          step.imageError = "";
-          state.steps[stage] = step;
-          state.currentStage = stage;
-          state.maxStage = Math.max(state.maxStage, stage);
-          await saveCurrentProject(false);
-        }
-        renderLoading(stage, "image");
-        try {
-          const imagePrompt = stage === 7 ? finalImagePrompt() : imagePromptForStage(stage, step.data);
-          step.image = await callImageModel(imagePrompt);
-          step.imageError = "";
-        } catch (imageError) {
-          step.imageError = friendlyApiError(imageError);
-          step.image = step.image || "";
-        }
-        state.steps[stage] = step;
-        state.currentStage = stage;
-        state.maxStage = Math.max(state.maxStage, stage);
-        state.updatedAt = new Date().toISOString();
-        await saveCurrentProject(false);
-        renderStage(stage);
-        if (step.imageError) {
-          showToast("보드 구조는 유지되었습니다. 이미지 생성만 다시 시도할 수 있습니다.", "error");
-        }
-      } catch (error) {
-        renderGenerationError(stage, friendlyApiError(error));
-      } finally {
-        busy = false;
-      }
-    }
-
-    function renderGenerationError(stage, message) {
-      state.currentStage = stage;
-      stageStatus.innerHTML = "현재 단계: <b>" + stage + "/7</b> | 생성 복구";
-      renderProgress();
-      app.innerHTML =
-        '<section class="surface"><div class="error-box">' +
-          '<h2>현재 단계 생성이 완료되지 않았습니다</h2>' +
-          '<p>이전 단계의 선택과 프로젝트 상태는 그대로 보존되었습니다. 아래 버튼으로 같은 단계만 다시 실행할 수 있습니다.</p>' +
-          '<div class="error-detail">' + escapeHtml(message) + '</div>' +
-          '<div class="board-actions"><button class="btn" type="button" data-action="api">API 설정</button>' +
-          '<button class="btn btn-primary" type="button" data-action="retry-stage" data-stage="' + stage + '">이 단계 다시 생성</button></div>' +
-        '</div></section>';
-      bindCommonActions();
-    }
-
-    function gridClass(stage) {
-      if (stage === 1 || stage === 4) return "grid-3";
-      if (stage === 2) return "grid-6";
-      if (stage === 3 || stage === 5) return "grid-10";
-      return "grid-8";
-    }
-
-    function gridShape(stage) {
-      if (stage === 1 || stage === 4) return { cols: 3, rows: 1 };
-      if (stage === 2) return { cols: 3, rows: 2 };
-      if (stage === 3 || stage === 5) return { cols: 2, rows: 5 };
-      return { cols: 4, rows: 2 };
-    }
-
-    function mediaStyle(stage, index, image) {
-      if (!image) return "";
-      const shape = gridShape(stage);
-      const col = index % shape.cols;
-      const row = Math.floor(index / shape.cols);
-      const x = shape.cols === 1 ? 0 : col * 100 / (shape.cols - 1);
-      const y = shape.rows === 1 ? 0 : row * 100 / (shape.rows - 1);
-      return "background-image:url('" + image + "');background-size:" + (shape.cols * 100) + "% " + (shape.rows * 100) + "%;background-position:" + x + "% " + y + "%;";
-    }
-
-    function itemTitle(item, stage) {
-      if (stage === 6) return item.koName + " · " + item.enName;
-      return item.title;
-    }
-
-    function itemBody(item, stage) {
-      if (stage === 1) {
-        return '<p>' + escapeHtml(item.description) + '</p><div class="cue-list">' +
-          (item.cues || []).map(function (cue) { return '<span class="cue">' + escapeHtml(cue) + '</span>'; }).join("") + '</div>';
-      }
-      if (stage === 2) {
-        return '<p>' + escapeHtml(item.description) + '</p><ul class="meta-list"><li><b>감성 근거</b> · ' + escapeHtml(item.sourceEmotion) + '</li></ul>';
-      }
-      if (stage === 3) {
-        return '<p>' + escapeHtml(item.description) + '</p><div class="scale"><span>LOW</span><span class="scale-line" style="--value:' + item.value + '%"></span><span>HIGH</span></div>' +
-          '<ul class="meta-list"><li><b>목표</b> · ' + escapeHtml(item.range) + '</li><li><b>연결 지각</b> · ' + escapeHtml(item.sourcePerception) + '</li></ul>';
-      }
-      if (stage === 4) {
-        return '<p>' + escapeHtml(item.sentence) + '</p><div class="cue-list">' +
-          (item.cues || []).map(function (cue) { return '<span class="cue">' + escapeHtml(cue) + '</span>'; }).join("") + '</div>';
-      }
-      if (stage === 5) {
-        return '<ul class="meta-list"><li><b>Material</b> · ' + escapeHtml(item.material) + '</li><li><b>Process</b> · ' + escapeHtml(item.process) +
-          '</li><li><b>Finish</b> · ' + escapeHtml(item.finish) + '</li><li><b>지각 효과</b> · ' + escapeHtml(item.effect) +
-          '</li><li><b>연결 물성</b> · ' + escapeHtml(item.linkedProperty) + '</li></ul>';
-      }
-      return '<ul class="meta-list"><li><b>소재</b> · ' + escapeHtml(item.material) + '</li><li><b>공정</b> · ' + escapeHtml(item.process) +
-        '</li><li><b>마감</b> · ' + escapeHtml(item.finish) + '</li><li><b>표면</b> · ' + escapeHtml(item.surface) +
-        '</li><li><b>지각 효과</b> · ' + escapeHtml(item.effect) + '</li><li><b>검증 가설</b> · ' + escapeHtml(item.hypothesis) + '</li></ul>';
-    }
-
-    function flowHtml(active) {
-      const labels = ["Emotion", "Perception", "Material Properties", "Inspiration", "Material & Process", "CMF Samples"];
-      return labels.map(function (label, index) {
-        const isActive = index + 1 === active;
-        const arrow = index < labels.length - 1 ? '<span class="arrow">→</span>' : "";
-        return (isActive ? "<b>" : "<span>") + label + (isActive ? "</b>" : "</span>") + arrow;
-      }).join("");
-    }
-
-    function selectionInstruction(stage, selectedCount) {
-      if (stage === 6) return "8개 샘플 전체가 최종 샘플 패밀리로 확정됩니다.";
-      const meta = STAGES[stage - 1];
-      if (meta.min === meta.max) return "정확히 " + meta.min + "개 선택 · 현재 " + selectedCount + "개";
-      return "최소 " + meta.min + "개 선택 · 현재 " + selectedCount + "개";
-    }
-
-    function canContinue(stage) {
-      if (stage === 6) return true;
-      const meta = STAGES[stage - 1];
-      const count = (state.steps[stage].selected || []).length;
-      return count >= meta.min && count <= meta.max && (meta.min !== meta.max || count === meta.min);
-    }
-
-    function renderStage(stage) {
-      currentView = "stage";
-      state.currentStage = stage;
-      const step = state.steps[stage];
-      if (!step) {
-        generateStage(stage, false);
-        return;
-      }
-      if (stage === 7) {
-        renderFinalBoard();
-        return;
-      }
-      const meta = STAGES[stage - 1];
-      const selected = step.selected || [];
-      stageStatus.innerHTML = "현재 단계: <b>" + stage + "/7</b> | " + escapeHtml(meta.ko + " " + meta.en);
-      renderProgress();
-      const cards = step.data.items.map(function (item, index) {
-        const isSelected = selected.indexOf(index) >= 0;
-        const disabled = stage === 6 ? ' aria-disabled="true"' : "";
-        return '<button class="choice-card ' + (isSelected ? "selected" : "") + '" type="button" data-choice="' + index + '"' + disabled + '>' +
-          '<div class="card-media" style="' + mediaStyle(stage, index, step.image) + '"><span class="card-num">' + String(index + 1).padStart(2, "0") +
-          '</span><span class="select-mark">' + (stage === 6 ? "확정" : "선택") + '</span></div>' +
-          '<div class="card-body"><h3>' + escapeHtml(itemTitle(item, stage)) + '</h3>' + itemBody(item, stage) + '</div></button>';
-      }).join("");
-      const imageWarning = step.imageError
-        ? '<div class="error-detail">이미지 생성 실패: ' + escapeHtml(step.imageError) + ' 보드의 텍스트와 선택 기능은 유지됩니다.</div>'
-        : "";
-      const nextLabel = stage === 6 ? "최종 CMF 보드 제작" : "선택 확정 후 다음 단계";
-      app.innerHTML =
-        '<section class="surface board-scroll"><article class="image-board" id="activeBoard">' +
-          '<header class="board-head"><div><h2>' + escapeHtml(step.data.boardTitle) + '</h2><p>' + escapeHtml(step.data.boardSummary) +
-          '</p></div><span class="stage-pill">' + stage + "/7 · " + escapeHtml(meta.en) + '</span></header>' +
-          '<div class="board-flow">' + flowHtml(stage) + '</div>' +
-          imageWarning +
-          '<div class="board-grid ' + gridClass(stage) + '">' + cards + '</div>' +
-          '<footer class="board-foot"><div class="selection-note"><b>' + escapeHtml(selectionInstruction(stage, selected.length)) + '</b><br>' +
-          (step.image ? "위 보드는 Gemini 이미지 한 장을 각 카드 위치에 맞춰 합성했습니다." : "이미지 재시도 후에도 현재 선택은 유지됩니다.") + '</div>' +
-          '<div class="board-actions"><button class="btn" type="button" data-action="download">보드 PNG 저장</button>' +
-          (step.imageError ? '<button class="btn btn-soft" type="button" data-action="retry-image" data-stage="' + stage + '">이미지만 다시 생성</button>' : "") +
-          '<button class="btn btn-primary" type="button" data-action="next" data-stage="' + stage + '"' + (canContinue(stage) ? "" : " disabled") + '>' + nextLabel + '</button></div></footer>' +
-        '</article></section>';
-      bindStageActions(stage);
-      saveCurrentProject(false);
-    }
-
-    function renderFinalBoard() {
-      const step = state.steps[7];
-      stageStatus.innerHTML = "현재 단계: <b>7/7</b> | 최종 CMF Material Strategy Board";
-      renderProgress();
-      const emotion = selectedItems(1)[0] || {};
-      const perceptions = selectedItems(2);
-      const properties = selectedItems(3);
-      const inspiration = selectedItems(4)[0] || {};
-      const processes = selectedItems(5);
-      const samples = selectedItems(6);
-      const imageTag = step && step.image
-        ? '<img class="final-hero-image" src="' + step.image + '" alt="생성된 CMF 최종 참조 이미지">'
-        : '<div class="final-hero-image"></div>';
-      const propertyHtml = properties.map(function (item) {
-        return '<li><b>' + escapeHtml(item.title) + '</b><div class="scale"><span>LOW</span><span class="scale-line" style="--value:' + item.value + '%"></span><span>HIGH</span></div></li>';
-      }).join("");
-      const processHtml = processes.map(function (item) {
-        return '<li><b>' + escapeHtml(item.material) + '</b><br>' + escapeHtml(item.process + " → " + item.finish) + '</li>';
-      }).join("");
-      const sampleHtml = samples.map(function (item, index) {
-        return '<div class="sample-mini"><b>' + String(index + 1).padStart(2, "0") + " " + escapeHtml(item.koName) + '</b>' + escapeHtml(item.material + " / " + item.finish) + '</div>';
-      }).join("");
-      const warning = step && step.imageError
-        ? '<div class="error-detail">최종 참조 이미지 생성 실패: ' + escapeHtml(step.imageError) + '</div>'
-        : "";
-      app.innerHTML =
-        '<section class="surface board-scroll"><article class="image-board final-board" id="activeBoard">' +
-          '<header class="board-head"><div><h2>감성 사례 | ' + escapeHtml(state.keyword) + '</h2><p>' + escapeHtml(emotion.description || "선택된 감성을 물질 경험으로 전환한 CMF 전략") +
-          '</p></div><span class="stage-pill">7/7 · Final Strategy</span></header>' +
-          '<div class="board-flow">' + flowHtml(0) + '</div>' + warning +
-          '<div class="strategy-grid">' +
-            '<section class="strategy-column">' + imageTag + '<h3>① 감성 <span>Emotion</span></h3><p><b>' + escapeHtml(emotion.title || state.keyword) + '</b></p><p>' + escapeHtml(emotion.description || "") + '</p></section>' +
-            '<section class="strategy-column"><h3>② 지각 <span>Perception</span></h3><ul>' + perceptions.map(function (item) { return '<li><b>' + escapeHtml(item.title) + '</b><br>' + escapeHtml(item.description) + '</li>'; }).join("") + '</ul></section>' +
-            '<section class="strategy-column"><h3>③ 물성 <span>Material Properties</span></h3><ul>' + propertyHtml + '</ul></section>' +
-            '<section class="strategy-column"><h3>④ 영감의 문장 <span>Inspiration</span></h3><p><b>' + escapeHtml(inspiration.title || "") + '</b></p><p>' + escapeHtml(inspiration.sentence || "") + '</p></section>' +
-            '<section class="strategy-column"><h3>⑤ 소재와 가공기법 <span>Material &amp; Process</span></h3><ul>' + processHtml + '</ul></section>' +
-            '<section class="strategy-column"><h3>⑥ CMF 샘플 <span>CMF Samples</span></h3><div class="sample-mini-grid">' + sampleHtml + '</div></section>' +
-          '</div>' +
-          '<div class="method-bar"><b>감성에서 출발</b> → 어떻게 지각되는가 → 어떤 물성이 필요한가 → 어떻게 구현할 것인가 → 샘플로 검증</div>' +
-          '<footer class="board-foot"><div class="selection-note"><b>Emotion → Perception → Materiality → Implementation → Validation</b><br>확정된 항목만 사용한 최종 CMF 전략 보드입니다.</div>' +
-          '<div class="board-actions"><button class="btn" type="button" data-action="download">보드 PNG 저장</button>' +
-          (step && step.imageError ? '<button class="btn btn-soft" type="button" data-action="retry-image" data-stage="7">이미지만 다시 생성</button>' : "") +
-          '<button class="btn btn-primary" type="button" data-action="home">프로젝트 완료</button></div></footer>' +
-        '</article></section>';
-      bindStageActions(7);
-    }
-
-    function bindStageActions(stage) {
-      document.querySelectorAll("[data-choice]").forEach(function (button) {
-        button.addEventListener("click", function () {
-          if (stage === 6) return;
-          toggleChoice(stage, Number(button.getAttribute("data-choice")));
-        });
-      });
-      bindCommonActions();
-    }
-
-    async function toggleChoice(stage, index) {
-      const step = state.steps[stage];
-      const meta = STAGES[stage - 1];
-      const selected = (step.selected || []).slice();
-      const position = selected.indexOf(index);
-      if (position >= 0) {
-        selected.splice(position, 1);
-      } else {
-        if (meta.max === 1) selected.splice(0, selected.length, index);
-        else if (selected.length >= meta.max) {
-          showToast("이 단계에서는 최대 " + meta.max + "개까지 선택할 수 있습니다.", "error");
-          return;
-        } else selected.push(index);
-      }
-      const hasDownstream = Object.keys(state.steps).some(function (key) { return Number(key) > stage; });
-      if (hasDownstream) {
-        const proceed = window.confirm("이 선택을 바꾸면 이후 단계의 결과가 무효화됩니다. 계속할까요?");
-        if (!proceed) return;
-        Object.keys(state.steps).forEach(function (key) {
-          if (Number(key) > stage) delete state.steps[key];
-        });
-        state.maxStage = stage;
-      }
-      step.selected = selected.sort(function (a, b) { return a - b; });
-      state.updatedAt = new Date().toISOString();
-      await saveCurrentProject(false);
-      renderStage(stage);
-    }
-
-    async function goNext(stage) {
-      if (!canContinue(stage)) {
-        const meta = STAGES[stage - 1];
-        const count = (state.steps[stage].selected || []).length;
-        const need = Math.max(0, meta.min - count);
-        showToast("현재 " + count + "개를 선택했습니다. " + need + "개를 더 선택해 주세요.", "error");
-        return;
-      }
-      const nextStage = stage + 1;
-      if (state.steps[nextStage]) renderStage(nextStage);
-      else await generateStage(nextStage, false);
-    }
-
-    function bindCommonActions() {
-      document.querySelectorAll("[data-action]").forEach(function (button) {
-        button.addEventListener("click", async function () {
-          const action = button.getAttribute("data-action");
-          const stage = Number(button.getAttribute("data-stage") || state.currentStage);
-          if (action === "api") openApiModal();
-          if (action === "retry-stage") await generateStage(stage, false);
-          if (action === "retry-image") await generateStage(stage, true);
-          if (action === "next") await goNext(stage);
-          if (action === "download") await downloadBoard();
-          if (action === "home") renderHome();
-        });
-      });
-    }
-
-    function renderProgress() {
-      progressEl.innerHTML = STAGES.map(function (stage) {
-        const generated = !!state.steps[stage.id];
-        const active = currentView === "stage" && state.currentStage === stage.id;
-        const disabled = !generated || busy;
-        return '<button class="step-tab ' + (active ? "active" : generated ? "done" : "") + '" type="button" data-stage-tab="' + stage.id + '"' + (disabled ? " disabled" : "") + '>' +
-          '<span class="num">' + stage.id + '</span><span><strong>' + escapeHtml(stage.ko) + '</strong>' + escapeHtml(stage.en) + '</span></button>';
-      }).join("");
-      document.querySelectorAll("[data-stage-tab]").forEach(function (button) {
-        button.addEventListener("click", function () { renderStage(Number(button.getAttribute("data-stage-tab"))); });
-      });
-    }
-
-    async function renderHome() {
-      currentView = "home";
-      stageStatus.textContent = "감성 키워드 입력 | 새 프로젝트 또는 저장 프로젝트를 선택하세요";
-      renderProgress();
-      const projects = await listProjects();
-      const cards = projects.length ? projects.map(function (project) {
-        const date = new Date(project.updatedAt || project.createdAt).toLocaleString("ko-KR");
-        return '<article class="project-card"><h4>' + escapeHtml(project.keyword || project.title) + '</h4><p>진행 단계 ' + (project.maxStage || 0) + '/7 · ' + escapeHtml(date) + '</p>' +
-          '<div class="project-actions"><button class="btn btn-soft" type="button" data-load-project="' + escapeHtml(project.id) + '">불러오기</button>' +
-          '<button class="btn btn-danger" type="button" data-delete-project="' + escapeHtml(project.id) + '">삭제</button></div></article>';
-      }).join("") : '<p>저장된 프로젝트가 없습니다.</p>';
-      app.innerHTML =
-        '<section class="surface hero"><div class="hero-copy"><p class="eyebrow">CMF MATERIAL EXPERIENCE WORKFLOW</p>' +
-          '<h2>감성을<br>검증 가능한 물성으로</h2><p class="lead">각 단계마다 Gemini가 단일 이미지 보드를 만들고, 보드에서 선택한 방향만 다음 단계에 반영합니다. 모든 확정 선택은 마지막 CMF Material Strategy Board로 이어집니다.</p>' +
-          '<form class="keyword-form" id="keywordForm"><label for="keywordInput"><b>감성 키워드 입력</b></label>' +
-          '<div class="keyword-row"><input class="input" id="keywordInput" maxlength="120" placeholder="예: 차분하고 미래적이다" required>' +
-          '<button class="btn btn-primary" type="submit">1단계 보드 생성</button></div>' +
-          '<div class="examples">' +
-          ["차분하고 미래적이다","멋지고 세련되다","젊고 활기차고 즐겁다","따뜻하고 편안하다","고급스럽고 신비롭다","부드럽고 여성스럽다","자연스럽고 생명감 있다","투명하고 유동적이다"].map(function (value) {
-            return '<button class="example-chip" type="button" data-example="' + escapeHtml(value) + '">' + escapeHtml(value) + '</button>';
-          }).join("") + '</div></form></div>' +
-          '<div class="hero-visual"><div class="visual-caption"><strong>Emotion → Materiality</strong>이미지 보드 선택을 통해 감성, 지각, 물성, 소재와 공정의 인과관계를 단계별로 좁혀갑니다.</div></div></section>' +
-          '<section class="surface projects"><div class="section-heading"><div><h3>저장 프로젝트</h3><p>이미지와 선택 상태까지 브라우저에 보관됩니다.</p></div></div>' +
-          '<div class="project-grid">' + cards + '</div></section>';
-      document.getElementById("keywordForm").addEventListener("submit", async function (event) {
-        event.preventDefault();
-        const keyword = document.getElementById("keywordInput").value.trim();
-        if (!keyword) return;
-        state = newProject(keyword);
-        state.title = keyword;
-        await saveCurrentProject(false);
-        await generateStage(1, false);
-      });
-      document.querySelectorAll("[data-example]").forEach(function (button) {
-        button.addEventListener("click", function () { document.getElementById("keywordInput").value = button.getAttribute("data-example"); });
-      });
-      document.querySelectorAll("[data-load-project]").forEach(function (button) {
-        button.addEventListener("click", async function () {
-          const loaded = await getProject(button.getAttribute("data-load-project"));
-          if (!loaded) return;
-          state = loaded;
-          if (state.currentStage && state.steps[state.currentStage]) renderStage(state.currentStage);
-          else renderHome();
-        });
-      });
-      document.querySelectorAll("[data-delete-project]").forEach(function (button) {
-        button.addEventListener("click", async function () {
-          if (!window.confirm("이 프로젝트를 삭제할까요? 이 작업은 되돌릴 수 없습니다.")) return;
-          await deleteProject(button.getAttribute("data-delete-project"));
-          renderHome();
-        });
-      });
-    }
-
-    function openDb() {
-      return new Promise(function (resolve, reject) {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = function () {
-          const db = request.result;
-          if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE, { keyPath: "id" });
-        };
-        request.onsuccess = function () { resolve(request.result); };
-        request.onerror = function () { reject(request.error); };
-      });
-    }
-
-    async function saveCurrentProject(notify) {
-      state.updatedAt = new Date().toISOString();
-      const db = await openDb();
-      await new Promise(function (resolve, reject) {
-        const tx = db.transaction(DB_STORE, "readwrite");
-        tx.objectStore(DB_STORE).put(state);
-        tx.oncomplete = resolve;
-        tx.onerror = function () { reject(tx.error); };
-      });
-      db.close();
-      if (notify !== false) showToast("현재 프로젝트를 저장했습니다.", "success");
-    }
-
-    async function listProjects() {
-      const db = await openDb();
-      const projects = await new Promise(function (resolve, reject) {
-        const request = db.transaction(DB_STORE, "readonly").objectStore(DB_STORE).getAll();
-        request.onsuccess = function () { resolve(request.result || []); };
-        request.onerror = function () { reject(request.error); };
-      });
-      db.close();
-      return projects.sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
-    }
-
-    async function getProject(id) {
-      const db = await openDb();
-      const project = await new Promise(function (resolve, reject) {
-        const request = db.transaction(DB_STORE, "readonly").objectStore(DB_STORE).get(id);
-        request.onsuccess = function () { resolve(request.result); };
-        request.onerror = function () { reject(request.error); };
-      });
-      db.close();
-      return project;
-    }
-
-    async function deleteProject(id) {
-      const db = await openDb();
-      await new Promise(function (resolve, reject) {
-        const tx = db.transaction(DB_STORE, "readwrite");
-        tx.objectStore(DB_STORE).delete(id);
-        tx.oncomplete = resolve;
-        tx.onerror = function () { reject(tx.error); };
-      });
-      db.close();
-    }
-
-    async function validateApiKey(key) {
-      assertModelLock();
-      
-      const payload = await fetchWithRetry(
-        `${API_BASE}/models/${MODEL_LOCK.text}:generateContent?key=${key}`,
-        {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "Reply with OK only." }] }]
-          })
-        },
-        0 
-      );
-      if (!outputText(payload)) throw new Error("모델 응답이 없습니다.");
-    }
-
-    async function downloadBoard() {
-      const board = document.getElementById("activeBoard");
-      if (!board) return;
-      showToast("보드 PNG를 준비하고 있습니다.");
-      try {
-        const clone = board.cloneNode(true);
-        clone.querySelectorAll(".board-foot").forEach(function (node) { node.remove(); });
-        clone.style.width = board.scrollWidth + "px";
-        clone.style.minWidth = board.scrollWidth + "px";
-        const css = document.querySelector("style").textContent;
-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + board.scrollWidth + '" height="' + board.scrollHeight + '">' +
-          '<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>' + css + '</style>' +
-          clone.outerHTML + '</div></foreignObject></svg>';
-        const image = new Image();
-        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        await new Promise(function (resolve, reject) {
-          image.onload = resolve;
-          image.onerror = reject;
-          image.src = url;
-        });
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.min(3840, board.scrollWidth * 2);
-        canvas.height = Math.round(canvas.width * board.scrollHeight / board.scrollWidth);
-        const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-        const link = document.createElement("a");
-        link.download = "CMF_" + (state.keyword || "board").replace(/[\\\\/:*?\\"<>|]/g, "_") + "_stage" + state.currentStage + ".png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        showToast("보드 PNG를 저장했습니다.", "success");
-      } catch (error) {
-        showToast("브라우저 보안 제한으로 PNG 변환에 실패했습니다. 인쇄 메뉴에서 PDF로 저장할 수 있습니다.", "error");
-      }
-    }
-
-    document.getElementById("apiBtn").addEventListener("click", openApiModal);
-    document.getElementById("homeBtn").addEventListener("click", renderHome);
-    document.getElementById("saveBtn").addEventListener("click", function () { saveCurrentProject(true); });
-    document.getElementById("closeApiBtn").addEventListener("click", closeApiModal);
-    document.getElementById("clearApiBtn").addEventListener("click", function () {
-      sessionStorage.removeItem(SESSION_KEY);
-      apiKeyInput.value = "";
-      showToast("세션의 API 키를 삭제했습니다.", "success");
-    });
-    
-    document.getElementById("connectApiBtn").addEventListener("click", async function () {
-      const key = apiKeyInput.value.trim();
-      if (!key) {
-        showToast("API 키를 입력해 주세요.", "error");
-        return;
-      }
-      const button = document.getElementById("connectApiBtn");
-      button.disabled = true;
-      button.textContent = "연결 확인 중…";
-      try {
-        await validateApiKey(key);
-        sessionStorage.setItem(SESSION_KEY, key);
-        closeApiModal();
-        showToast("Gemini API 연결을 확인했습니다.", "success");
-      } catch (error) {
-        showToast(friendlyApiError(error), "error");
-      } finally {
-        button.disabled = false;
-        button.textContent = "연결 확인";
-      }
-    });
-    
-    apiModal.addEventListener("click", function (event) {
-      if (event.target === apiModal) closeApiModal();
-    });
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") closeApiModal();
-    });
-
-    window.addEventListener("unhandledrejection", function (event) {
-      showToast(friendlyApiError(event.reason), "error");
-    });
-
-    assertModelLock();
-    renderHome();
-    if (!getApiKey()) setTimeout(openApiModal, 350);
-  </script>
+/* ───────── 루프 ───────── */
+const tmp = new THREE.Vector3();
+function tick(){
+  requestAnimationFrame(tick);
+  layoutView();
+  if (camTween){
+    camTween.t = Math.min(1, camTween.t + .05);
+    const e = 1 - Math.pow(1-camTween.t, 3);
+    camera.position.lerpVectors(camTween.from, camTween.to, e);
+    if (camTween.t >= 1) camTween = null;
+  }
+  controls.update();
+  if (state.view === 'cut'){
+    tmp.subVectors(controls.target, camera.position); tmp.y = 0; tmp.normalize();
+    clipPlane.normal.copy(tmp); clipPlane.constant = 0;
+  }
+  composer.render();
+}
+loadPreset(0); syncUI(); applyScene(); layoutView(true); initCamera(); setCollapsed(true);
+requestAnimationFrame(() => { tick(); setTimeout(()=>$('load').classList.add('done'), 120); });
+</script>
 </body>
 </html>
