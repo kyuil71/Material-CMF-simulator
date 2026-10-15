@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>불릿 라이트 CMF</title>
+<title>불릿 라이트 CMF · PC GPU 최적화</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
@@ -249,11 +249,54 @@ loadPreset(0);
 
 /* ───────── 렌더러 / 씬 ───────── */
 const canvas = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+/* PC 전용 GPU 프로파일: 스마트폰/태블릿은 원본 렌더링을 그대로 유지합니다.
+   PC에서는 장치 DPI와 실제 화면 넓이를 모두 고려해 렌더 타깃의 크기를 한 번 결정합니다.
+   FPS에 따라 해상도를 반복 변경하지 않으므로 후처리 버퍼 재생성에 따른 깜빡임을 피합니다. */
+const mobileRender = (navigator.userAgentData?.mobile === true) ||
+  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const PC_MAX_RENDER_PIXELS = 2400000;
+const initialDPR = Math.min(window.devicePixelRatio || 1, 2);
+const stablePcDPR = Math.max(0.45, Math.min(initialDPR, 1.25,
+  Math.sqrt(PC_MAX_RENDER_PIXELS / Math.max(1, innerWidth * innerHeight))));
+const renderer = new THREE.WebGLRenderer({
+  canvas, antialias:mobileRender, powerPreference:'high-performance',
+  alpha:false, preserveDrawingBuffer:false
+});
+renderer.setPixelRatio(mobileRender ? initialDPR : stablePcDPR);
+// GPU 렌더링이 지원되어도 실제 외장/내장 GPU 선택은 브라우저와 OS의 권한입니다.
+let pcDirty = true;
+let pcNeedsLayout = true;
+let pcShadowSignature = '';
+let pcContextLost = false;
+function invalidatePc(shadows=false){
+  if(mobileRender) return;
+  pcDirty = true;
+  if(shadows) renderer.shadowMap.needsUpdate = true;
+}
+if(!mobileRender){
+  addEventListener('resize', () => {pcNeedsLayout=true; invalidatePc();}, {passive:true});
+  canvas.addEventListener('webglcontextlost', event => {
+    event.preventDefault(); pcContextLost=true;
+    const loading=document.getElementById('load');
+    loading.textContent='GPU 연결을 복구하는 중…'; loading.classList.remove('done');
+  });
+  canvas.addEventListener('webglcontextrestored', () => {
+    pcContextLost=false; invalidatePc(true);
+    document.getElementById('load').classList.add('done');
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden) invalidatePc(true);
+  });
+}
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// PC: 조명과 모델이 그대로라면 그림자 텍스처를 매 프레임 다시 계산하지 않습니다.
+if(!mobileRender) {
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
+}
 renderer.localClippingEnabled = true;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30,1,.05,100);
@@ -266,7 +309,12 @@ controls.target.set(0,.98,0);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), .04).texture;
 
-const rt = new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
+// PC: 화면 전체에 4x MSAA+HalfFloat 버퍼를 중복 적용하는 과도한 VRAM 사용을 줄입니다.
+// 모바일 렌더타깃은 원본(samples:4)을 보존합니다.
+const rt = new THREE.WebGLRenderTarget(1,1,{
+  type:THREE.HalfFloatType, samples:mobileRender ? 4 : 2,
+  depthBuffer:true, stencilBuffer:false
+});
 const composer = new EffectComposer(renderer, rt);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(256,256), .5, .4, 1.1);
@@ -484,10 +532,11 @@ function shadowMat(Base, self, opts){
 
 /* ───────── 형상 ───────── */
 function bulletGeo(R){
-  const pts=[]; const nc=56, nd=72;
+  // PC: 둥근 외형을 유지하면서 셰이더가 처리하는 정점 수를 줄입니다.
+  const pts=[]; const nc=mobileRender?56:44, nd=mobileRender?72:54;
   for(let i=0;i<=nc;i++) pts.push(new THREE.Vector2(R, H*i/nc));
   for(let i=1;i<=nd;i++){const a=i/nd*Math.PI/2; pts.push(new THREE.Vector2(Math.max(R*Math.cos(a),1e-4), H+R*Math.sin(a)));}
-  return new THREE.LatheGeometry(pts, 200);
+  return new THREE.LatheGeometry(pts, mobileRender?200:144);
 }
 
 const LY = {};
@@ -530,14 +579,14 @@ floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
 const pLight = new THREE.PointLight(0xffffff, 1, 0, 2);
 pLight.position.set(0, H*.55, 0);
 pLight.castShadow = true;
-pLight.shadow.mapSize.set(1024,1024);
+pLight.shadow.mapSize.set(mobileRender?1024:512,mobileRender?1024:512);
 pLight.shadow.camera.near = .02; pLight.shadow.camera.far = 4;
 pLight.shadow.bias = -.0008;
 scene.add(pLight);
 
 const key = new THREE.DirectionalLight(0xffffff, 1);
 key.position.set(2.4, 4.2, 2.0);
-key.castShadow = true; key.shadow.mapSize.set(2048,2048);
+key.castShadow = true; key.shadow.mapSize.set(mobileRender?2048:1024,mobileRender?2048:1024);
 Object.assign(key.shadow.camera, {left:-1.6,right:1.6,top:1.6,bottom:-1.6,near:.5,far:10});
 key.shadow.bias = -.0004; key.shadow.normalBias = .01;
 scene.add(key);
@@ -590,14 +639,23 @@ function applyScene(){
     E.uFres.value = P.fres; E.uPremul.value = P.transp?1:0; E.uTrans.value = L.t;
     E.uDiff.value = L.mat==='glass' ? .08 + (1-L.g)*.9 : 1;
     for (const m of ly.mats){
+      // Clearcoat/Sheen은 유무에 따라 GPU 셰이더 프로그램이 달라집니다.
+      // 실제로 효과가 켜지거나 꺼질 때에만 재컴파일합니다.
+      const clearcoatChanged = (m.clearcoat > 0) !== (P.clear > 0);
+      const sheenChanged = (m.sheen > 0) !== (P.sheen > 0);
       m.color.set(L.color);
       m.roughness = P.rough; m.metalness = P.metal;
       m.clearcoat = P.clear; m.clearcoatRoughness = .06;
       m.sheen = P.sheen; m.sheenRoughness = .55; m.sheenColor.set('#ffffff');
       m.ior = 1.5; m.specularIntensity = 1;
       m.envMapIntensity = state.envL*P.env*1.8 + .05;
-      const needs = m.transparent!==P.transp || m.alphaToCoverage===P.transp || ((m.clippingPlanes&&m.clippingPlanes.length)?1:0)!==(cut?1:0);
-      m.transparent = P.transp; m.premultipliedAlpha = P.transp; m.depthWrite = !P.transp; m.alphaToCoverage = !P.transp;
+      // 투명 모드/클리핑/AA 상태가 실제로 바뀔 때만 셰이더를 갱신합니다.
+      // PC에서는 MSAA alpha-to-coverage로 인한 미세 천공 에지 깜빡임을 방지합니다.
+      const targetATC = mobileRender ? !P.transp : false;
+      const needs = m.transparent!==P.transp || m.alphaToCoverage!==targetATC ||
+        Boolean(m.clippingPlanes?.length)!==cut || clearcoatChanged || sheenChanged;
+      m.transparent = P.transp; m.premultipliedAlpha = P.transp;
+      m.depthWrite = !P.transp; m.alphaToCoverage = targetATC;
       m.clippingPlanes = cut ? [clipPlane] : null;
       if (needs) m.needsUpdate = true;
     }
@@ -609,9 +667,26 @@ function applyScene(){
   LY.inner.E.uEnvOcc.value = LY.outer.front.visible ? .08 + .92*phys.outer.T : 1;
   LY.outer.E.oVis.value = LY.inner.front.visible ? 1 : 0;
   G.uGapBlur.value = state.gap*SC*(.15 + phys.outer.rough*1.2);
-  baseMat.clippingPlanes = cut ? [clipPlane] : null; baseMat.needsUpdate = true;
+  if(mobileRender){
+    // 원본 모바일 동작을 유지합니다.
+    baseMat.clippingPlanes = cut ? [clipPlane] : null;
+    baseMat.needsUpdate = true;
+  } else if(Boolean(baseMat.clippingPlanes?.length) !== cut){
+    baseMat.clippingPlanes = cut ? [clipPlane] : null;
+    baseMat.needsUpdate = true;
+  }
   baseMat.envMapIntensity = state.envL*2 + .1; floorMat.envMapIntensity = state.envL;
   controls.autoRotate = state.rot;
+  if(!mobileRender){
+    // 불투명 레이어의 천공이나 형상이 달라졌을 때에만 그림자 맵을 재생성합니다.
+    const shadowKey = JSON.stringify({gap:state.gap,view:state.view,
+      layers:['inner','outer'].map(k=>{
+        const l=state.layers[k];
+        return [l.mat,l.perf,l.size,l.pitch,l.dist,l.vari,l.stag,l.seed,l.vis,l.t];
+      })});
+    invalidatePc(shadowKey!==pcShadowSignature);
+    pcShadowSignature=shadowKey;
+  }
   updateTexts();
 }
 
@@ -761,7 +836,7 @@ grip.onclick = () => { if(dragged){ dragged=false; return; } setCollapsed(!sheet
 
 /* 시점 */
 let camTween = null;
-function goView(pos){ camTween = {from:camera.position.clone(), to:pos, t:0}; }
+function goView(pos){ camTween = {from:camera.position.clone(), to:pos, t:0}; invalidatePc(); }
 const baseDist = () => camera.position.distanceTo(controls.target);
 $('vFront').onclick = () => { const d=baseDist(); goView(new THREE.Vector3(0, .98+d*.12, d)); };
 $('vHigh').onclick  = () => { const d=baseDist(); goView(new THREE.Vector3(d*.45, .98+d*.75, d*.5)); };
@@ -777,6 +852,13 @@ function layoutView(force){
   const k = `${w}x${h}x${Math.round(cover)}x${Math.round(head)}`;
   if (k === lastKey && !force) return; lastKey = k;
   renderer.setSize(w, h, false); composer.setSize(w, h);
+  if(!mobileRender){
+    // 작은 고정 블룸 타깃: 화질 변경 없이 GPU 후처리 부담만 절감.
+    const pw=Math.max(1,Math.round(w*stablePcDPR*.65));
+    const ph=Math.max(1,Math.round(h*stablePcDPR*.65));
+    bloom.setSize(pw,ph);
+    invalidatePc();
+  }
   camera.aspect = w/h;
   if (wide) camera.setViewOffset(w, h, 210, 0, w, h);
   else camera.setViewOffset(w, h, 0, (cover - head)*.5, w, h);
@@ -799,21 +881,28 @@ function initCamera(){
 const tmp = new THREE.Vector3();
 function tick(){
   requestAnimationFrame(tick);
-  layoutView();
+  if(pcContextLost || (!mobileRender && document.hidden)) return;
+  // PC는 브라우저 크기가 실제로 바뀔 때만 DOM 레이아웃을 읽습니다.
+  if(mobileRender || pcNeedsLayout){layoutView(); pcNeedsLayout=false;}
+  let cameraTweening = !!camTween;
   if (camTween){
     camTween.t = Math.min(1, camTween.t + .05);
     const e = 1 - Math.pow(1-camTween.t, 3);
     camera.position.lerpVectors(camTween.from, camTween.to, e);
     if (camTween.t >= 1) camTween = null;
   }
-  controls.update();
+  // OrbitControls는 카메라가 실제로 움직였는지 boolean으로 알려줍니다.
+  const cameraMoved = controls.update();
+  if(!mobileRender && !pcDirty && !cameraMoved && !cameraTweening && !controls.autoRotate) return;
   if (state.view === 'cut'){
     tmp.subVectors(controls.target, camera.position); tmp.y = 0; tmp.normalize();
     clipPlane.normal.copy(tmp); clipPlane.constant = 0;
   }
   composer.render();
+  pcDirty = false;
 }
 loadPreset(0); syncUI(); applyScene(); layoutView(true); initCamera(); setCollapsed(true);
+invalidatePc(true);
 requestAnimationFrame(() => { tick(); setTimeout(()=>$('load').classList.add('done'), 120); });
 </script>
 </body>
