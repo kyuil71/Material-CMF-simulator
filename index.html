@@ -355,15 +355,12 @@ vec3 kQ=vObj;
 float kHgt=0., kRg=0., kAw=1.;
 vec3 kAlb=vec3(1.);
 float kAA=length(fwidth(vObj));
-#if K_MAT==2
-{            /* 메탈: 선반 가공 결 */
+if(uMat>1.5&&uMat<2.5){            /* 메탈: 선반 가공 결 */
   float f=kSP.y*1400.;
   float fade=clamp(1.-fwidth(f)*.6,0.,1.);
   float n=mix(.5,kVN(vec3(f,cos(kSP.x)*4.,sin(kSP.x)*4.)),fade);
   kHgt+=(n-.5)*.00003; kRg+=(n-.5)*.18; kAlb*=1.-.05*n;
-}
-#elif K_MAT==3
-{     /* 나무: 세로 결 + 물관 */
+} else if(uMat>2.5&&uMat<3.5){     /* 나무: 세로 결 + 물관 */
   vec3 w=vec3(kQ.x*7.,kQ.z*7.,kQ.y*.55);
   float g=kFbm(w)*9.+kFbm(w*3.1+4.)*.6;
   float r=fract(g);
@@ -373,18 +370,14 @@ float kAA=length(fwidth(vObj));
   kAlb*=mix(.6,1.08,band)*(.92+.16*kFbm(w*5.))*(1.-.18*pores);
   kHgt+=-.00012*(1.-band)-.00008*pores;
   kRg+=(1.-band)*.12;
-}
-#elif K_MAT==4
-{     /* 대리석: 베인 */
+} else if(uMat>3.5&&uMat<4.5){     /* 대리석: 베인 */
   float t1=kFbm(kQ*2.6+1.3);
   float v1=abs(sin(kQ.x*4.+kQ.z*2.5+kQ.y*3.+t1*7.));
   float v2=abs(sin(kQ.z*9.-kQ.y*5.+kFbm(kQ*6.)*9.));
   float m=max(1.-smoothstep(0.,.16,v1),(1.-smoothstep(0.,.08,v2))*.7);
   kAlb*=mix(vec3(1.),vec3(.34,.33,.32),m)*(.94+.1*kFbm(kQ*14.));
   kRg+=m*.06;
-}
-#elif K_MAT==5
-{               /* 패브릭: 평직 */
+} else if(uMat>4.5){               /* 패브릭: 평직 */
   float wv=.011; float N=floor(KTAU*hR/wv);
   float uu=(kSP.x/KTAU+.5)*N, vv=kSP.y/wv;
   vec2 f=fract(vec2(uu,vv))-.5;
@@ -400,16 +393,11 @@ float kAA=length(fwidth(vObj));
   kHgt+=over*.00018*(1.-aa);
   kAw=mix(1.-uTrans,1.,cv);
 }
-#endif
 diffuseColor.rgb*=kAlb;
 `;
 const GL_ALPHA = /* glsl */`
 #include <alphamap_fragment>
-#if K_HOLES
 vec3 kHS=kHoles(vObj,hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag,kAA*.75+1e-5);
-#else
-vec3 kHS=vec3(0.,1e3,0.);
-#endif
 float kCov=1.-kHS.x;
 diffuseColor.a=uAlpha*kAw*kCov;
 if(kCov<.01) discard;
@@ -436,13 +424,9 @@ const GL_EMIS = /* glsl */`
   float fall=(1.+pow(.5/.3,2.))/(1.+pow(dd/.3,2.));
   float tin=1.;
   if(uIsOuter>.5&&oVis>.5){
-#if K_OHOLES
     vec3 pin=kProj(vObj,hH,oR);
     vec3 HI=kHoles(pin,oR,hH,oOn,oPitch,oSize,oVar,oMode,oSeed,oStag,kAA*.75+uGapBlur+1e-5);
     tin=mix(oT,1.,HI.x);
-#else
-    tin=oT;
-#endif
   }
   vec3 Lc=uLC*uLI*fall*uGlowK;
   totalEmissiveRadiance=Lc*tin*(uScatter*diffuseColor.rgb+kRim*uRimK*mix(vec3(1.),diffuseColor.rgb,.5));
@@ -471,7 +455,6 @@ const extU = isOuter => ({uIsOuter:{value:isOuter?1:0},uMat:{value:0},uAlpha:{va
 
 function makeMat(self, other, ext, side){
   const m = new THREE.MeshPhysicalMaterial({side});
-  m.defines = {K_MAT:0, K_HOLES:0, K_OHOLES:0};
   const otherMap = {oR:other.hR,oOn:other.hOn,oPitch:other.hPitch,oSize:other.hSize,oVar:other.hVar,oMode:other.hMode,oSeed:other.hSeed,oStag:other.hStag};
   m.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, self, G, ext, otherMap);
@@ -490,22 +473,13 @@ function makeMat(self, other, ext, side){
 }
 function shadowMat(Base, self, opts){
   const m = new Base(opts);
-  m.defines = {K_HOLES:0};
-  m.side = THREE.DoubleSide;   // 그림자 패스가 지정하는 면과 같게 두어 미리 컴파일한 프로그램을 재사용
   m.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, self);
     sh.vertexShader = 'varying vec3 vObj;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position;');
     sh.fragmentShader = GL_COMMON + sh.fragmentShader.replace(/void\s+main\s*\(\s*\)\s*\{/,
-      'void main() {\n#if K_HOLES\n if(kHoles(vObj,hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag,.0005).x>.5) discard;\n#endif\n');
+      'void main() {\n if(kHoles(vObj,hR,hH,hOn,hPitch,hSize,hVar,hMode,hSeed,hStag,.0005).x>.5) discard;');
   };
   return m;
-}
-
-/* 셰이더 변형 키: 값이 실제로 바뀔 때만 재컴파일 */
-function setDefs(m, d){
-  let ch = false;
-  for (const k in d) if (m.defines[k] !== d[k]){ m.defines[k] = d[k]; ch = true; }
-  if (ch) m.needsUpdate = true;
 }
 
 /* ───────── 형상 ───────── */
@@ -583,7 +557,10 @@ function layerPhys(L){
   r.T = L.mat==='metal' ? 0 : L.mat==='fabric' ? Math.min(1,.12+t*.8) : Math.min(1,(1-r.alpha)+r.alpha*r.scatter*.75);
   return r;
 }
+let dirty = 60;                       // 남은 '다시 그리기' 프레임 수
+const markDirty = (n=60) => { dirty = Math.max(dirty, n); };
 function applyScene(){
+  markDirty();
   const lc = LIGHTS[state.light].rgb, I = state.li/100;
   G.uLC.value.setRGB(lc[0],lc[1],lc[2]); G.uLI.value = I;
   pLight.color.setRGB(lc[0],lc[1],lc[2]); pLight.intensity = I*1.5;
@@ -629,10 +606,6 @@ function applyScene(){
     }
     const vis = L.vis && !(key==='outer' && state.view==='inner');
     ly.front.visible = ly.back.visible = vis;
-    const oHoles = key==='outer' && state.layers.inner.perf && LY.inner.front.visible ? 1 : 0;
-    for (const m of ly.mats) setDefs(m, {K_MAT:MATS[L.mat].idx, K_HOLES:L.perf?1:0, K_OHOLES:oHoles});
-    setDefs(ly.front.customDepthMaterial, {K_HOLES:L.perf?1:0});
-    setDefs(ly.front.customDistanceMaterial, {K_HOLES:L.perf?1:0});
     ly.front.castShadow = vis && P.cast;
   }
   LY.outer.E.oT.value = phys.inner.T;
@@ -782,7 +755,7 @@ function updateTexts(){
 
 /* 시트 접기 */
 const sheet = $('sheet'), grip = $('grip');
-function setCollapsed(c){ sheet.classList.toggle('collapsed', c); grip.setAttribute('aria-expanded', c?'false':'true'); }
+function setCollapsed(c){ markDirty(); sheet.classList.toggle('collapsed', c); grip.setAttribute('aria-expanded', c?'false':'true'); }
 let dragY = null, dragged = false;
 $('handle').addEventListener('pointerdown', e => { if(e.target.closest('.nav')) return; dragY = e.clientY; dragged = false; });
 addEventListener('pointerup', e => { if(dragY===null) return; const dy = e.clientY-dragY; dragY=null;
@@ -791,7 +764,7 @@ grip.onclick = () => { if(dragged){ dragged=false; return; } setCollapsed(!sheet
 
 /* 시점 */
 let camTween = null;
-function goView(pos){ camTween = {from:camera.position.clone(), to:pos, t:0}; }
+function goView(pos){ camTween = {from:camera.position.clone(), to:pos, t:0}; markDirty(); }
 const baseDist = () => camera.position.distanceTo(controls.target);
 $('vFront').onclick = () => { const d=baseDist(); goView(new THREE.Vector3(0, .98+d*.12, d)); };
 $('vHigh').onclick  = () => { const d=baseDist(); goView(new THREE.Vector3(d*.45, .98+d*.75, d*.5)); };
@@ -805,7 +778,7 @@ function layoutView(force){
   const cover = wide ? 0 : Math.max(0, h - top);
   const head = document.querySelector('.top').getBoundingClientRect().bottom;
   const k = `${w}x${h}x${Math.round(cover)}x${Math.round(head)}`;
-  if (k === lastKey && !force) return; lastKey = k;
+  if (k === lastKey && !force) return; lastKey = k; markDirty();
   renderer.setSize(w, h, false); composer.setSize(w, h);
   camera.aspect = w/h;
   if (wide) camera.setViewOffset(w, h, 210, 0, w, h);
@@ -827,6 +800,7 @@ function initCamera(){
 
 /* ───────── 루프 ───────── */
 const tmp = new THREE.Vector3();
+addEventListener('visibilitychange', () => markDirty());
 function tick(){
   requestAnimationFrame(tick);
   layoutView();
@@ -836,59 +810,64 @@ function tick(){
     camera.position.lerpVectors(camTween.from, camTween.to, e);
     if (camTween.t >= 1) camTween = null;
   }
-  controls.update();
+  const moved = controls.update();
+  if (!moved && !camTween && dirty <= 0) return;   // 변화가 없으면 GPU를 쉬게 함
+  if (dirty > 0) dirty--;
   if (state.view === 'cut'){
     tmp.subVectors(controls.target, camera.position); tmp.y = 0; tmp.normalize();
     clipPlane.normal.copy(tmp); clipPlane.constant = 0;
   }
   composer.render();
 }
-/* ───────── 셰이더 선컴파일 ─────────
-   PC(특히 Windows Chrome)는 WebGL 셰이더를 Direct3D로 변환·컴파일하느라 처음 수십 초 멈출 수 있습니다.
-   1) 첫 화면에 필요한 셰이더만 먼저 컴파일하고 준비가 끝나면 화면을 엽니다.
-   2) 나머지 테마의 셰이더는 백그라운드 컴파일 스레드(KHR_parallel_shader_compile)에서 미리 준비합니다. */
+/* ───────── 셰이더 미리 컴파일 ─────────
+   PC(특히 Windows)는 셰이더 컴파일이 오래 걸려 처음 화면이 멈춘 것처럼 보입니다.
+   실제 재질과 셰이더 코드는 그대로 두고, 화면에 나오지 않는 '연습용 재질'로 같은 셰이더를 미리 만들어 둡니다.
+   three.js는 같은 셰이더를 재질끼리 공유하므로 실제 재질은 미리 만든 셰이더를 그대로 씁니다. */
 const parallelCompile = renderer.extensions.get('KHR_parallel_shader_compile') !== null;
 const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const warmScene = new THREE.Scene();
-const warmMeshes = [];
-for (const k of ['inner','outer']){
-  const f = LY[k].front;
-  for (const sm of [f.customDepthMaterial, f.customDistanceMaterial]){
-    const wm = new THREE.Mesh(f.geometry, sm); warmScene.add(wm); warmMeshes.push([wm, f]);
-  }
-}
-function compileState(){
+function compileSceneFor(sc, target){
   const prev = renderer.getRenderTarget();
-  renderer.setRenderTarget(composer.readBuffer);       // 실제 렌더와 같은 출력 설정으로 컴파일
-  for (const [wm, f] of warmMeshes){ wm.geometry = f.geometry; wm.matrixWorld.copy(f.matrixWorld); }
-  const mats = [...renderer.compile(scene, camera), ...renderer.compile(warmScene, camera, scene)];
+  renderer.setRenderTarget(composer.readBuffer);      // 실제 렌더(후처리 버퍼)와 같은 조건으로 컴파일
+  const mats = renderer.compile(sc, camera, target);
   renderer.setRenderTarget(prev);
-  return mats.map(m => renderer.properties.get(m).currentProgram).filter(Boolean);
+  return [...mats].map(m => renderer.properties.get(m).currentProgram).filter(Boolean);
 }
 function waitReady(progs){
   return new Promise(res => { const chk = () => progs.every(p => p.isReady()) ? res() : setTimeout(chk, 16); chk(); });
 }
 async function warmThemes(){
-  for (let i = 0; i < PRESETS.length; i++){
-    await new Promise(r => setTimeout(r, 40));
-    const src = themeStates[i] || PRESETS[i];
-    const snap = {light:state.light, li:state.li, inner:state.layers.inner, outer:state.layers.outer};
-    state.light = src.light; state.li = src.li;
-    state.layers.inner = structuredClone(src.inner); state.layers.outer = structuredClone(src.outer);
-    applyScene();
-    const progs = compileState();                       // 컴파일 요청만 보내고 바로 복귀
-    state.light = snap.light; state.li = snap.li; state.layers.inner = snap.inner; state.layers.outer = snap.outer;
-    applyScene();
-    await waitReady(progs);
+  const warmScene = new THREE.Scene();
+  const seen = new Set();
+  for (const p of PRESETS){
+    for (const [key, isOuter, U, other] of [['inner',false,U_in,U_out],['outer',true,U_out,U_in]]){
+      const L = p[key], P = layerPhys(L);
+      for (const side of [THREE.FrontSide, THREE.BackSide]){
+        const sig = [isOuter, side, P.clear>0, P.sheen>0, P.transp].join('|');
+        if (seen.has(sig)) continue; seen.add(sig);
+        const m = makeMat(holeU(U.hR.value), holeU(other.hR.value), extU(isOuter), side);
+        m.clearcoat = P.clear; m.sheen = P.sheen;
+        m.transparent = P.transp; m.premultipliedAlpha = P.transp; m.depthWrite = !P.transp; m.alphaToCoverage = !P.transp;
+        const mesh = new THREE.Mesh(LY[key].front.geometry, m);
+        mesh.receiveShadow = true; mesh.visible = false;
+        warmScene.add(mesh);
+      }
+    }
+  }
+  // 한 번에 하나씩 요청해서 화면 조작을 방해하지 않게 함
+  for (const mesh of [...warmScene.children]){
+    await new Promise(r => setTimeout(r, 30));
+    const one = new THREE.Scene(); one.add(mesh);
+    await waitReady(compileSceneFor(one, scene));
   }
 }
 
 loadPreset(0); syncUI(); applyScene(); layoutView(true); initCamera(); setCollapsed(true);
 (async () => {
-  try { await waitReady(compileState()); } catch(e) { console.warn(e); }
+  // 첫 화면의 셰이더가 준비된 뒤에 화면을 엽니다.
+  try { await waitReady(compileSceneFor(scene, null)); } catch(e) { console.warn(e); }
   requestAnimationFrame(() => {
     tick(); setTimeout(()=>$('load').classList.add('done'), 120);
-    if (parallelCompile || !isMobile) setTimeout(() => warmThemes().catch(e => console.warn(e)), 400);
+    if (parallelCompile || !isMobile) setTimeout(() => warmThemes().catch(e => console.warn(e)), 500);
   });
 })();
 </script>
